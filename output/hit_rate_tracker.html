@@ -16,6 +16,10 @@
     --text:     #e2e8f0;
     --muted:    #94a3b8;
     --accent:   #4ade80;
+    --green:    #4ade80;
+    --red:      #f87171;
+    --yellow:   #facc15;
+    --blue:     #60a5fa;
   }
 
   body {
@@ -26,24 +30,29 @@
     line-height: 1.5;
     padding: 24px 20px 48px;
     min-height: 100vh;
+    max-width: 1440px;
+    margin: 0 auto;
   }
 
   .header {
     display: flex;
     align-items: baseline;
     gap: 16px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
     padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
-  .header-title { font-size: 1.4em; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+  .header-title { font-size: 1.5em; font-weight: 700; letter-spacing: 0.04em; }
   .header-sub   { color: var(--muted); font-size: 0.85em; }
 
+  .date-range { color: var(--muted); font-size: 0.82em; margin-bottom: 20px; padding-top: 8px; }
+
+  /* ---- Top-level summary cards ---- */
   .summary-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
   .stat-card {
     background: var(--surface);
@@ -51,14 +60,84 @@
     border-radius: 10px;
     padding: 16px 18px;
   }
-  .stat-label { color: var(--muted); font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .stat-value { font-size: 1.6em; font-weight: 700; color: var(--text); }
-  .stat-sub   { color: var(--muted); font-size: 0.75em; margin-top: 2px; }
+  .stat-label { color: var(--muted); font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.5em; font-weight: 700; }
+  .stat-sub   { color: var(--muted); font-size: 0.72em; margin-top: 3px; }
+  .stat-value.green  { color: var(--green); }
+  .stat-value.red    { color: var(--red); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-value.blue   { color: var(--blue); }
+  .stat-value.neutral { color: var(--text); }
 
-  .charts-grid {
+  /* ---- Market sections ---- */
+  .market-section {
+    margin-bottom: 36px;
+  }
+  .market-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .market-title { font-size: 1.15em; font-weight: 700; }
+  .market-subtitle { color: var(--muted); font-size: 0.8em; }
+
+  /* ---- Tier breakdown table ---- */
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 0.88em;
+  }
+  .tier-table th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .tier-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(46,51,71,0.5);
+  }
+  .tier-table tr:last-child td { border-bottom: none; }
+  .tier-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .tier-name { font-weight: 600; }
+  .tier-rate { font-weight: 700; font-size: 1.05em; }
+  .tier-rate.above { color: var(--green); }
+  .tier-rate.below { color: var(--red); }
+  .tier-rate.neutral { color: var(--yellow); }
+  .bar-bg {
+    width: 100%;
+    max-width: 140px;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  /* ---- Chart cards (same as before, improved) ---- */
+  .chart-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-    gap: 20px;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+    align-items: start;
   }
   .chart-card {
     background: var(--surface);
@@ -67,23 +146,23 @@
     padding: 20px 20px 16px;
     overflow: hidden;
   }
-  .chart-title { font-size: 1em; font-weight: 700; margin-bottom: 2px; }
-  .chart-sub   { color: var(--muted); font-size: 0.78em; margin-bottom: 14px; }
+  .chart-card.full-width { grid-column: 1 / -1; }
 
   .legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 18px;
-    margin-bottom: 14px;
+    gap: 8px 16px;
+    margin-bottom: 12px;
   }
-  .legend-item  { display: flex; align-items: center; gap: 6px; font-size: 0.8em; }
-  .legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-item  { display: flex; align-items: center; gap: 5px; font-size: 0.78em; }
+  .legend-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .legend-label { color: var(--muted); }
-  .legend-n     { color: var(--muted); font-size: 0.9em; }
+  .legend-n     { color: var(--muted); font-size: 0.85em; }
 
   .chart-svg { display: block; width: 100%; overflow: visible; }
   .chart-svg text { font-family: inherit; }
 
+  /* ---- Tooltip ---- */
   #tooltip {
     position: fixed;
     pointer-events: none;
@@ -108,20 +187,24 @@
   .no-data-sub   { font-size: 0.9em; line-height: 1.7; }
   code { background: var(--surface2); padding: 1px 6px; border-radius: 4px; font-size: 0.95em; }
 
+  @media (max-width: 900px) {
+    .summary-row { grid-template-columns: repeat(2, 1fr); }
+    .chart-section { grid-template-columns: 1fr; }
+  }
   @media (max-width: 600px) {
-    .charts-grid { grid-template-columns: 1fr; }
+    .summary-row { grid-template-columns: 1fr; }
   }
 
 </style>
 </head>
 <body>
 <div class="header"><span class="header-title">NRFI / F5 Hit Rate Tracker</span><span class="header-sub">Cumulative accuracy over time · pushes = losses</span></div>
-<div class="summary-row"><div class="stat-card"><div class="stat-label">Resolved Games</div><div class="stat-value">94</div><div class="stat-sub">2026-04-06 → 2026-04-12</div></div><div class="stat-card"><div class="stat-label">NRFI Hit Rate</div><div class="stat-value">51.1%</div><div class="stat-sub">94 graded predictions</div></div><div class="stat-card"><div class="stat-label">Days of Data</div><div class="stat-value">7</div><div class="stat-sub">game-days resolved</div></div><div class="stat-card"><div class="stat-label">Break-Even</div><div class="stat-value">52.4%</div><div class="stat-sub">for -110 lines</div></div></div>
+<div class="summary-row"><div class="stat-card"><div class="stat-label">Resolved Games</div><div class="stat-value">94</div><div class="stat-sub">2026-04-06 → 2026-04-12</div></div><div class="stat-card"><div class="stat-label">NRFI Hit Rate</div><div class="stat-value">—</div><div class="stat-sub">0 graded predictions</div></div><div class="stat-card"><div class="stat-label">Days of Data</div><div class="stat-value">7</div><div class="stat-sub">game-days resolved</div></div><div class="stat-card"><div class="stat-label">Break-Even</div><div class="stat-value">52.4%</div><div class="stat-sub">for -110 lines</div></div></div>
 <div class="charts-grid" id="chartsGrid"></div>
 <div id="tooltip"></div>
 <script>
-const CHARTS_DATA = {"nrfi": {"LEAN": [{"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-11", "day_hits": 0, "day_n": 1, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}], "TOSS-UP": [{"date": "2026-04-06", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-07", "day_hits": 1, "day_n": 2, "cum_hits": 2, "cum_n": 3, "cum_rate": 66.7}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 4, "cum_rate": 75.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 2, "cum_hits": 4, "cum_n": 6, "cum_rate": 66.7}, {"date": "2026-04-12", "day_hits": 1, "day_n": 1, "cum_hits": 5, "cum_n": 7, "cum_rate": 71.4}], "FADE": [{"date": "2026-04-06", "day_hits": 6, "day_n": 12, "cum_hits": 6, "cum_n": 12, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 9, "day_n": 13, "cum_hits": 15, "cum_n": 25, "cum_rate": 60.0}, {"date": "2026-04-08", "day_hits": 7, "day_n": 15, "cum_hits": 22, "cum_n": 40, "cum_rate": 55.0}, {"date": "2026-04-09", "day_hits": 4, "day_n": 6, "cum_hits": 26, "cum_n": 46, "cum_rate": 56.5}, {"date": "2026-04-10", "day_hits": 8, "day_n": 13, "cum_hits": 34, "cum_n": 59, "cum_rate": 57.6}, {"date": "2026-04-11", "day_hits": 4, "day_n": 12, "cum_hits": 38, "cum_n": 71, "cum_rate": 53.5}, {"date": "2026-04-12", "day_hits": 4, "day_n": 14, "cum_hits": 42, "cum_n": 85, "cum_rate": 49.4}]}, "f5_ml": {"STRONG": [{"date": "2026-04-06", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 1, "cum_rate": 0.0}, {"date": "2026-04-08", "day_hits": 0, "day_n": 2, "cum_hits": 0, "cum_n": 3, "cum_rate": 0.0}, {"date": "2026-04-09", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 4, "cum_rate": 0.0}, {"date": "2026-04-11", "day_hits": 0, "day_n": 2, "cum_hits": 0, "cum_n": 6, "cum_rate": 0.0}], "MODERATE": [{"date": "2026-04-06", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 1, "cum_rate": 0.0}, {"date": "2026-04-08", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 2, "cum_rate": 0.0}, {"date": "2026-04-09", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 3, "cum_rate": 0.0}], "LEAN": [{"date": "2026-04-06", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 1, "cum_rate": 0.0}, {"date": "2026-04-08", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 2, "cum_rate": 0.0}, {"date": "2026-04-10", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 3, "cum_rate": 0.0}]}, "f5_spread": {}, "f5_total": {"STRONG OVER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 2, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 1, "cum_hits": 1, "cum_n": 3, "cum_rate": 33.3}, {"date": "2026-04-08", "day_hits": 1, "day_n": 1, "cum_hits": 2, "cum_n": 4, "cum_rate": 50.0}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 5, "cum_rate": 60.0}, {"date": "2026-04-11", "day_hits": 4, "day_n": 4, "cum_hits": 7, "cum_n": 9, "cum_rate": 77.8}, {"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 8, "cum_n": 11, "cum_rate": 72.7}], "LEAN OVER": [{"date": "2026-04-06", "day_hits": 2, "day_n": 4, "cum_hits": 2, "cum_n": 4, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 3, "cum_hits": 2, "cum_n": 7, "cum_rate": 28.6}, {"date": "2026-04-08", "day_hits": 3, "day_n": 5, "cum_hits": 5, "cum_n": 12, "cum_rate": 41.7}, {"date": "2026-04-10", "day_hits": 2, "day_n": 3, "cum_hits": 7, "cum_n": 15, "cum_rate": 46.7}, {"date": "2026-04-11", "day_hits": 2, "day_n": 3, "cum_hits": 9, "cum_n": 18, "cum_rate": 50.0}, {"date": "2026-04-12", "day_hits": 4, "day_n": 5, "cum_hits": 13, "cum_n": 23, "cum_rate": 56.5}], "STRONG UNDER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-07", "day_hits": 1, "day_n": 1, "cum_hits": 2, "cum_n": 2, "cum_rate": 100.0}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 3, "cum_rate": 100.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 1, "cum_hits": 4, "cum_n": 4, "cum_rate": 100.0}, {"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 5, "cum_n": 6, "cum_rate": 83.3}], "LEAN UNDER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 3, "cum_hits": 1, "cum_n": 3, "cum_rate": 33.3}, {"date": "2026-04-07", "day_hits": 3, "day_n": 3, "cum_hits": 4, "cum_n": 6, "cum_rate": 66.7}, {"date": "2026-04-08", "day_hits": 1, "day_n": 2, "cum_hits": 5, "cum_n": 8, "cum_rate": 62.5}, {"date": "2026-04-09", "day_hits": 3, "day_n": 3, "cum_hits": 8, "cum_n": 11, "cum_rate": 72.7}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 9, "cum_n": 12, "cum_rate": 75.0}, {"date": "2026-04-11", "day_hits": 2, "day_n": 3, "cum_hits": 11, "cum_n": 15, "cum_rate": 73.3}, {"date": "2026-04-12", "day_hits": 2, "day_n": 2, "cum_hits": 13, "cum_n": 17, "cum_rate": 76.5}]}};
-const MARKET_CONFIGS = [{"key": "nrfi", "title": "NRFI Hit Rate", "subtitle": "No Run First Inning \u2014 by confidence tier", "tiers": [{"key": "LEAN", "label": "Lean", "color": "#facc15"}, {"key": "TOSS-UP", "label": "Toss-Up", "color": "#94a3b8"}, {"key": "FADE", "label": "Fade", "color": "#f87171"}]}, {"key": "f5_ml", "title": "F5 Moneyline Hit Rate", "subtitle": "First 5 innings ML \u2014 by confidence tier (ties = loss)", "tiers": [{"key": "STRONG", "label": "Strong", "color": "#4ade80"}, {"key": "MODERATE", "label": "Moderate", "color": "#60a5fa"}, {"key": "LEAN", "label": "Lean", "color": "#facc15"}]}, {"key": "f5_spread", "title": "F5 Spread Hit Rate", "subtitle": "First 5 innings spread \u2014 by confidence (pushes = loss)", "tiers": []}, {"key": "f5_total", "title": "F5 Total Hit Rate", "subtitle": "First 5 innings total \u2014 by lean & confidence (pushes = loss)", "tiers": [{"key": "STRONG OVER", "label": "Strong Over", "color": "#4ade80"}, {"key": "LEAN OVER", "label": "Lean Over", "color": "#86efac"}, {"key": "STRONG UNDER", "label": "Strong Under", "color": "#818cf8"}, {"key": "LEAN UNDER", "label": "Lean Under", "color": "#a5b4fc"}]}];
+const CHARTS_DATA = {"nrfi": {"LEAN": [{"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-11", "day_hits": 0, "day_n": 1, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}], "TOSS-UP": [{"date": "2026-04-06", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-07", "day_hits": 1, "day_n": 2, "cum_hits": 2, "cum_n": 3, "cum_rate": 66.7}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 4, "cum_rate": 75.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 2, "cum_hits": 4, "cum_n": 6, "cum_rate": 66.7}, {"date": "2026-04-12", "day_hits": 1, "day_n": 1, "cum_hits": 5, "cum_n": 7, "cum_rate": 71.4}], "FADE": [{"date": "2026-04-06", "day_hits": 6, "day_n": 12, "cum_hits": 6, "cum_n": 12, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 9, "day_n": 13, "cum_hits": 15, "cum_n": 25, "cum_rate": 60.0}, {"date": "2026-04-08", "day_hits": 7, "day_n": 15, "cum_hits": 22, "cum_n": 40, "cum_rate": 55.0}, {"date": "2026-04-09", "day_hits": 4, "day_n": 6, "cum_hits": 26, "cum_n": 46, "cum_rate": 56.5}, {"date": "2026-04-10", "day_hits": 8, "day_n": 13, "cum_hits": 34, "cum_n": 59, "cum_rate": 57.6}, {"date": "2026-04-11", "day_hits": 4, "day_n": 12, "cum_hits": 38, "cum_n": 71, "cum_rate": 53.5}, {"date": "2026-04-12", "day_hits": 4, "day_n": 14, "cum_hits": 42, "cum_n": 85, "cum_rate": 49.4}]}, "f5_ml": {"STRONG": [{"date": "2026-04-06", "day_hits": 0, "day_n": 4, "cum_hits": 0, "cum_n": 4, "cum_rate": 0.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 2, "cum_hits": 0, "cum_n": 6, "cum_rate": 0.0}, {"date": "2026-04-08", "day_hits": 2, "day_n": 4, "cum_hits": 2, "cum_n": 10, "cum_rate": 20.0}, {"date": "2026-04-09", "day_hits": 0, "day_n": 1, "cum_hits": 2, "cum_n": 11, "cum_rate": 18.2}, {"date": "2026-04-10", "day_hits": 2, "day_n": 4, "cum_hits": 4, "cum_n": 15, "cum_rate": 26.7}, {"date": "2026-04-11", "day_hits": 2, "day_n": 4, "cum_hits": 6, "cum_n": 19, "cum_rate": 31.6}, {"date": "2026-04-12", "day_hits": 6, "day_n": 8, "cum_hits": 12, "cum_n": 27, "cum_rate": 44.4}], "MODERATE": [{"date": "2026-04-06", "day_hits": 1, "day_n": 6, "cum_hits": 1, "cum_n": 6, "cum_rate": 16.7}, {"date": "2026-04-07", "day_hits": 2, "day_n": 4, "cum_hits": 3, "cum_n": 10, "cum_rate": 30.0}, {"date": "2026-04-08", "day_hits": 2, "day_n": 3, "cum_hits": 5, "cum_n": 13, "cum_rate": 38.5}, {"date": "2026-04-09", "day_hits": 1, "day_n": 2, "cum_hits": 6, "cum_n": 15, "cum_rate": 40.0}, {"date": "2026-04-10", "day_hits": 1, "day_n": 2, "cum_hits": 7, "cum_n": 17, "cum_rate": 41.2}, {"date": "2026-04-11", "day_hits": 0, "day_n": 1, "cum_hits": 7, "cum_n": 18, "cum_rate": 38.9}, {"date": "2026-04-12", "day_hits": 2, "day_n": 5, "cum_hits": 9, "cum_n": 23, "cum_rate": 39.1}], "LEAN": [{"date": "2026-04-06", "day_hits": 1, "day_n": 3, "cum_hits": 1, "cum_n": 3, "cum_rate": 33.3}, {"date": "2026-04-07", "day_hits": 1, "day_n": 2, "cum_hits": 2, "cum_n": 5, "cum_rate": 40.0}, {"date": "2026-04-08", "day_hits": 2, "day_n": 7, "cum_hits": 4, "cum_n": 12, "cum_rate": 33.3}, {"date": "2026-04-09", "day_hits": 1, "day_n": 2, "cum_hits": 5, "cum_n": 14, "cum_rate": 35.7}, {"date": "2026-04-10", "day_hits": 5, "day_n": 7, "cum_hits": 10, "cum_n": 21, "cum_rate": 47.6}, {"date": "2026-04-11", "day_hits": 1, "day_n": 4, "cum_hits": 11, "cum_n": 25, "cum_rate": 44.0}, {"date": "2026-04-12", "day_hits": 1, "day_n": 1, "cum_hits": 12, "cum_n": 26, "cum_rate": 46.2}]}, "f5_spread": {"STRONG": [{"date": "2026-04-06", "day_hits": 0, "day_n": 2, "cum_hits": 0, "cum_n": 2, "cum_rate": 0.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 2, "cum_hits": 0, "cum_n": 4, "cum_rate": 0.0}, {"date": "2026-04-08", "day_hits": 2, "day_n": 4, "cum_hits": 2, "cum_n": 8, "cum_rate": 25.0}, {"date": "2026-04-09", "day_hits": 0, "day_n": 1, "cum_hits": 2, "cum_n": 9, "cum_rate": 22.2}, {"date": "2026-04-10", "day_hits": 1, "day_n": 3, "cum_hits": 3, "cum_n": 12, "cum_rate": 25.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 3, "cum_hits": 4, "cum_n": 15, "cum_rate": 26.7}, {"date": "2026-04-12", "day_hits": 4, "day_n": 8, "cum_hits": 8, "cum_n": 23, "cum_rate": 34.8}], "LEAN": [{"date": "2026-04-06", "day_hits": 0, "day_n": 4, "cum_hits": 0, "cum_n": 4, "cum_rate": 0.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 5, "cum_rate": 0.0}, {"date": "2026-04-09", "day_hits": 0, "day_n": 1, "cum_hits": 0, "cum_n": 6, "cum_rate": 0.0}, {"date": "2026-04-10", "day_hits": 0, "day_n": 3, "cum_hits": 0, "cum_n": 9, "cum_rate": 0.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 10, "cum_rate": 10.0}, {"date": "2026-04-12", "day_hits": 1, "day_n": 3, "cum_hits": 2, "cum_n": 13, "cum_rate": 15.4}], "SLIGHT": [{"date": "2026-04-06", "day_hits": 2, "day_n": 6, "cum_hits": 2, "cum_n": 6, "cum_rate": 33.3}, {"date": "2026-04-07", "day_hits": 3, "day_n": 4, "cum_hits": 5, "cum_n": 10, "cum_rate": 50.0}, {"date": "2026-04-08", "day_hits": 4, "day_n": 8, "cum_hits": 9, "cum_n": 18, "cum_rate": 50.0}, {"date": "2026-04-09", "day_hits": 2, "day_n": 2, "cum_hits": 11, "cum_n": 20, "cum_rate": 55.0}, {"date": "2026-04-10", "day_hits": 0, "day_n": 2, "cum_hits": 11, "cum_n": 22, "cum_rate": 50.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 3, "cum_hits": 12, "cum_n": 25, "cum_rate": 48.0}, {"date": "2026-04-12", "day_hits": 2, "day_n": 3, "cum_hits": 14, "cum_n": 28, "cum_rate": 50.0}]}, "f5_total": {"STRONG OVER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 2, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 1, "cum_hits": 1, "cum_n": 3, "cum_rate": 33.3}, {"date": "2026-04-08", "day_hits": 1, "day_n": 1, "cum_hits": 2, "cum_n": 4, "cum_rate": 50.0}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 5, "cum_rate": 60.0}, {"date": "2026-04-11", "day_hits": 4, "day_n": 4, "cum_hits": 7, "cum_n": 9, "cum_rate": 77.8}, {"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 8, "cum_n": 11, "cum_rate": 72.7}], "LEAN OVER": [{"date": "2026-04-06", "day_hits": 2, "day_n": 4, "cum_hits": 2, "cum_n": 4, "cum_rate": 50.0}, {"date": "2026-04-07", "day_hits": 0, "day_n": 3, "cum_hits": 2, "cum_n": 7, "cum_rate": 28.6}, {"date": "2026-04-08", "day_hits": 3, "day_n": 5, "cum_hits": 5, "cum_n": 12, "cum_rate": 41.7}, {"date": "2026-04-10", "day_hits": 2, "day_n": 3, "cum_hits": 7, "cum_n": 15, "cum_rate": 46.7}, {"date": "2026-04-11", "day_hits": 2, "day_n": 3, "cum_hits": 9, "cum_n": 18, "cum_rate": 50.0}, {"date": "2026-04-12", "day_hits": 4, "day_n": 5, "cum_hits": 13, "cum_n": 23, "cum_rate": 56.5}], "STRONG UNDER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 1, "cum_hits": 1, "cum_n": 1, "cum_rate": 100.0}, {"date": "2026-04-07", "day_hits": 1, "day_n": 1, "cum_hits": 2, "cum_n": 2, "cum_rate": 100.0}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 3, "cum_rate": 100.0}, {"date": "2026-04-11", "day_hits": 1, "day_n": 1, "cum_hits": 4, "cum_n": 4, "cum_rate": 100.0}, {"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 5, "cum_n": 6, "cum_rate": 83.3}], "LEAN UNDER": [{"date": "2026-04-06", "day_hits": 1, "day_n": 3, "cum_hits": 1, "cum_n": 3, "cum_rate": 33.3}, {"date": "2026-04-07", "day_hits": 3, "day_n": 3, "cum_hits": 4, "cum_n": 6, "cum_rate": 66.7}, {"date": "2026-04-08", "day_hits": 1, "day_n": 2, "cum_hits": 5, "cum_n": 8, "cum_rate": 62.5}, {"date": "2026-04-09", "day_hits": 3, "day_n": 3, "cum_hits": 8, "cum_n": 11, "cum_rate": 72.7}, {"date": "2026-04-10", "day_hits": 1, "day_n": 1, "cum_hits": 9, "cum_n": 12, "cum_rate": 75.0}, {"date": "2026-04-11", "day_hits": 2, "day_n": 3, "cum_hits": 11, "cum_n": 15, "cum_rate": 73.3}, {"date": "2026-04-12", "day_hits": 2, "day_n": 2, "cum_hits": 13, "cum_n": 17, "cum_rate": 76.5}]}};
+const MARKET_CONFIGS = [{"key": "nrfi", "title": "NRFI Hit Rate", "subtitle": "No Run First Inning \u2014 by confidence tier", "tiers": [{"key": "LEAN", "label": "Lean", "color": "#facc15"}, {"key": "TOSS-UP", "label": "Toss-Up", "color": "#94a3b8"}, {"key": "FADE", "label": "Fade", "color": "#f87171"}]}, {"key": "f5_ml", "title": "F5 Moneyline Hit Rate", "subtitle": "First 5 innings ML \u2014 by confidence tier (ties = loss)", "tiers": [{"key": "STRONG", "label": "Strong", "color": "#4ade80"}, {"key": "MODERATE", "label": "Moderate", "color": "#60a5fa"}, {"key": "LEAN", "label": "Lean", "color": "#facc15"}]}, {"key": "f5_spread", "title": "F5 Spread Hit Rate", "subtitle": "First 5 innings spread \u2014 by confidence (pushes = loss)", "tiers": [{"key": "STRONG", "label": "Strong", "color": "#4ade80"}, {"key": "LEAN", "label": "Lean", "color": "#facc15"}, {"key": "SLIGHT", "label": "SLIGHT", "color": "#ffffff"}]}, {"key": "f5_total", "title": "F5 Total Hit Rate", "subtitle": "First 5 innings total \u2014 by lean & confidence (pushes = loss)", "tiers": [{"key": "STRONG OVER", "label": "Strong Over", "color": "#4ade80"}, {"key": "LEAN OVER", "label": "Lean Over", "color": "#86efac"}, {"key": "STRONG UNDER", "label": "Strong Under", "color": "#818cf8"}, {"key": "LEAN UNDER", "label": "Lean Under", "color": "#a5b4fc"}]}];
 
 const PAD = { top: 18, right: 28, bottom: 46, left: 50 };
 const VW  = 560;

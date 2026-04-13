@@ -24,6 +24,7 @@ import csv
 import os
 import sys
 import math
+import re
 from datetime import datetime, date
 from collections import defaultdict
 import requests
@@ -464,6 +465,66 @@ def component_utility(joined: list) -> list:
 # F5 REPORTING HELPERS
 # ---------------------------------------------------------------------------
 
+def _f5_token_key(value) -> str:
+    """Uppercase token key for robust team/side matching."""
+    return re.sub(r"[^A-Z0-9]+", "", str(value or "").upper())
+
+
+def _f5_matchup_sides(row: dict) -> tuple[str, str]:
+    """Parse matchup into (away_tag, home_tag)."""
+    matchup = str(row.get("matchup", "") or "").strip()
+    if "@" not in matchup:
+        return "", ""
+    away_tag, home_tag = matchup.split("@", 1)
+    return away_tag.strip(), home_tag.strip()
+
+
+def _normalize_f5_side(raw_side: str, row: dict) -> str:
+    """
+    Canonicalize side labels to away/home/tie where possible.
+
+    Supports direct labels ('away', 'home', 'tie'), matchup abbreviations,
+    and team full names.
+    """
+    raw = str(raw_side or "").strip()
+    if not raw:
+        return "unknown"
+
+    direct = {
+        "away": "away",
+        "road": "away",
+        "visitor": "away",
+        "visiting": "away",
+        "home": "home",
+        "host": "home",
+        "tie": "tie",
+        "tied": "tie",
+        "draw": "tie",
+        "push": "tie",
+    }
+    key = raw.lower()
+    if key in direct:
+        return direct[key]
+
+    raw_key = _f5_token_key(raw)
+    away_tag, home_tag = _f5_matchup_sides(row)
+    away_tag_key = _f5_token_key(away_tag)
+    home_tag_key = _f5_token_key(home_tag)
+    if raw_key and away_tag_key and raw_key == away_tag_key:
+        return "away"
+    if raw_key and home_tag_key and raw_key == home_tag_key:
+        return "home"
+
+    away_name_key = _f5_token_key(row.get("away_team", ""))
+    home_name_key = _f5_token_key(row.get("home_team", ""))
+    if raw_key and away_name_key and (raw_key == away_name_key or raw_key in away_name_key):
+        return "away"
+    if raw_key and home_name_key and (raw_key == home_name_key or raw_key in home_name_key):
+        return "home"
+
+    return "unknown"
+
+
 def _f5_pick_side(row: dict) -> str:
     """
     Determine whether the F5 ML pick is for the 'away' team, 'home' team,
@@ -473,18 +534,33 @@ def _f5_pick_side(row: dict) -> str:
     is stored as "NYY @ TB" (away @ home).  We parse the matchup to classify.
     """
     pick = str(row.get("f5_ml_pick", "")).strip()
-    if not pick or pick.upper() in ("PICK", ""):
+    if not pick or pick.upper() in ("PICK", "PICKEM", "PICK'EM", "PK", ""):
         return "pick"
-    matchup = str(row.get("matchup", ""))
-    if "@" in matchup:
-        parts = matchup.split("@", 1)
-        away_abbr = parts[0].strip()
-        home_abbr = parts[1].strip()
-        if pick == away_abbr:
-            return "away"
-        if pick == home_abbr:
-            return "home"
-    return "unknown"
+    return _normalize_f5_side(pick, row)
+
+
+def _f5_winner_side(row: dict) -> str:
+    """
+    Canonical winner side for F5 ML grading.
+
+    Uses f5_ml_winner_side first; if missing/unparseable, derives from
+    away_runs_f5/home_runs_f5.
+    """
+    winner = _normalize_f5_side(row.get("f5_ml_winner_side", ""), row)
+    if winner != "unknown":
+        return winner
+
+    try:
+        away_f5 = float(row.get("away_runs_f5", "") or "")
+        home_f5 = float(row.get("home_runs_f5", "") or "")
+    except (TypeError, ValueError):
+        return "unknown"
+
+    if away_f5 > home_f5:
+        return "away"
+    if home_f5 > away_f5:
+        return "home"
+    return "tie"
 
 
 def f5_ml_results(joined: list) -> dict:
@@ -500,7 +576,7 @@ def f5_ml_results(joined: list) -> dict:
     for r in joined:
         if not r.get("f5_innings_complete"):
             continue
-        winner = r.get("f5_ml_winner_side", "")
+        winner = _f5_winner_side(r)
         pick_side = _f5_pick_side(r)
         confidence = r.get("f5_ml_confidence", "?") or "?"
         if not winner or pick_side in ("pick", "unknown"):

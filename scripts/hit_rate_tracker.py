@@ -20,6 +20,7 @@ Usage (called automatically by run_nrfi.py):
 import csv
 import json
 import os
+import re
 from collections import defaultdict
 
 
@@ -41,22 +42,104 @@ def _load_csv(path):
 # Hit determination — pushes = losses
 # ---------------------------------------------------------------------------
 
-def _f5_ml_hit(pred, winner_side):
+def _token_key(value):
+    """Uppercase token key, preserving alphanumerics."""
+    return re.sub(r"[^A-Z0-9]+", "", str(value or "").upper())
+
+
+def _parse_matchup_sides(pred):
+    """Return (away_tag, home_tag) parsed from matchup like 'STL @ WSH'."""
+    matchup = str(pred.get("matchup", "") or "").strip()
+    if "@" not in matchup:
+        return "", ""
+    away_tag, home_tag = matchup.split("@", 1)
+    return away_tag.strip(), home_tag.strip()
+
+
+def _normalize_side(raw_side, pred):
+    """
+    Canonicalize side labels to 'away'/'home'/'tie' when possible.
+
+    Accepts direct side labels, team abbreviations from matchup, and full team
+    names (including compacted forms with punctuation removed).
+    """
+    raw = str(raw_side or "").strip()
+    if not raw:
+        return None
+
+    direct = {
+        "away": "away",
+        "road": "away",
+        "visitor": "away",
+        "visiting": "away",
+        "home": "home",
+        "host": "home",
+        "tie": "tie",
+        "tied": "tie",
+        "draw": "tie",
+        "push": "tie",
+    }
+    key = raw.lower()
+    if key in direct:
+        return direct[key]
+
+    raw_key = _token_key(raw)
+    away_tag, home_tag = _parse_matchup_sides(pred)
+    away_tag_key = _token_key(away_tag)
+    home_tag_key = _token_key(home_tag)
+    if raw_key and away_tag_key and raw_key == away_tag_key:
+        return "away"
+    if raw_key and home_tag_key and raw_key == home_tag_key:
+        return "home"
+
+    away_name_key = _token_key(pred.get("away_team", ""))
+    home_name_key = _token_key(pred.get("home_team", ""))
+    if raw_key and away_name_key and (raw_key == away_name_key or raw_key in away_name_key):
+        return "away"
+    if raw_key and home_name_key and (raw_key == home_name_key or raw_key in home_name_key):
+        return "home"
+
+    return None
+
+
+def _resolve_pick_side(pred):
+    """Map F5 ML pick to canonical side label."""
+    pick = str(pred.get("f5_ml_pick", "") or "").strip()
+    if not pick or pick.upper() in {"PICK", "PICKEM", "PICK'EM", "PK"}:
+        return None
+    return _normalize_side(pick, pred)
+
+
+def _winner_from_f5_runs(away_f5, home_f5):
+    """Infer winner side from away/home F5 runs when winner-side text is absent."""
+    try:
+        away = float(away_f5)
+        home = float(home_f5)
+    except (TypeError, ValueError):
+        return None
+    if away > home:
+        return "away"
+    if home > away:
+        return "home"
+    return "tie"
+
+
+def _f5_ml_hit(pred, winner_side, away_f5=None, home_f5=None):
     """True = hit, False = loss (including ties). None = skip (no pick)."""
     pick = pred.get("f5_ml_pick", "").strip()
-    if not pick or not winner_side:
+    if not pick:
         return None
-    if winner_side == "tie":
+    winner = _normalize_side(winner_side, pred)
+    if winner is None:
+        winner = _winner_from_f5_runs(away_f5, home_f5)
+    if winner is None:
+        return None
+    if winner == "tie":
         return False  # push = loss
-    away = pred.get("away_team", "").strip()
-    home = pred.get("home_team", "").strip()
-    if pick == away or (away and pick in away):
-        pick_side = "away"
-    elif pick == home or (home and pick in home):
-        pick_side = "home"
-    else:
+    pick_side = _resolve_pick_side(pred)
+    if pick_side is None:
         return None
-    return pick_side == winner_side
+    return pick_side == winner
 
 
 def _f5_spread_hit(pred, away_f5, home_f5):
@@ -71,14 +154,13 @@ def _f5_spread_hit(pred, away_f5, home_f5):
         line = float(parts[-1])
     except (ValueError, IndexError):
         return None
-    away = pred.get("away_team", "").strip()
-    home = pred.get("home_team", "").strip()
-    if pick == away or (away and pick in away):
-        margin = away_f5 - home_f5
-    elif pick == home or (home and pick in home):
-        margin = home_f5 - away_f5
-    else:
+    pick_side = _resolve_pick_side(pred)
+    if pick_side is None:
         return None
+    if pick_side == "away":
+        margin = away_f5 - home_f5
+    else:
+        margin = home_f5 - away_f5
     # Covers if margin strictly exceeds the spread threshold
     # -0.5: need margin >= 1   → margin > 0.5 ✓
     # -1.5: need margin >= 2   → margin > 1.5 ✓
@@ -178,7 +260,7 @@ def compute_hit_rates(predictions_csv, outcomes_csv):
         # F5 ML
         ml_conf = p.get("f5_ml_confidence", "").strip()
         if ml_conf:
-            h = _f5_ml_hit(p, winner)
+            h = _f5_ml_hit(p, winner, away_f5, home_f5)
             if h is not None:
                 f5_ml_b[ml_conf][game_date].append(h)
 
@@ -222,22 +304,48 @@ def compute_hit_rates(predictions_csv, outcomes_csv):
                 result[tier] = series
         return result
 
-    # Summary stats
-    all_nrfi = [x for tier_series in build_series(nrfi_b).values() for x in tier_series]
-    total_nrfi_hits = sum(s["day_hits"] for s in all_nrfi)
-    total_nrfi_n    = sum(s["day_n"] for s in all_nrfi)
+    series_nrfi     = build_series(nrfi_b)
+    series_f5_ml    = build_series(f5_ml_b)
+    series_f5_sp    = build_series(f5_spread_b)
+    series_f5_tot   = build_series(f5_total_b)
+
+    def _market_summary(series_dict):
+        """Compute aggregate hits/n/rate across all tiers in a market."""
+        total_hits = total_n = 0
+        per_tier = {}
+        for tier, series in series_dict.items():
+            if not series:
+                continue
+            last = series[-1]
+            per_tier[tier] = {
+                "hits": last["cum_hits"],
+                "n": last["cum_n"],
+                "rate": last["cum_rate"],
+            }
+            total_hits += last["cum_hits"]
+            total_n += last["cum_n"]
+        return {
+            "hits": total_hits,
+            "n": total_n,
+            "rate": round(100.0 * total_hits / total_n, 1) if total_n else 0.0,
+            "per_tier": per_tier,
+        }
+
     all_dates = sorted({game_date for game_date, _, _ in joined})
 
     return {
-        "nrfi":      build_series(nrfi_b),
-        "f5_ml":     build_series(f5_ml_b),
-        "f5_spread": build_series(f5_spread_b),
-        "f5_total":  build_series(f5_total_b),
+        "nrfi":      series_nrfi,
+        "f5_ml":     series_f5_ml,
+        "f5_spread": series_f5_sp,
+        "f5_total":  series_f5_tot,
+        "market_summaries": {
+            "nrfi":      _market_summary(series_nrfi),
+            "f5_ml":     _market_summary(series_f5_ml),
+            "f5_spread": _market_summary(series_f5_sp),
+            "f5_total":  _market_summary(series_f5_tot),
+        },
         "summary": {
             "total_resolved":    len(joined),
-            "overall_nrfi_hits": total_nrfi_hits,
-            "overall_nrfi_n":    total_nrfi_n,
-            "overall_nrfi_rate": round(100.0 * total_nrfi_hits / total_nrfi_n, 1) if total_nrfi_n else 0.0,
             "days":              len(all_dates),
             "first_date":        all_dates[0] if all_dates else "",
             "last_date":         all_dates[-1] if all_dates else "",
@@ -307,6 +415,10 @@ _CSS = """
     --text:     #e2e8f0;
     --muted:    #94a3b8;
     --accent:   #4ade80;
+    --green:    #4ade80;
+    --red:      #f87171;
+    --yellow:   #facc15;
+    --blue:     #60a5fa;
   }
 
   body {
@@ -317,24 +429,29 @@ _CSS = """
     line-height: 1.5;
     padding: 24px 20px 48px;
     min-height: 100vh;
+    max-width: 1440px;
+    margin: 0 auto;
   }
 
   .header {
     display: flex;
     align-items: baseline;
     gap: 16px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
     padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
-  .header-title { font-size: 1.4em; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+  .header-title { font-size: 1.5em; font-weight: 700; letter-spacing: 0.04em; }
   .header-sub   { color: var(--muted); font-size: 0.85em; }
 
+  .date-range { color: var(--muted); font-size: 0.82em; margin-bottom: 20px; padding-top: 8px; }
+
+  /* ---- Top-level summary cards ---- */
   .summary-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
   .stat-card {
     background: var(--surface);
@@ -342,14 +459,84 @@ _CSS = """
     border-radius: 10px;
     padding: 16px 18px;
   }
-  .stat-label { color: var(--muted); font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .stat-value { font-size: 1.6em; font-weight: 700; color: var(--text); }
-  .stat-sub   { color: var(--muted); font-size: 0.75em; margin-top: 2px; }
+  .stat-label { color: var(--muted); font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.5em; font-weight: 700; }
+  .stat-sub   { color: var(--muted); font-size: 0.72em; margin-top: 3px; }
+  .stat-value.green  { color: var(--green); }
+  .stat-value.red    { color: var(--red); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-value.blue   { color: var(--blue); }
+  .stat-value.neutral { color: var(--text); }
 
-  .charts-grid {
+  /* ---- Market sections ---- */
+  .market-section {
+    margin-bottom: 36px;
+  }
+  .market-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .market-title { font-size: 1.15em; font-weight: 700; }
+  .market-subtitle { color: var(--muted); font-size: 0.8em; }
+
+  /* ---- Tier breakdown table ---- */
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 0.88em;
+  }
+  .tier-table th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .tier-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(46,51,71,0.5);
+  }
+  .tier-table tr:last-child td { border-bottom: none; }
+  .tier-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .tier-name { font-weight: 600; }
+  .tier-rate { font-weight: 700; font-size: 1.05em; }
+  .tier-rate.above { color: var(--green); }
+  .tier-rate.below { color: var(--red); }
+  .tier-rate.neutral { color: var(--yellow); }
+  .bar-bg {
+    width: 100%;
+    max-width: 140px;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+
+  /* ---- Chart cards (same as before, improved) ---- */
+  .chart-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-    gap: 20px;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+    align-items: start;
   }
   .chart-card {
     background: var(--surface);
@@ -358,23 +545,23 @@ _CSS = """
     padding: 20px 20px 16px;
     overflow: hidden;
   }
-  .chart-title { font-size: 1em; font-weight: 700; margin-bottom: 2px; }
-  .chart-sub   { color: var(--muted); font-size: 0.78em; margin-bottom: 14px; }
+  .chart-card.full-width { grid-column: 1 / -1; }
 
   .legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px 18px;
-    margin-bottom: 14px;
+    gap: 8px 16px;
+    margin-bottom: 12px;
   }
-  .legend-item  { display: flex; align-items: center; gap: 6px; font-size: 0.8em; }
-  .legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-item  { display: flex; align-items: center; gap: 5px; font-size: 0.78em; }
+  .legend-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .legend-label { color: var(--muted); }
-  .legend-n     { color: var(--muted); font-size: 0.9em; }
+  .legend-n     { color: var(--muted); font-size: 0.85em; }
 
   .chart-svg { display: block; width: 100%; overflow: visible; }
   .chart-svg text { font-family: inherit; }
 
+  /* ---- Tooltip ---- */
   #tooltip {
     position: fixed;
     pointer-events: none;
@@ -399,8 +586,12 @@ _CSS = """
   .no-data-sub   { font-size: 0.9em; line-height: 1.7; }
   code { background: var(--surface2); padding: 1px 6px; border-radius: 4px; font-size: 0.95em; }
 
+  @media (max-width: 900px) {
+    .summary-row { grid-template-columns: repeat(2, 1fr); }
+    .chart-section { grid-template-columns: 1fr; }
+  }
   @media (max-width: 600px) {
-    .charts-grid { grid-template-columns: 1fr; }
+    .summary-row { grid-template-columns: 1fr; }
   }
 """
 
