@@ -1,0 +1,12 @@
+{
+  "name": "nrfi-analyzer",
+  "version": "1.0.0",
+  "description": "MLB NRFI + F5 betting analysis system",
+  "scripts": {
+    "analyze": "python run_nrfi.py",
+    "analyze:odds": "python run_nrfi.py --refresh-odds",
+    "backtest": "python scripts/backtest.py",
+    "backtest:update": "python scripts/backtest.py --update-only",
+    "backtest:report": "python scripts/backtest.py --report-only"
+  }
+}
