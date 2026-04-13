@@ -30,7 +30,7 @@ from f5_analyzer import compute_f5_scores
 # ---------------------------------------------------------------------------
 MLB_BASE = "https://statsapi.mlb.com/api/v1"
 OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast"
-CURRENT_SEASON = 2026  # update if needed
+DEFAULT_SEASON = date.today().year
 
 # Ballpark coordinates for weather lookups
 BALLPARK_COORDS = {
@@ -214,6 +214,47 @@ def safe_get(d, *keys, default=None):
     return d
 
 
+def _parse_game_date(game_date: Optional[str]) -> date:
+    """Best-effort ISO date parse; falls back to today."""
+    if game_date:
+        try:
+            return date.fromisoformat(game_date)
+        except Exception:
+            pass
+    return date.today()
+
+
+def _season_for_date(game_date: Optional[str]) -> int:
+    """Map a slate date to MLB season year."""
+    return _parse_game_date(game_date).year or DEFAULT_SEASON
+
+
+def _stats_end_date(game_date: Optional[str]) -> str:
+    """
+    End date used for historical feature computation.
+    We stop at day-1 so a replay only uses data known before first pitch.
+    """
+    return (_parse_game_date(game_date) - timedelta(days=1)).isoformat()
+
+
+def _first_stat_from_groups(stat_groups: list[dict]) -> dict:
+    """Return the first non-empty stat dict from MLB stat-group payloads."""
+    for stat_group in stat_groups or []:
+        for split in stat_group.get("splits", []):
+            stat = split.get("stat", {})
+            if stat:
+                return stat
+    return {}
+
+
+def _fmt_rate(v: Optional[float]) -> str:
+    """Format batting rates as MLB-style strings (e.g. .287, 1.042)."""
+    if v is None:
+        return ".000"
+    s = f"{v:.3f}"
+    return s[1:] if s.startswith("0") else s
+
+
 # ---------------------------------------------------------------------------
 # 1. SCHEDULE
 # ---------------------------------------------------------------------------
@@ -284,32 +325,35 @@ def parse_game_info(game: dict) -> dict:
 # ---------------------------------------------------------------------------
 # 2. PITCHER STATS
 # ---------------------------------------------------------------------------
-def get_pitcher_season_stats(pitcher_id: int) -> dict:
-    """Fetch a pitcher's current season stats. Falls back to career."""
+def get_pitcher_season_stats(pitcher_id: int, game_date: Optional[str] = None,
+                             season: Optional[int] = None) -> dict:
+    """Fetch pitcher season-to-date stats as of the target slate date."""
     if not pitcher_id:
         return {}
+    season = season or _season_for_date(game_date)
+    start_date = f"{season}-01-01"
+    end_date = _stats_end_date(game_date)
+
     try:
+        # Primary: current season-to-date as of day-1.
+        data = mlb_get(f"people/{pitcher_id}/stats", {
+            "stats": "byDateRange",
+            "group": "pitching",
+            "startDate": start_date,
+            "endDate": end_date,
+        })
+        s = _first_stat_from_groups(data.get("stats", []))
+        if s:
+            return s
+
+        # Fallback: full prior season (available pregame without look-ahead).
         data = mlb_get(f"people/{pitcher_id}", {
-            "hydrate": f"stats(group=[pitching],type=[season],season={CURRENT_SEASON})"
+            "hydrate": f"stats(group=[pitching],type=[season],season={season - 1})"
         })
         person = data.get("people", [{}])[0]
-        splits = safe_get(person, "stats", default=[])
-        for stat_group in splits:
-            for split in stat_group.get("splits", []):
-                s = split.get("stat", {})
-                if s:
-                    return s
-        # If no current season, try career
-        data = mlb_get(f"people/{pitcher_id}", {
-            "hydrate": "stats(group=[pitching],type=[career])"
-        })
-        person = data.get("people", [{}])[0]
-        splits = safe_get(person, "stats", default=[])
-        for stat_group in splits:
-            for split in stat_group.get("splits", []):
-                s = split.get("stat", {})
-                if s:
-                    return s
+        s = _first_stat_from_groups(safe_get(person, "stats", default=[]))
+        if s:
+            return s
     except Exception as e:
         print(f"  ⚠ Could not fetch pitcher {pitcher_id}: {e}")
     return {}
@@ -327,7 +371,8 @@ def get_pitcher_hand(pitcher_id: int) -> str:
         return "?"
 
 
-def get_pitcher_rest_and_workload(pitcher_id: int, game_date: str) -> dict:
+def get_pitcher_rest_and_workload(pitcher_id: int, game_date: str,
+                                  season: Optional[int] = None) -> dict:
     """
     Determine how many days since the pitcher's last start and how many
     pitches they threw.  Uses the current-season game log.
@@ -347,12 +392,13 @@ def get_pitcher_rest_and_workload(pitcher_id: int, game_date: str) -> dict:
         as_of = date.fromisoformat(game_date)
     except Exception:
         as_of = date.today()
+    season = season or _season_for_date(game_date)
 
     try:
         data = mlb_get(f"people/{pitcher_id}/stats", {
             "stats": "gameLog",
             "group": "pitching",
-            "season": CURRENT_SEASON,
+            "season": season,
         })
         starts = []
         for sg in data.get("stats", []):
@@ -431,30 +477,42 @@ def score_rest(rest_info: dict) -> float:
     return round(max(-3.0, min(3.0, adj)), 1)
 
 
-def get_first_inning_stats(pitcher_id: int) -> dict:
+def get_first_inning_stats(pitcher_id: int, game_date: Optional[str] = None,
+                           season: Optional[int] = None) -> dict:
     """
     Compute first-inning stats by cross-referencing game logs with linescores.
     Uses current season first; if <5 starts, supplements with prior season.
     """
     if not pitcher_id:
         return {"has_data": False}
+    as_of = _parse_game_date(game_date)
+    season = season or _season_for_date(game_date)
 
-    def fetch_season_starts(season):
+    def fetch_season_starts(target_season: int):
         try:
             data = mlb_get(f"people/{pitcher_id}/stats", {
                 "stats": "gameLog",
                 "group": "pitching",
-                "season": season,
+                "season": target_season,
             })
             starts = []
             for sg in data.get("stats", []):
                 for split in sg.get("splits", []):
                     gs = split.get("stat", {}).get("gamesStarted", 0)
                     if gs > 0:
+                        split_date = split.get("date", "")
+                        try:
+                            start_dt = date.fromisoformat(split_date)
+                        except Exception:
+                            continue
+                        if start_dt >= as_of:
+                            continue
                         starts.append({
                             "gpk": split.get("game", {}).get("gamePk"),
                             "isHome": split.get("isHome"),
+                            "date": split_date,
                         })
+            starts.sort(key=lambda s: s.get("date", ""), reverse=True)
             return starts
         except Exception:
             return []
@@ -463,12 +521,12 @@ def get_first_inning_stats(pitcher_id: int) -> dict:
     # Tag each start with its season so we can apply recency weighting.
     PRIOR_SEASON_WEIGHT = 0.5  # prior-season starts count half
 
-    cur_starts = fetch_season_starts(CURRENT_SEASON)
+    cur_starts = fetch_season_starts(season)
     for s in cur_starts:
         s["weight"] = 1.0
     starts = cur_starts
     if len(cur_starts) < 5:
-        prior_starts = fetch_season_starts(CURRENT_SEASON - 1)
+        prior_starts = fetch_season_starts(season - 1)
         for s in prior_starts:
             s["weight"] = PRIOR_SEASON_WEIGHT
         starts += prior_starts
@@ -477,6 +535,7 @@ def get_first_inning_stats(pitcher_id: int) -> dict:
         return {"has_data": False}
 
     # Fetch first-inning runs from linescores (cap at 25 most recent starts)
+    starts.sort(key=lambda s: s.get("date", ""), reverse=True)
     starts = starts[:25]
     fi_entries = []  # list of (runs, hits, weight) tuples
 
@@ -855,18 +914,34 @@ def extract_pitcher_metrics(stats: dict) -> dict:
 # ---------------------------------------------------------------------------
 # 3. BATTER STATS (top of order)
 # ---------------------------------------------------------------------------
-def get_batter_season_stats(player_id: int) -> dict:
-    """Fetch a single batter's season stats by player ID."""
+def get_batter_season_stats(player_id: int, game_date: Optional[str] = None,
+                            season: Optional[int] = None) -> dict:
+    """Fetch a batter's season-to-date stats as of the target slate date."""
     if not player_id:
         return {}
+    season = season or _season_for_date(game_date)
+    start_date = f"{season}-01-01"
+    end_date = _stats_end_date(game_date)
     try:
+        # Primary: current season-to-date as of day-1.
+        data = mlb_get(f"people/{player_id}/stats", {
+            "stats": "byDateRange",
+            "group": "hitting",
+            "startDate": start_date,
+            "endDate": end_date,
+        })
+        s = _first_stat_from_groups(data.get("stats", []))
+        if s:
+            return s
+
+        # Fallback: prior full season.
         data = mlb_get(f"people/{player_id}", {
-            "hydrate": f"stats(group=[hitting],type=[season],season={CURRENT_SEASON})",
+            "hydrate": f"stats(group=[hitting],type=[season],season={season - 1})",
         })
         person = data.get("people", [{}])[0]
-        for sg in safe_get(person, "stats", default=[]):
-            for split in sg.get("splits", []):
-                return split.get("stat", {})
+        s = _first_stat_from_groups(safe_get(person, "stats", default=[]))
+        if s:
+            return s
     except Exception:
         pass
     return {}
@@ -965,7 +1040,8 @@ def _get_last_lineup_vs_hand(team_id: int, opposing_hand: str,
 
 def get_top_of_order(lineup: list[dict], team_id: int, lineup_available: bool,
                      opposing_hand: str = "?",
-                     game_date: str = None) -> tuple[list[dict], bool]:
+                     game_date: str = None,
+                     season: Optional[int] = None) -> tuple[list[dict], bool]:
     """
     Get the top 4 batters with their season stats.
 
@@ -981,7 +1057,7 @@ def get_top_of_order(lineup: list[dict], team_id: int, lineup_available: bool,
         """Fetch season stats for a list of player dicts with 'id'/'name'."""
         batters = []
         for p in player_list:
-            stat = get_batter_season_stats(p["id"])
+            stat = get_batter_season_stats(p["id"], game_date=game_date, season=season)
             pa = 0
             try:
                 pa = int(stat.get("plateAppearances", 0))
@@ -1016,10 +1092,16 @@ def get_top_of_order(lineup: list[dict], team_id: int, lineup_available: bool,
     # --- Strategy 3: Fallback to roster sorted by PA ---
     if not team_id:
         return [], False
+    season = season or _season_for_date(game_date)
+    end_date = _stats_end_date(game_date)
     try:
         data = mlb_get(f"teams/{team_id}/roster", {
             "rosterType": "active",
-            "hydrate": f"person(stats(group=[hitting],type=[season],season={CURRENT_SEASON}))",
+            "hydrate": (
+                "person(stats("
+                f"group=[hitting],type=[byDateRange],startDate={season}-01-01,endDate={end_date}"
+                "))"
+            ),
         })
         batters = []
         for entry in data.get("roster", []):
@@ -1027,11 +1109,7 @@ def get_top_of_order(lineup: list[dict], team_id: int, lineup_available: bool,
             if pos == "P":
                 continue
             person = entry.get("person", {})
-            stats_list = safe_get(person, "stats", default=[])
-            stat = {}
-            for sg in stats_list:
-                for split in sg.get("splits", []):
-                    stat = split.get("stat", {})
+            stat = _first_stat_from_groups(safe_get(person, "stats", default=[]))
             pa = 0
             try:
                 pa = int(stat.get("plateAppearances", 0))
@@ -1082,7 +1160,9 @@ def summarize_top_order(batters: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 # 3b. BATTER L/R PLATOON SPLITS
 # ---------------------------------------------------------------------------
-def get_batter_platoon_splits(batters: list[dict], pitcher_hand: str) -> list[dict]:
+def get_batter_platoon_splits(batters: list[dict], pitcher_hand: str,
+                              game_date: Optional[str] = None,
+                              season: Optional[int] = None) -> list[dict]:
     """
     Enrich each batter with their stats specifically against LHP or RHP.
     pitcher_hand: 'L' or 'R'
@@ -1091,6 +1171,9 @@ def get_batter_platoon_splits(batters: list[dict], pitcher_hand: str) -> list[di
         return batters  # can't look up splits without knowing hand
 
     sit_code = "vl" if pitcher_hand == "L" else "vr"
+    season = season or _season_for_date(game_date)
+    start_date = f"{season}-01-01"
+    end_date = _stats_end_date(game_date)
 
     enriched = []
     for batter in batters:
@@ -1102,8 +1185,10 @@ def get_batter_platoon_splits(batters: list[dict], pitcher_hand: str) -> list[di
                 data = mlb_get(f"people/{batter_id}/stats", {
                     "stats": "statSplits",
                     "group": "hitting",
-                    "season": CURRENT_SEASON,
+                    "season": season,
                     "sitCodes": sit_code,
+                    "startDate": start_date,
+                    "endDate": end_date,
                 })
                 for sg in data.get("stats", []):
                     for split in sg.get("splits", []):
@@ -1229,11 +1314,14 @@ def score_platoon(platoon_summary: dict) -> float:
 # ---------------------------------------------------------------------------
 STREAK_GAMES = 7  # look-back window
 
-def get_batter_recent_form(batters: list[dict]) -> list[dict]:
+def get_batter_recent_form(batters: list[dict], game_date: Optional[str] = None,
+                           season: Optional[int] = None) -> list[dict]:
     """
     Enrich each batter with their last-7-game stats.
     Compares recent OPS to season OPS to detect hot/cold streaks.
     """
+    as_of = _parse_game_date(game_date)
+    season = season or _season_for_date(game_date)
     enriched = []
     for batter in batters:
         batter_id = batter.get("id")
@@ -1242,29 +1330,58 @@ def get_batter_recent_form(batters: list[dict]) -> list[dict]:
         if batter_id:
             try:
                 data = mlb_get(f"people/{batter_id}/stats", {
-                    "stats": "lastXGames",
+                    "stats": "gameLog",
                     "group": "hitting",
-                    "limit": STREAK_GAMES,
+                    "season": season,
                 })
+                logs = []
                 for sg in data.get("stats", []):
                     for split in sg.get("splits", []):
-                        st = split.get("stat", {})
-                        ab = int(st.get("atBats", 0))
-                        if ab > 0:
-                            recent = {
-                                "has_data": True,
-                                "games": STREAK_GAMES,
-                                "ab": ab,
-                                "hits": int(st.get("hits", 0)),
-                                "hr": int(st.get("homeRuns", 0)),
-                                "so": int(st.get("strikeOuts", 0)),
-                                "bb": int(st.get("baseOnBalls", 0)),
-                                "avg": st.get("avg", ".000"),
-                                "obp": st.get("obp", ".000"),
-                                "ops": st.get("ops", ".000"),
-                            }
-                        break
-                    break
+                        d = split.get("date", "")
+                        try:
+                            d_dt = date.fromisoformat(d)
+                        except Exception:
+                            continue
+                        if d_dt >= as_of:
+                            continue
+                        logs.append({"date": d, "stat": split.get("stat", {})})
+
+                logs.sort(key=lambda g: g["date"], reverse=True)
+                recent_logs = logs[:STREAK_GAMES]
+                if recent_logs:
+                    ab = sum(int((g["stat"] or {}).get("atBats", 0) or 0) for g in recent_logs)
+                    hits = sum(int((g["stat"] or {}).get("hits", 0) or 0) for g in recent_logs)
+                    hr = sum(int((g["stat"] or {}).get("homeRuns", 0) or 0) for g in recent_logs)
+                    so = sum(int((g["stat"] or {}).get("strikeOuts", 0) or 0) for g in recent_logs)
+                    bb = sum(int((g["stat"] or {}).get("baseOnBalls", 0) or 0) for g in recent_logs)
+                    hbp = sum(int((g["stat"] or {}).get("hitByPitch", 0) or 0) for g in recent_logs)
+                    sf = sum(int((g["stat"] or {}).get("sacFlies", 0) or 0) for g in recent_logs)
+                    doubles = sum(int((g["stat"] or {}).get("doubles", 0) or 0) for g in recent_logs)
+                    triples = sum(int((g["stat"] or {}).get("triples", 0) or 0) for g in recent_logs)
+
+                    total_bases = sum(int((g["stat"] or {}).get("totalBases", 0) or 0) for g in recent_logs)
+                    if total_bases == 0 and hits > 0:
+                        singles = max(0, hits - doubles - triples - hr)
+                        total_bases = singles + 2 * doubles + 3 * triples + 4 * hr
+
+                    avg = (hits / ab) if ab > 0 else None
+                    obp_den = ab + bb + hbp + sf
+                    obp = ((hits + bb + hbp) / obp_den) if obp_den > 0 else None
+                    slg = (total_bases / ab) if ab > 0 else None
+                    ops = (obp + slg) if (obp is not None and slg is not None) else None
+
+                    recent = {
+                        "has_data": True,
+                        "games": len(recent_logs),
+                        "ab": ab,
+                        "hits": hits,
+                        "hr": hr,
+                        "so": so,
+                        "bb": bb,
+                        "avg": _fmt_rate(avg),
+                        "obp": _fmt_rate(obp),
+                        "ops": _fmt_rate(ops),
+                    }
             except Exception:
                 pass
 
@@ -1372,18 +1489,30 @@ def score_streaks(streak_summary: dict) -> float:
 # ---------------------------------------------------------------------------
 # 3c. BATTER vs PITCHER (BvP) MATCHUP HISTORY
 # ---------------------------------------------------------------------------
-def get_bvp_matchups(batters: list[dict], pitcher_id: int) -> list[dict]:
+def get_bvp_matchups(batters: list[dict], pitcher_id: int,
+                     game_date: Optional[str] = None) -> list[dict]:
     """
     For each batter, fetch their career stats against a specific pitcher.
     Returns enriched batter dicts with 'bvp' key added.
     """
     if not pitcher_id or not batters:
         return batters
+    as_of = _parse_game_date(game_date)
+    historical_replay = as_of < date.today()
+    end_date = _stats_end_date(game_date)
 
     enriched = []
     for batter in batters:
         batter_id = batter.get("id")
         bvp = {"ab": 0, "hits": 0, "hr": 0, "so": 0, "bb": 0, "avg": None, "ops": None, "has_data": False}
+
+        # MLB vsPlayerTotal currently ignores start/end date filters. To avoid
+        # look-ahead leakage on historical replays, disable BvP there.
+        if historical_replay:
+            b_copy = dict(batter)
+            b_copy["bvp"] = bvp
+            enriched.append(b_copy)
+            continue
 
         if batter_id:
             try:
@@ -1391,6 +1520,8 @@ def get_bvp_matchups(batters: list[dict], pitcher_id: int) -> list[dict]:
                     "stats": "vsPlayerTotal",
                     "opposingPlayerId": pitcher_id,
                     "group": "hitting",
+                    "startDate": "1900-01-01",
+                    "endDate": end_date,
                 })
                 for stat_group in data.get("stats", []):
                     for split in stat_group.get("splits", []):
@@ -1909,6 +2040,10 @@ def analyze_date(game_date: str) -> list[dict]:
 
     # Reset cross-function caches at the start of every run.
     _linescore_cache.clear()
+    season = _season_for_date(game_date)
+    stats_through = _stats_end_date(game_date)
+
+    print(f"Using stats through {stats_through} (season {season})")
 
     games = get_todays_games(game_date)
     if not games:
@@ -1925,8 +2060,8 @@ def analyze_date(game_date: str) -> list[dict]:
 
         # Pitcher stats + handedness + first-inning ERA
         print(f"  Fetching pitcher stats...")
-        away_p_raw = get_pitcher_season_stats(info["away_pitcher_id"])
-        home_p_raw = get_pitcher_season_stats(info["home_pitcher_id"])
+        away_p_raw = get_pitcher_season_stats(info["away_pitcher_id"], game_date, season)
+        home_p_raw = get_pitcher_season_stats(info["home_pitcher_id"], game_date, season)
         away_p = extract_pitcher_metrics(away_p_raw)
         home_p = extract_pitcher_metrics(home_p_raw)
 
@@ -1936,8 +2071,8 @@ def analyze_date(game_date: str) -> list[dict]:
 
         # Pitcher rest + workload
         print(f"  Fetching pitcher rest & workload...")
-        away_rest = get_pitcher_rest_and_workload(info["away_pitcher_id"], game_date)
-        home_rest = get_pitcher_rest_and_workload(info["home_pitcher_id"], game_date)
+        away_rest = get_pitcher_rest_and_workload(info["away_pitcher_id"], game_date, season)
+        home_rest = get_pitcher_rest_and_workload(info["home_pitcher_id"], game_date, season)
         away_rest_adj = score_rest(away_rest)
         home_rest_adj = score_rest(home_rest)
         if away_rest.get("has_data"):
@@ -1948,8 +2083,8 @@ def analyze_date(game_date: str) -> list[dict]:
                   f"{home_rest['last_pitches'] or '?'}P last outing (adj {'+' if home_rest_adj >= 0 else ''}{home_rest_adj})")
 
         print(f"  Fetching first-inning history...")
-        away_fi = get_first_inning_stats(info["away_pitcher_id"])
-        home_fi = get_first_inning_stats(info["home_pitcher_id"])
+        away_fi = get_first_inning_stats(info["away_pitcher_id"], game_date, season)
+        home_fi = get_first_inning_stats(info["home_pitcher_id"], game_date, season)
         away_fi_adj = score_first_inning(away_fi)
         home_fi_adj = score_first_inning(home_fi)
         if away_fi.get("has_data"):
@@ -1976,10 +2111,10 @@ def analyze_date(game_date: str) -> list[dict]:
         # last game vs same-handed starter, then roster
         home_batters, home_real_lineup = get_top_of_order(
             info["home_lineup"], info["home_team_id"],
-            info["home_lineup_available"], away_hand, game_date)
+            info["home_lineup_available"], away_hand, game_date, season)
         away_batters, away_real_lineup = get_top_of_order(
             info["away_lineup"], info["away_team_id"],
-            info["away_lineup_available"], home_hand, game_date)
+            info["away_lineup_available"], home_hand, game_date, season)
 
         lineup_note = ""
         if home_real_lineup and away_real_lineup:
@@ -1992,18 +2127,18 @@ def analyze_date(game_date: str) -> list[dict]:
 
         # L/R platoon splits
         print(f"  Fetching L/R platoon splits...")
-        home_batters_plat = get_batter_platoon_splits(home_batters, away_hand)
-        away_batters_plat = get_batter_platoon_splits(away_batters, home_hand)
+        home_batters_plat = get_batter_platoon_splits(home_batters, away_hand, game_date, season)
+        away_batters_plat = get_batter_platoon_splits(away_batters, home_hand, game_date, season)
 
         # Recent form (hot/cold streaks)
         print(f"  Fetching recent form (last {STREAK_GAMES} games)...")
-        home_batters_streaks = get_batter_recent_form(home_batters_plat)
-        away_batters_streaks = get_batter_recent_form(away_batters_plat)
+        home_batters_streaks = get_batter_recent_form(home_batters_plat, game_date, season)
+        away_batters_streaks = get_batter_recent_form(away_batters_plat, game_date, season)
 
         # BvP matchup history (enriches on top of streak + platoon data)
         print(f"  Fetching batter vs pitcher history...")
-        home_batters_bvp = get_bvp_matchups(home_batters_streaks, info["away_pitcher_id"])
-        away_batters_bvp = get_bvp_matchups(away_batters_streaks, info["home_pitcher_id"])
+        home_batters_bvp = get_bvp_matchups(home_batters_streaks, info["away_pitcher_id"], game_date)
+        away_batters_bvp = get_bvp_matchups(away_batters_streaks, info["home_pitcher_id"], game_date)
 
         home_top = summarize_top_order(home_batters_bvp)
         away_top = summarize_top_order(away_batters_bvp)
@@ -2163,5 +2298,10 @@ if __name__ == "__main__":
 
     json_path = os.path.join(output_dir, f"nrfi_{target_date}.json")
     with open(json_path, "w") as f:
-        json.dump({"date": target_date, "generated": datetime.now().isoformat(), "games": results}, f, indent=2)
+        json.dump({
+            "date": target_date,
+            "stats_through": _stats_end_date(target_date),
+            "generated": datetime.now().isoformat(),
+            "games": results,
+        }, f, indent=2)
     print(f"\nJSON saved: {json_path}")

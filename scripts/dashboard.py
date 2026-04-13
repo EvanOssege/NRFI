@@ -29,6 +29,12 @@ def generate_dashboard(data: dict, output_path: str):
     games = data.get("games", [])
     analysis_date = data.get("date", "Unknown")
     generated = data.get("generated", "")
+    stats_through = data.get("stats_through")
+    if not stats_through:
+        try:
+            stats_through = (datetime.fromisoformat(analysis_date) - timedelta(days=1)).date().isoformat()
+        except Exception:
+            stats_through = "Unknown"
 
     # Separate top picks
     strong = [g for g in games if g["nrfi"]["tier"] == "STRONG"]
@@ -611,6 +617,29 @@ def generate_dashboard(data: dict, output_path: str):
     margin-bottom: 6px;
   }}
   .header .subtitle {{ color: var(--text-dim); font-size: 0.9em; }}
+  .header-meta {{
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }}
+  .meta-pill {{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--surface2);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.78em;
+    letter-spacing: 0.2px;
+  }}
+  .meta-pill strong {{
+    color: var(--text-dim);
+    font-weight: 600;
+  }}
 
   .summary-bar {{
     display: flex;
@@ -1018,6 +1047,9 @@ def generate_dashboard(data: dict, output_path: str):
 <div class="header">
   <h1>NRFI + F5 Dashboard</h1>
   <div class="subtitle">{analysis_date} · Generated {datetime.now().strftime('%I:%M %p')} · {len(games)} games analyzed</div>
+  <div class="header-meta">
+    <span class="meta-pill"><strong>Stats Through</strong> {stats_through}</span>
+  </div>
 </div>
 
 <div class="summary-bar">

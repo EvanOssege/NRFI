@@ -29,6 +29,15 @@ import json
 from datetime import datetime
 
 
+def _stats_through_for_date(target_date: str) -> str:
+    """Return day-1 cutoff date used for historical feature inputs."""
+    try:
+        d = date.fromisoformat(target_date)
+    except Exception:
+        d = date.today()
+    return (d - timedelta(days=1)).isoformat()
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = [a for a in sys.argv[1:] if a.startswith("--")]
@@ -60,6 +69,7 @@ def main():
 
     data = {
         "date": target_date,
+        "stats_through": _stats_through_for_date(target_date),
         "generated": datetime.now().isoformat(),
         "games": results,
     }
