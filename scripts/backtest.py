@@ -207,11 +207,13 @@ def save_outcomes(csv_path: str, outcomes: dict):
         writer.writeheader()
         # Sort by date first, then game_pk so each day's games are grouped together.
         def sort_key(row):
-            date_str = row.get("game_date") or ""
+            date_str = _normalize_date(row.get("game_date") or "")
+            if not (len(date_str) == 10 and date_str[4] == "-" and date_str[7] == "-"):
+                date_str = "9999-12-31"
             try:
                 gpk_int = int(row.get("game_pk", 0))
             except (TypeError, ValueError):
-                gpk_int = 0
+                gpk_int = 10**18
             return (date_str, gpk_int)
         for row in sorted(outcomes.values(), key=sort_key):
             writer.writerow(row)

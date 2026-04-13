@@ -77,11 +77,48 @@ PREDICTIONS_COLUMNS = [
 ]
 
 
+def _normalize_prediction_date(raw: str) -> str:
+    """Normalize date strings to YYYY-MM-DD when possible."""
+    raw = (raw or "").strip()
+    if not raw:
+        return ""
+
+    # Already ISO
+    if len(raw) == 10 and raw[4] == "-" and raw[7] == "-":
+        return raw
+
+    # Legacy slash dates
+    for fmt in ("%m/%d/%y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(raw, fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+
+    return raw
+
+
+def _prediction_sort_key(row: dict) -> tuple[str, int, str]:
+    """
+    Sort earliest dates first, then game_pk for stable intra-day ordering.
+    Unknown/malformed dates are pushed to the end.
+    """
+    date_str = _normalize_prediction_date(row.get("prediction_date", ""))
+    if not (len(date_str) == 10 and date_str[4] == "-" and date_str[7] == "-"):
+        date_str = "9999-12-31"
+
+    try:
+        gpk = int(str(row.get("game_pk", "")).strip())
+    except (TypeError, ValueError):
+        gpk = 10**18
+
+    return (date_str, gpk, str(row.get("matchup", "")))
+
+
 def _row_from_game(prediction_date: str, g: dict) -> dict:
     """Flatten a game result dict into a single CSV row."""
     nrfi = g.get("nrfi", {})
     return {
-        "prediction_date": prediction_date,
+        "prediction_date": _normalize_prediction_date(prediction_date),
         "logged_at": datetime.now().isoformat(timespec="seconds"),
         "game_pk": g.get("game_pk", ""),
         "matchup": g.get("matchup", ""),
@@ -148,6 +185,7 @@ def _read_existing_rows(csv_path: str) -> list[dict]:
             for row in reader:
                 # Normalise: keep only known columns, fill blanks for missing ones
                 clean = {col: row.get(col, "") for col in PREDICTIONS_COLUMNS}
+                clean["prediction_date"] = _normalize_prediction_date(clean.get("prediction_date", ""))
                 rows.append(clean)
     except Exception:
         pass
@@ -168,6 +206,7 @@ def log_predictions(prediction_date: str, games: list, csv_path: str) -> dict:
 
     Returns a small summary dict with counts.
     """
+    prediction_date = _normalize_prediction_date(prediction_date)
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
 
     # ------------------------------------------------------------------ #
@@ -209,9 +248,9 @@ def log_predictions(prediction_date: str, games: list, csv_path: str) -> dict:
         new_rows.append(row)
 
     # ------------------------------------------------------------------ #
-    # 3. Write: other-date rows first, then today's fresh rows             #
+    # 3. Write sorted chronologically (earliest date first)               #
     # ------------------------------------------------------------------ #
-    all_rows = other_date_rows + new_rows
+    all_rows = sorted(other_date_rows + new_rows, key=_prediction_sort_key)
 
     tmp_path = csv_path + ".tmp"
     with open(tmp_path, "w", newline="") as f:
