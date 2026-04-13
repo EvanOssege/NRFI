@@ -2,6 +2,13 @@
 
 MLB betting analysis system for **NRFI** (No Run First Inning) and **F5** (First 5 Innings) markets. Scores every game daily on a 0–100 scale and outputs picks with confidence tiers.
 
+### Quick Links
+
+- [**Today's Dashboard**](output/nrfi_dashboard_2026-04-13.html) — interactive picks & scores
+- [**Hit-Rate Tracker**](output/hit_rate_tracker.html) — model accuracy over time
+- [**Predictions Log**](output/predictions.csv) — all daily predictions (append-only)
+- [**Outcomes**](output/outcomes.csv) — actual results for backtesting
+
 ## Setup
 
 **Requirements:** Python 3.8+
