@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+
+# Track output/ so GitHub Actions can commit daily results back to the repo.
+# Exclude only the odds cache — it changes every run and has no analytical value.
+output/odds_cache_*.json

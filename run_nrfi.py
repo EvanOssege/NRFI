@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""
+NRFI Daily Runner
+==================
+One-command script: fetches data, scores games, generates dashboard.
+
+Usage:
+  python run_nrfi.py                      # today's games
+  python run_nrfi.py 2026-04-15           # specific date
+  python run_nrfi.py --refresh-odds       # force fresh odds pull (bypass 2hr cache)
+  python run_nrfi.py 2026-04-15 --refresh-odds
+"""
+
+import sys
+import os
+from datetime import date
+
+# Ensure scripts dir is on path
+script_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
+sys.path.insert(0, script_dir)
+
+from nrfi_analyzer import analyze_date
+from dashboard import generate_dashboard
+from predictions_log import log_predictions
+from odds import fetch_nrfi_odds, match_odds_to_games
+import json
+from datetime import datetime
+
+
+def main():
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = [a for a in sys.argv[1:] if a.startswith("--")]
+    target_date = args[0] if args else date.today().isoformat()
+    refresh_odds = "--refresh-odds" in flags
+
+    # 1. Run analysis
+    results = analyze_date(target_date)
+
+    if not results:
+        print("\nNo games to analyze. Exiting.")
+        return
+
+    # 1b. Fetch betting odds (optional — requires ODDS_API_KEY)
+    print("\nFetching NRFI odds...")
+    odds = fetch_nrfi_odds(target_date, force_refresh=refresh_odds)
+    if odds:
+        match_odds_to_games(odds, results)
+        matched = sum(1 for g in results if g.get("odds", {}).get("has_odds"))
+        print(f"  Matched odds for {matched}/{len(results)} games")
+    else:
+        for g in results:
+            g["odds"] = {"has_odds": False}
+        print("  No odds available (set ODDS_API_KEY to enable)")
+
+    # 2. Save JSON
+    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+    os.makedirs(output_dir, exist_ok=True)
+
+    data = {
+        "date": target_date,
+        "generated": datetime.now().isoformat(),
+        "games": results,
+    }
+
+    json_path = os.path.join(output_dir, f"nrfi_{target_date}.json")
+    with open(json_path, "w") as f:
+        json.dump(data, f, indent=2)
+    print(f"\nJSON saved: {json_path}")
+
+    # 2b. Upsert predictions log — re-runs update existing rows for the same date
+    predictions_csv = os.path.join(output_dir, "predictions.csv")
+    log_summary = log_predictions(target_date, results, predictions_csv)
+    parts = []
+    if log_summary["appended"]:
+        parts.append(f"+{log_summary['appended']} new")
+    if log_summary["updated"]:
+        parts.append(f"~{log_summary['updated']} updated")
+    if log_summary["skipped_no_pk"]:
+        parts.append(f"{log_summary['skipped_no_pk']} skipped (no game_pk)")
+    print(f"Predictions log: {', '.join(parts) or 'no changes'} -> {predictions_csv}")
+
+    # 3. Generate dashboard
+    dash_path = os.path.join(output_dir, f"nrfi_dashboard_{target_date}.html")
+    generate_dashboard(data, dash_path)
+
+    # 4. Print summary
+    print(f"\n{'='*60}")
+    print(f"  TOP PICKS — {target_date}")
+    print(f"{'='*60}")
+
+    # --- NRFI Picks ---
+    picks = [g for g in results if g["nrfi"]["tier"] in ("STRONG", "LEAN")]
+    print(f"\n  NRFI")
+    print(f"  {'─'*40}")
+    if picks:
+        for g in picks:
+            n = g["nrfi"]
+            emoji = "🟢" if n["tier"] == "STRONG" else "🟡"
+            print(f"  {emoji} {g['matchup']:12s}  Score: {n['score']:5.1f}  ({n['tier']})")
+            print(f"     {g['away_pitcher']} vs {g['home_pitcher']}")
+            print(f"     {g['venue']} · Weather: ", end="")
+            w = g['weather']
+            if w.get('indoor'):
+                print("Indoor")
+            else:
+                parts = []
+                if w.get('temp_f') is not None: parts.append(f"{w['temp_f']:.0f}°F")
+                if w.get('wind_mph') is not None: parts.append(f"{w['wind_mph']:.0f}mph wind")
+                print(" · ".join(parts) if parts else "N/A")
+            print()
+    else:
+        print("  No strong/lean NRFI picks today.")
+
+    # --- F5 Moneyline Picks ---
+    f5_ml_picks = [g for g in results
+                   if g.get("f5", {}).get("ml", {}).get("confidence") in ("STRONG", "MODERATE")]
+    print(f"\n  F5 MONEYLINE")
+    print(f"  {'─'*40}")
+    if f5_ml_picks:
+        for g in f5_ml_picks:
+            ml = g["f5"]["ml"]
+            emoji = "🟢" if ml["confidence"] == "STRONG" else "🟡"
+            print(f"  {emoji} {g['matchup']:12s}  Pick: {ml['pick']} (edge {ml['edge']:+.1f}, {ml['confidence']})")
+            print(f"     {g['away_pitcher']} vs {g['home_pitcher']}")
+    else:
+        print("  No strong F5 ML picks today.")
+
+    # --- F5 Total Picks ---
+    f5_total_picks = [g for g in results
+                      if g.get("f5", {}).get("total", {}).get("confidence") in ("STRONG", "LEAN")]
+    print(f"\n  F5 TOTAL")
+    print(f"  {'─'*40}")
+    if f5_total_picks:
+        for g in f5_total_picks:
+            t = g["f5"]["total"]
+            emoji = "⬆️" if t["lean"] == "OVER" else "⬇️"
+            print(f"  {emoji} {g['matchup']:12s}  Proj: {t['projected_total']} ({t['lean']} {t['primary_line']}, {t['confidence']})")
+            print(f"     {g['away_pitcher']} vs {g['home_pitcher']}")
+    else:
+        print("  No strong F5 total picks today.")
+
+    # --- F5 Spread Picks ---
+    f5_spread_picks = [g for g in results
+                       if g.get("f5", {}).get("spread", {}).get("confidence") in ("STRONG", "LEAN")]
+    print(f"\n  F5 SPREAD")
+    print(f"  {'─'*40}")
+    if f5_spread_picks:
+        for g in f5_spread_picks:
+            s = g["f5"]["spread"]
+            print(f"  ► {g['matchup']:12s}  {s['recommended_label']} ({s['confidence']})")
+            print(f"     {g['away_pitcher']} vs {g['home_pitcher']}")
+    else:
+        print("  No strong F5 spread picks today.")
+
+    print(f"\n{'─'*60}")
+    print(f"Dashboard: {dash_path}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,63 @@
+name: Daily NRFI + F5 Analysis
+
+on:
+  schedule:
+    # 12:00 PM ET = 16:00 UTC (EDT, Mar–Nov). Lineups are usually posted by noon.
+    # Adjust to 17:00 UTC during EST (Nov–Mar) if needed.
+    - cron: "0 16 * * *"
+
+  # Also lets you trigger a run manually from the GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Date to analyze (YYYY-MM-DD). Leave blank for today."
+        required: false
+        default: ""
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Check out the repo (full history so we can push back) ──────────
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Python setup ───────────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ── 3. Run NRFI + F5 analysis ─────────────────────────────────────────
+      - name: Run analysis
+        env:
+          # Optional: add ODDS_API_KEY in repo Settings → Secrets → Actions
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python run_nrfi.py "${{ github.event.inputs.date }}"
+          else
+            python run_nrfi.py
+          fi
+
+      # ── 4. Update outcomes (backtest) ─────────────────────────────────────
+      - name: Update outcomes (backtest)
+        run: python scripts/backtest.py --update-only
+
+      # ── 5. Commit output files back to the repo ───────────────────────────
+      # Saves predictions.csv, outcomes.csv, and the daily JSON/HTML so they
+      # persist between runs without any external storage.
+      - name: Commit outputs
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/
+          # Only commit if there's actually something new
+          git diff --cached --quiet || git commit -m "chore: daily analysis $(date -u +%Y-%m-%d)"
+          git push
