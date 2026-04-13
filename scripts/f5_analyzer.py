@@ -214,6 +214,14 @@ def compute_f5_spread(game: dict, f5_ml: dict) -> dict:
 # Baseline: MLB average is roughly 4.5 runs per game full, ~2.5 over F5.
 # The most common F5 O/U line is 4.5 or 5.
 F5_BASELINE_TOTAL = 4.5
+F5_SIDE_BASE_RUNS = 2.25
+F5_PITCHER_SCALE = 0.60
+F5_LINEUP_SCALE = 0.35
+F5_FI_ADJ_SCALE = 0.02
+F5_BVP_ADJ_SCALE = 0.04
+F5_PLATOON_ADJ_SCALE = 0.04
+F5_STREAK_ADJ_SCALE = 0.03
+F5_REST_ADJ_SCALE = 0.05
 
 def _estimate_f5_runs(pitcher_score, lineup_threat, fi_adj, bvp_adj,
                       platoon_adj, streak_adj, rest_adj):
@@ -227,25 +235,25 @@ def _estimate_f5_runs(pitcher_score, lineup_threat, fi_adj, bvp_adj,
     no adjustments) should project ~2.25 runs per side (4.5 total for F5).
     """
     # Start from a baseline of 2.25 runs per side (half of F5 total)
-    base = 2.25
+    base = F5_SIDE_BASE_RUNS
 
     # Pitcher quality: each point above 50 reduces runs
     # Scale: a 70-score pitcher might allow ~1.5 runs; a 30-score ~3.0
     pitcher_delta = (50 - pitcher_score) / 50.0  # positive = bad pitcher
-    runs_from_pitcher = base * (1 + pitcher_delta * 0.6)
+    runs_from_pitcher = base * (1 + pitcher_delta * F5_PITCHER_SCALE)
 
     # Lineup threat: each point above 50 adds runs
     lineup_delta = (lineup_threat - 50) / 50.0  # positive = dangerous lineup
-    runs_from_lineup = runs_from_pitcher * (1 + lineup_delta * 0.35)
+    runs_from_lineup = runs_from_pitcher * (1 + lineup_delta * F5_LINEUP_SCALE)
 
     # Adjustments — convert from NRFI-scale (positive=good for pitcher)
     # to runs (positive = more runs scored). Flip the sign.
     adj_runs = 0
-    adj_runs -= fi_adj * 0.02       # FI adj: minor influence over 5 inn
-    adj_runs -= bvp_adj * 0.04      # BvP: meaningful
-    adj_runs -= platoon_adj * 0.04  # platoon: meaningful
-    adj_runs -= streak_adj * 0.03   # streaks: moderate
-    adj_runs -= rest_adj * 0.05     # rest: amplified over 5 innings
+    adj_runs -= fi_adj * F5_FI_ADJ_SCALE       # FI adj: minor influence over 5 inn
+    adj_runs -= bvp_adj * F5_BVP_ADJ_SCALE     # BvP: meaningful
+    adj_runs -= platoon_adj * F5_PLATOON_ADJ_SCALE  # platoon: meaningful
+    adj_runs -= streak_adj * F5_STREAK_ADJ_SCALE    # streaks: moderate
+    adj_runs -= rest_adj * F5_REST_ADJ_SCALE   # rest: amplified over 5 innings
 
     total = runs_from_lineup + adj_runs
     return max(0.5, round(total, 2))  # floor at 0.5 — can't be negative

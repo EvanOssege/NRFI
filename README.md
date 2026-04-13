@@ -61,6 +61,11 @@ npm run backtest:update
 npm run backtest:report
 ```
 
+Backtest reports now include **F5 coefficient calibration by pitcher-quality tier**:
+- Uses completed-game F5 outcomes (innings 1-5) to compare projected vs actual median runs allowed by tier.
+- Runs a bounded coefficient search for `_estimate_f5_runs()` scales.
+- Prints recommendation-only, copy-paste-ready constants for `scripts/f5_analyzer.py` (manual apply).
+
 ## Confidence Tiers
 
 | Tier | Score | Meaning |
@@ -75,4 +80,3 @@ npm run backtest:report
 - **MLB Stats API** — schedule, rosters, pitcher/batter stats (free, no key)
 - **Open-Meteo** — weather forecasts for outdoor parks (free, no key)
 - **The Odds API** — FanDuel NRFI odds, optional (free tier: 500 req/month)
-

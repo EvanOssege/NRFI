@@ -27,7 +27,19 @@ import math
 import re
 from datetime import datetime, date
 from collections import defaultdict
+from statistics import median
 import requests
+
+from f5_analyzer import (
+    F5_SIDE_BASE_RUNS,
+    F5_PITCHER_SCALE,
+    F5_LINEUP_SCALE,
+    F5_FI_ADJ_SCALE,
+    F5_BVP_ADJ_SCALE,
+    F5_PLATOON_ADJ_SCALE,
+    F5_STREAK_ADJ_SCALE,
+    F5_REST_ADJ_SCALE,
+)
 
 MLB_BASE = "https://statsapi.mlb.com/api/v1"
 
@@ -62,6 +74,29 @@ COMPONENT_COLUMNS = [
     "weather_adj",
     "team_tendency_adj",
 ]
+
+F5_PITCHER_TIERS = [
+    ("ELITE", 70.0, float("inf")),
+    ("STRONG", 60.0, 70.0),
+    ("AVERAGE", 50.0, 60.0),
+    ("WEAK", float("-inf"), 50.0),
+]
+
+F5_CAL_MIN_SIDE_SAMPLES = 80
+F5_CAL_MIN_TIER_SAMPLES = 12
+F5_CAL_ITERATIONS = 4
+F5_CAL_MULTIPLIERS = [0.80, 0.90, 0.95, 1.00, 1.05, 1.10, 1.20]
+
+F5_CAL_BOUNDS = {
+    "base": (1.50, 3.25),
+    "pitcher_scale": (0.20, 1.10),
+    "lineup_scale": (0.10, 0.90),
+    "fi_scale": (0.00, 0.10),
+    "bvp_scale": (0.00, 0.16),
+    "platoon_scale": (0.00, 0.16),
+    "streak_scale": (0.00, 0.16),
+    "rest_scale": (0.00, 0.16),
+}
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +387,13 @@ def _safe_float(v, default=0.0):
         return float(v)
     except (TypeError, ValueError):
         return default
+
+
+def _safe_float_or_none(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
 
 
 def hit_rate_by_tier(joined: list) -> dict:
@@ -751,6 +793,216 @@ def f5_total_calibration(joined: list) -> list:
     return result
 
 
+def _f5_default_coeffs() -> dict:
+    return {
+        "base": F5_SIDE_BASE_RUNS,
+        "pitcher_scale": F5_PITCHER_SCALE,
+        "lineup_scale": F5_LINEUP_SCALE,
+        "fi_scale": F5_FI_ADJ_SCALE,
+        "bvp_scale": F5_BVP_ADJ_SCALE,
+        "platoon_scale": F5_PLATOON_ADJ_SCALE,
+        "streak_scale": F5_STREAK_ADJ_SCALE,
+        "rest_scale": F5_REST_ADJ_SCALE,
+    }
+
+
+def _f5_pitcher_tier(pitcher_score: float) -> str:
+    for label, lo, hi in F5_PITCHER_TIERS:
+        if lo <= pitcher_score < hi:
+            return label
+    return "UNKNOWN"
+
+
+def _build_f5_side_samples(joined: list) -> list:
+    """
+    Convert completed games into side-level rows for calibration.
+    Each game contributes up to two samples:
+      - away pitcher vs home lineup (actual runs allowed = home_runs_f5)
+      - home pitcher vs away lineup (actual runs allowed = away_runs_f5)
+    """
+    rows = []
+    for r in joined:
+        if not r.get("f5_innings_complete"):
+            continue
+
+        away_pitcher_score = _safe_float_or_none(r.get("away_pitcher_score"))
+        home_pitcher_score = _safe_float_or_none(r.get("home_pitcher_score"))
+        home_lineup_threat = _safe_float_or_none(r.get("home_lineup_threat"))
+        away_lineup_threat = _safe_float_or_none(r.get("away_lineup_threat"))
+        home_runs_f5 = _safe_float_or_none(r.get("home_runs_f5"))
+        away_runs_f5 = _safe_float_or_none(r.get("away_runs_f5"))
+        if None in (
+            away_pitcher_score, home_pitcher_score,
+            home_lineup_threat, away_lineup_threat,
+            home_runs_f5, away_runs_f5,
+        ):
+            continue
+
+        fi_adj = _safe_float(r.get("fi_adj")) * 0.5
+        bvp_adj = _safe_float(r.get("bvp_adj")) * 0.5
+        platoon_adj = _safe_float(r.get("platoon_adj")) * 0.5
+        streak_adj = _safe_float(r.get("streak_adj")) * 0.5
+        rest_adj = _safe_float(r.get("rest_adj")) * 0.5
+
+        rows.append({
+            "tier": _f5_pitcher_tier(away_pitcher_score),
+            "pitcher_score": away_pitcher_score,
+            "lineup_threat": home_lineup_threat,
+            "fi_adj": fi_adj,
+            "bvp_adj": bvp_adj,
+            "platoon_adj": platoon_adj,
+            "streak_adj": streak_adj,
+            "rest_adj": rest_adj,
+            "actual_runs_allowed": home_runs_f5,
+        })
+        rows.append({
+            "tier": _f5_pitcher_tier(home_pitcher_score),
+            "pitcher_score": home_pitcher_score,
+            "lineup_threat": away_lineup_threat,
+            "fi_adj": fi_adj,
+            "bvp_adj": bvp_adj,
+            "platoon_adj": platoon_adj,
+            "streak_adj": streak_adj,
+            "rest_adj": rest_adj,
+            "actual_runs_allowed": away_runs_f5,
+        })
+    return rows
+
+
+def _project_f5_runs_allowed(sample: dict, coeffs: dict) -> float:
+    base = coeffs["base"]
+    pitcher_delta = (50 - sample["pitcher_score"]) / 50.0
+    runs_from_pitcher = base * (1 + pitcher_delta * coeffs["pitcher_scale"])
+
+    lineup_delta = (sample["lineup_threat"] - 50) / 50.0
+    runs_from_lineup = runs_from_pitcher * (1 + lineup_delta * coeffs["lineup_scale"])
+
+    adj_runs = 0.0
+    adj_runs -= sample["fi_adj"] * coeffs["fi_scale"]
+    adj_runs -= sample["bvp_adj"] * coeffs["bvp_scale"]
+    adj_runs -= sample["platoon_adj"] * coeffs["platoon_scale"]
+    adj_runs -= sample["streak_adj"] * coeffs["streak_scale"]
+    adj_runs -= sample["rest_adj"] * coeffs["rest_scale"]
+
+    return max(0.5, round(runs_from_lineup + adj_runs, 2))
+
+
+def _tier_median_bias(side_samples: list, coeffs: dict) -> list:
+    tier_actual = defaultdict(list)
+    tier_proj = defaultdict(list)
+    for row in side_samples:
+        tier = row["tier"]
+        tier_actual[tier].append(row["actual_runs_allowed"])
+        tier_proj[tier].append(_project_f5_runs_allowed(row, coeffs))
+
+    out = []
+    for tier, _, _ in F5_PITCHER_TIERS:
+        actual = tier_actual.get(tier, [])
+        proj = tier_proj.get(tier, [])
+        n = len(actual)
+        if n == 0:
+            out.append({
+                "tier": tier,
+                "n": 0,
+                "actual_median": float("nan"),
+                "projected_median": float("nan"),
+                "bias": float("nan"),
+                "eligible": False,
+            })
+            continue
+        actual_med = median(actual)
+        proj_med = median(proj)
+        out.append({
+            "tier": tier,
+            "n": n,
+            "actual_median": round(actual_med, 2),
+            "projected_median": round(proj_med, 2),
+            "bias": round(proj_med - actual_med, 2),
+            "eligible": n >= F5_CAL_MIN_TIER_SAMPLES,
+        })
+    return out
+
+
+def _tier_weighted_abs_bias(tier_rows: list) -> float:
+    eligible = [r for r in tier_rows if r.get("eligible")]
+    if not eligible:
+        return float("inf")
+    total_n = sum(r["n"] for r in eligible)
+    if total_n == 0:
+        return float("inf")
+    return sum(abs(r["bias"]) * r["n"] for r in eligible) / total_n
+
+
+def _search_f5_coefficients(side_samples: list, base_coeffs: dict) -> tuple[dict, float]:
+    best = dict(base_coeffs)
+    best_loss = _tier_weighted_abs_bias(_tier_median_bias(side_samples, best))
+
+    for _ in range(F5_CAL_ITERATIONS):
+        improved = False
+        for key, (lo, hi) in F5_CAL_BOUNDS.items():
+            current = best[key]
+            candidates = {round(max(lo, min(hi, current * m)), 4) for m in F5_CAL_MULTIPLIERS}
+            candidates.add(round(max(lo, min(hi, current)), 4))
+            local_best = current
+            local_loss = best_loss
+
+            for candidate in sorted(candidates):
+                trial = dict(best)
+                trial[key] = candidate
+                loss = _tier_weighted_abs_bias(_tier_median_bias(side_samples, trial))
+                if loss + 1e-9 < local_loss:
+                    local_loss = loss
+                    local_best = candidate
+
+            if local_best != current:
+                best[key] = local_best
+                best_loss = local_loss
+                improved = True
+        if not improved:
+            break
+
+    return best, best_loss
+
+
+def f5_coefficient_calibration(joined: list) -> dict:
+    side_samples = _build_f5_side_samples(joined)
+    if len(side_samples) < F5_CAL_MIN_SIDE_SAMPLES:
+        return {
+            "ready": False,
+            "side_samples": len(side_samples),
+            "min_side_samples": F5_CAL_MIN_SIDE_SAMPLES,
+        }
+
+    baseline = _f5_default_coeffs()
+    before = _tier_median_bias(side_samples, baseline)
+    before_loss = _tier_weighted_abs_bias(before)
+
+    tuned, after_loss = _search_f5_coefficients(side_samples, baseline)
+    after = _tier_median_bias(side_samples, tuned)
+
+    # No auto-write: output recommendation-only constants for manual update.
+    constants_block = {
+        "F5_SIDE_BASE_RUNS": round(tuned["base"], 4),
+        "F5_PITCHER_SCALE": round(tuned["pitcher_scale"], 4),
+        "F5_LINEUP_SCALE": round(tuned["lineup_scale"], 4),
+        "F5_FI_ADJ_SCALE": round(tuned["fi_scale"], 4),
+        "F5_BVP_ADJ_SCALE": round(tuned["bvp_scale"], 4),
+        "F5_PLATOON_ADJ_SCALE": round(tuned["platoon_scale"], 4),
+        "F5_STREAK_ADJ_SCALE": round(tuned["streak_scale"], 4),
+        "F5_REST_ADJ_SCALE": round(tuned["rest_scale"], 4),
+    }
+
+    return {
+        "ready": True,
+        "side_samples": len(side_samples),
+        "before": before,
+        "after": after,
+        "before_loss": before_loss,
+        "after_loss": after_loss,
+        "constants_block": constants_block,
+    }
+
+
 # ---------------------------------------------------------------------------
 # REPORT PRINTING
 # ---------------------------------------------------------------------------
@@ -897,6 +1149,41 @@ def print_report(joined: list):
                 print(f"  {row['proj_bucket']:>6.1f} {row['n']:>4} {row['avg_actual']:>11.2f} {bias_str}{flag}")
             print("  → Bias = avg_actual − projection. Negative = model overestimates runs.")
             print()
+
+        # F5 coefficient calibration (recommendation-only; no auto-write)
+        f5_cal = f5_coefficient_calibration(joined)
+        print("F5 coefficient calibration by pitcher tier (runs allowed through 5 inn):")
+        if not f5_cal.get("ready"):
+            print(f"  Not enough side samples yet: {f5_cal.get('side_samples', 0)} "
+                  f"(need {f5_cal.get('min_side_samples', F5_CAL_MIN_SIDE_SAMPLES)}).")
+            print("  Keep logging predictions/outcomes; rerun backtest after more games complete.\n")
+        else:
+            before_map = {r["tier"]: r for r in f5_cal["before"]}
+            after_map = {r["tier"]: r for r in f5_cal["after"]}
+            print(f"  Side samples: {f5_cal['side_samples']}")
+            print(f"  Objective (weighted abs tier bias): "
+                  f"{f5_cal['before_loss']:.3f} → {f5_cal['after_loss']:.3f}")
+            print(f"  {'Tier':<9} {'N':>5} {'Actual Med':>11} {'Proj Med (old)':>14} "
+                  f"{'Proj Med (new)':>14} {'Bias old':>9} {'Bias new':>9}")
+            print(f"  {'-' * 80}")
+            for tier, _, _ in F5_PITCHER_TIERS:
+                b = before_map.get(tier)
+                a = after_map.get(tier)
+                if not b or b["n"] == 0:
+                    print(f"  {tier:<9} {'-':>5} {'-':>11} {'-':>14} {'-':>14} {'-':>9} {'-':>9}")
+                    continue
+                actual_med = f"{b['actual_median']:.2f}"
+                old_proj = f"{b['projected_median']:.2f}"
+                new_proj = f"{a['projected_median']:.2f}" if a else "-"
+                old_bias = f"{b['bias']:+.2f}"
+                new_bias = f"{a['bias']:+.2f}" if a else "-"
+                print(f"  {tier:<9} {b['n']:>5} {actual_med:>11} {old_proj:>14} {new_proj:>14} "
+                      f"{old_bias:>9} {new_bias:>9}")
+
+            print("\n  Recommended constants for scripts/f5_analyzer.py:")
+            for name, value in f5_cal["constants_block"].items():
+                print(f"  {name} = {value}")
+            print("  (Recommendation-only output; apply manually after reviewing sample quality.)\n")
 
 
 # ---------------------------------------------------------------------------
