@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NRFI + F5 Hub</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f1923;
+    color: #e4e8ec;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    color: #8899a6;
+    font-size: 14px;
+    margin-bottom: 36px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    max-width: 640px;
+    width: 100%;
+  }
+  a.card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #1a2733;
+    border: 1px solid #2a3a4a;
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  a.card:hover {
+    border-color: #4a9eff;
+    transform: translateY(-2px);
+  }
+  .card .icon { font-size: 28px; margin-bottom: 4px; }
+  .card .label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .card .desc {
+    font-size: 13px;
+    color: #8899a6;
+    line-height: 1.4;
+  }
+  .card.primary { border-color: #1d6fdb; background: #162638; }
+  .card.primary:hover { border-color: #4a9eff; }
+  .date-label {
+    font-size: 13px;
+    color: #5c7a99;
+    margin-top: 32px;
+  }
+  #error-msg {
+    color: #e8866a;
+    font-size: 14px;
+    margin-top: 16px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <h1>NRFI + F5 Hub</h1>
+  <p class="subtitle" id="date-line">Loading…</p>
+
+  <div class="grid">
+    <a class="card primary" id="dashboard-link" href="#">
+      <span class="icon">📊</span>
+      <span class="label">Today's Dashboard</span>
+      <span class="desc">Interactive picks, scores & breakdowns</span>
+    </a>
+    <a class="card" href="hit_rate_tracker.html">
+      <span class="icon">🎯</span>
+      <span class="label">Hit-Rate Tracker</span>
+      <span class="desc">Model accuracy & calibration over time</span>
+    </a>
+    <a class="card" href="predictions.csv">
+      <span class="icon">📋</span>
+      <span class="label">Predictions Log</span>
+      <span class="desc">All daily predictions (append-only CSV)</span>
+    </a>
+    <a class="card" href="outcomes.csv">
+      <span class="icon">✅</span>
+      <span class="label">Outcomes</span>
+      <span class="desc">Actual results for backtesting</span>
+    </a>
+  </div>
+
+  <p id="error-msg"></p>
+  <p class="date-label" id="extra-dates"></p>
+
+<script>
+(function() {
+  // Find the most recent dashboard by checking today backward up to 7 days
+  const link = document.getElementById('dashboard-link');
+  const dateLine = document.getElementById('date-line');
+  const errorMsg = document.getElementById('error-msg');
+  const extraDates = document.getElementById('extra-dates');
+
+  function fmt(d) {
+    return d.toISOString().slice(0, 10);
+  }
+
+  function checkDashboard(dateStr) {
+    return new Promise(resolve => {
+      const url = 'nrfi_dashboard_' + dateStr + '.html';
+      const xhr = new XMLHttpRequest();
+      xhr.open('HEAD', url, true);
+      xhr.onload = () => resolve(xhr.status >= 200 && xhr.status < 400 ? url : null);
+      xhr.onerror = () => resolve(null);
+      xhr.send();
+    });
+  }
+
+  // For file:// protocol, XHR HEAD won't work — use a direct approach
+  const isFileProtocol = window.location.protocol === 'file:';
+
+  if (isFileProtocol) {
+    // On file://, just link to today's date and provide last 5 days as fallbacks
+    const today = new Date();
+    const todayStr = fmt(today);
+    link.href = 'nrfi_dashboard_' + todayStr + '.html';
+    dateLine.textContent = todayStr;
+
+    // Show recent dates as fallback links
+    let links = [];
+    for (let i = 1; i <= 5; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const ds = fmt(d);
+      links.push('<a href="nrfi_dashboard_' + ds + '.html" style="color:#4a9eff">' + ds + '</a>');
+    }
+    extraDates.innerHTML = 'Recent: ' + links.join(' · ');
+  } else {
+    // Hosted or localhost — probe for the most recent dashboard
+    (async function() {
+      const today = new Date();
+      for (let i = 0; i <= 7; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const ds = fmt(d);
+        const url = await checkDashboard(ds);
+        if (url) {
+          link.href = url;
+          dateLine.textContent = ds + (i > 0 ? ' (latest available)' : '');
+          return;
+        }
+      }
+      dateLine.textContent = 'No recent dashboard found';
+      errorMsg.textContent = 'Run "python run_nrfi.py" to generate today\'s analysis.';
+      errorMsg.style.display = 'block';
+    })();
+  }
+})();
+</script>
+</body>
+</html>

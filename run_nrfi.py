@@ -170,8 +170,10 @@ def main():
     else:
         print("  No strong F5 spread picks today.")
 
+    hub_path = os.path.join(output_dir, "index.html")
     print(f"\n{'─'*60}")
     print(f"Dashboard: {dash_path}")
+    print(f"Hub:       {hub_path}")
 
     # 5. Clean up output files older than 5 days
     cutoff = date.today() - timedelta(days=5)
