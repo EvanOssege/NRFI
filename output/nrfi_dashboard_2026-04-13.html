@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NRFI Dashboard — 2026-04-13</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--surface2);
+  }
+  .header h1 {
+    font-size: 1.8em;
+    margin-bottom: 6px;
+  }
+  .header .subtitle { color: var(--text-dim); font-size: 0.9em; }
+
+  .summary-bar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .summary-chip {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85em;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .summary-chip:hover { opacity: 0.85; }
+  .summary-chip.active { border-color: white; }
+
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    color: var(--text);
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { background: var(--surface2); }
+  .filter-btn.active { background: var(--accent); color: #000; font-weight: 600; }
+
+  .game-card {
+    background: var(--surface);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+    overflow: hidden;
+    transition: transform 0.1s;
+  }
+  .game-card:hover { transform: translateX(2px); }
+
+  .game-header {
+    padding: 14px 18px;
+  }
+  .matchup-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .matchup { font-size: 1.2em; font-weight: 700; }
+  .nrfi-badge {
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  .header-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .odds-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.82em;
+    background: var(--surface2);
+    white-space: nowrap;
+  }
+  .odds-book {
+    color: var(--text-dim);
+    font-size: 0.85em;
+  }
+  .odds-price {
+    font-weight: 700;
+    color: var(--text);
+  }
+  .odds-prob {
+    color: var(--text-dim);
+    font-size: 0.9em;
+  }
+  .odds-value {
+    font-weight: 700;
+    font-size: 0.85em;
+    margin-left: 2px;
+  }
+  .game-meta { color: var(--text-dim); font-size: 0.82em; margin-top: 4px; }
+
+  .game-body { padding: 14px 18px; }
+
+  .pitchers-row {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .pitcher-section { flex: 1; }
+  .vs-divider {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+  .section-label {
+    font-size: 0.7em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .pitcher-card {
+    background: var(--bg);
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .pitcher-name { font-weight: 600; font-size: 1em; margin-bottom: 4px; }
+  .pitcher-score { font-size: 1.6em; font-weight: 800; margin-bottom: 6px; }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  .stat { text-align: center; }
+  .stat-label { display: block; font-size: 0.65em; color: var(--text-dim); text-transform: uppercase; }
+  .stat-value { display: block; font-size: 0.9em; font-weight: 600; }
+
+  .lineup-details {
+    margin-top: 12px;
+  }
+  .lineup-details summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 0.85em;
+    padding: 6px 0;
+  }
+  .lineups-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .lineup-section { flex: 1; }
+  .batter-table {
+    width: 100%;
+    font-size: 0.78em;
+    border-collapse: collapse;
+  }
+  .batter-table th {
+    text-align: left;
+    color: var(--text-dim);
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--surface2);
+    font-weight: 600;
+  }
+  .batter-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .lineup-src {
+    font-size: 0.72em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .lineup-confirmed { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .lineup-partial { background: rgba(234,179,8,0.15); color: #eab308; }
+  .lineup-estimated { background: rgba(239,68,68,0.15); color: #f87171; }
+
+  .badge-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 4px 0 6px 0;
+  }
+
+  .park-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .park-hitter { background: rgba(239,68,68,0.2); color: #ef4444; }
+  .park-pitcher { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .park-neutral { background: rgba(107,114,128,0.15); color: #9ca3af; }
+
+  .bvp-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.72em;
+    font-weight: 600;
+    margin: 4px 0 6px 0;
+  }
+  .bvp-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+  .bvp-warn { background: rgba(234,179,8,0.2); color: #eab308; }
+  .bvp-neutral { background: rgba(107,114,128,0.2); color: #9ca3af; }
+  .bvp-good { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .bvp-safe { background: rgba(34,197,94,0.25); color: #22c55e; }
+
+  .hand-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.7em;
+    font-weight: 700;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .hand-left { background: rgba(96,165,250,0.2); color: #60a5fa; }
+  .hand-right { background: rgba(251,146,60,0.2); color: #fb923c; }
+
+  .fi-row { margin-top: 6px; }
+  .fi-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.68em;
+    font-weight: 600;
+  }
+  .fi-good { background: rgba(34,197,94,0.2); color: #22c55e; }
+  .fi-neutral { background: rgba(107,114,128,0.15); color: #9ca3af; }
+  .fi-bad { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+  .score-breakdown {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 0.75em;
+    color: var(--text-dim);
+    padding-top: 8px;
+    border-top: 1px solid var(--surface2);
+    flex-wrap: wrap;
+  }
+
+  .tend-panel {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+  }
+  .tend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .tend-title {
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tend-adj {
+    font-size: 0.85em;
+    font-weight: 700;
+  }
+  .tend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .tend-cell {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .tend-label {
+    font-size: 0.7em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 2px;
+  }
+  .tend-val {
+    font-size: 1.05em;
+    font-weight: 700;
+  }
+  .tend-sub {
+    font-size: 0.72em;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+  .tend-foot {
+    margin-top: 6px;
+    font-size: 0.7em;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .methodology {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 30px;
+    font-size: 0.82em;
+    color: var(--text-dim);
+    border: 1px solid var(--surface2);
+  }
+  .methodology h3 { color: var(--text); margin-bottom: 8px; }
+
+  .no-games {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 1.1em;
+  }
+
+  @media (max-width: 700px) {
+    .pitchers-row, .lineups-row { flex-direction: column; }
+    .vs-divider { justify-content: center; padding: 4px 0; }
+    body { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>NRFI Dashboard</h1>
+  <div class="subtitle">2026-04-13 · Generated 07:48 PM · 10 games analyzed</div>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-chip" style="background:#22c55e;color:#000" onclick="filterTier('STRONG')">STRONG 0</div>
+  <div class="summary-chip" style="background:#eab308;color:#000" onclick="filterTier('LEAN')">LEAN 0</div>
+  <div class="summary-chip" style="background:#f97316;color:#000" onclick="filterTier('TOSS-UP')">TOSS-UP 0</div>
+  <div class="summary-chip" style="background:#ef4444;color:#000" onclick="filterTier('FADE')">FADE 10</div>
+</div>
+
+<div class="filter-row">
+  <button class="filter-btn active" onclick="filterTier('ALL')">All Games</button>
+  <button class="filter-btn" onclick="filterTier('PICKS')">Top Picks Only</button>
+</div>
+
+<div id="games-container">
+  
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">HOU @ SEA</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              43.2 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">T-Mobile Park <span class="park-badge park-pitcher" title="Park Factor: 96">⚾ 96 Pitcher-friendly</span> · 4:10 PM ET · 🏟️ Indoor (72°F)</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Mike Burrows <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            37.7
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">5.63</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.75</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">8.4</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.4</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.7</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="16/22 clean 1st innings">1st Inn ERA: 3.96 · 68% clean (22GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">George Kirby <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            54.2
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">3.60</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.90</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">7.2</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.2</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.4</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">20.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="19/25 clean 1st innings">1st Inn ERA: 4.18 · 71% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Burrows) · Threat: 25.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 4AB (limited)</span> <span class="bvp-badge bvp-neutral">L7: .585 OPS (+0.006) · 2🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-good">vs RHP: .593 OPS · 1dis/3adv — SP has edge</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Brendan Donovan</td>
+              <td>.293</td>
+              <td>.412</td>
+              <td>.973</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (23AB)">L 1.326</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .150 AVG / .630 OPS (-0.343)">🧊 .150/.630</span></td>
+              <td>3</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Cal Raleigh</td>
+              <td>.133</td>
+              <td>.232</td>
+              <td>.499</td>
+              <td><span style="color:#22c55e" title="SHB vs RHP (42AB)">S .612</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .148 AVG / .657 OPS (+0.158)">🔥 .148/.657</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Julio Rodríguez</td>
+              <td>.194</td>
+              <td>.286</td>
+              <td>.544</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (44AB)">R .498</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .250 AVG / .716 OPS (+0.172)">🔥 .250/.716</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.333 (2AB)</span></td>
+            </tr><tr>
+              <td>Josh Naylor</td>
+              <td>.102</td>
+              <td>.197</td>
+              <td>.299</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (41AB)">L .264</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .111 AVG / .337 OPS (+0.038)">➖ .111/.337</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="1-for-2, 0 HR">.500/1.000 (2AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Kirby) · Threat: 82.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-safe">BvP: .426 OPS · 46AB · 0HR — SP dominates</span> <span class="bvp-badge bvp-good">L7: .846 OPS (-0.114) · 0🔥 3🧊 — Cooling off</span> <span class="bvp-badge bvp-danger">vs RHP: .931 OPS · 3dis/1adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Jose Altuve</td>
+              <td>.333</td>
+              <td>.457</td>
+              <td>.983</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (37AB)">R 1.014</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .345 AVG / .889 OPS (-0.094)">📉 .345/.889</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="3-for-17, 0 HR">.176/.387 (17AB)</span></td>
+            </tr><tr>
+              <td>Yordan Alvarez</td>
+              <td>.340</td>
+              <td>.500</td>
+              <td>1.255</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (32AB)">L 1.007</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .259 AVG / 1.024 OPS (-0.231)">🧊 .259/1.024</span></td>
+              <td>6</td>
+              <td><span style="color:#22c55e" title="3-for-14, 0 HR">.214/.500 (14AB)</span></td>
+            </tr><tr>
+              <td>Isaac Paredes</td>
+              <td>.225</td>
+              <td>.340</td>
+              <td>.665</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (22AB)">R .560</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .250 AVG / .671 OPS (+0.006)">➖ .250/.671</span></td>
+              <td>0</td>
+              <td><span style="color:#22c55e" title="2-for-10, 0 HR">.200/.400 (10AB)</span></td>
+            </tr><tr>
+              <td>Christian Walker</td>
+              <td>.298</td>
+              <td>.375</td>
+              <td>.936</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (39AB)">R .999</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .240 AVG / .801 OPS (-0.135)">📉 .240/.801</span></td>
+              <td>3</td>
+              <td><span style="color:#22c55e" title="1-for-5, 0 HR">.200/.400 (5AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -3.0</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">SEA batting at HOME</div><div class="tend-val" style="color:#ff5e5e">44% <span class="tend-sub">(8/18)</span></div><div class="tend-sub">overall 43% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">HOU batting on ROAD</div><div class="tend-val" style="color:#ffb84d">29% <span class="tend-sub">(5/17)</span></div><div class="tend-sub">overall 40% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 37% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 41.0</span>
+          <span>Lineup: 29.4</span>
+          <span>1st Inn: +4.0</span>
+          <span>BvP: +8.0</span>
+          <span>L/R: -2.0</span>
+          <span>Form: +4.0</span>
+          <span>Park: +2.4</span>
+          <span>Weather: +3</span>
+          <span>Team Tend: -3.0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">CLE @ STL</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              41.1 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Busch Stadium <span class="park-badge park-neutral" title="Park Factor: 100">⚾ 100</span> · 7:45 PM ET · 76°F · 13 mph wind · 2% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Gavin Williams <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            57.5
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">2.04</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.08</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">12.7</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">7.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">17.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-good" title="19/25 clean 1st innings">1st Inn ERA: 2.25 · 79% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Matthew Liberatore <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            45.5
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">3.38</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.50</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">5.6</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.8</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.2</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="19/25 clean 1st innings">1st Inn ERA: 3.21 · 75% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Williams) · Threat: 74.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 5AB (limited)</span> <span class="bvp-badge bvp-neutral">L7: .772 OPS (-0.022) · 1🔥 3🧊 — Steady</span> <span class="bvp-badge bvp-danger">vs RHP: .825 OPS · 2dis/2adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>JJ Wetherholt</td>
+              <td>.214</td>
+              <td>.338</td>
+              <td>.624</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (38AB)">L .634</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .148 AVG / .488 OPS (-0.136)">📉 .148/.488</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Iván Herrera</td>
+              <td>.192</td>
+              <td>.377</td>
+              <td>.627</td>
+              <td><span style="color:#eab308" title="RHB vs RHP (34AB)">R .685</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .167 AVG / .561 OPS (-0.066)">📉 .167/.561</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Alec Burleson</td>
+              <td>.259</td>
+              <td>.379</td>
+              <td>.786</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (34AB)">L 1.026</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .240 AVG / .727 OPS (-0.059)">📉 .240/.727</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr><tr>
+              <td>Jordan Walker</td>
+              <td>.327</td>
+              <td>.393</td>
+              <td>1.138</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (38AB)">R .962</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .357 AVG / 1.312 OPS (+0.174)">🔥 .357/1.312</span></td>
+              <td>7</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.000 (2AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Liberatore) · Threat: 47.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-safe">BvP: .405 OPS · 14AB · 0HR — SP dominates</span> <span class="bvp-badge bvp-warn">L7: .854 OPS (+0.144) · 4🔥 0🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs LHP: .701 OPS · 2dis/2adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Steven Kwan</td>
+              <td>.246</td>
+              <td>.338</td>
+              <td>.671</td>
+              <td><span style="color:#22c55e" title="LHB vs LHP (18AB)">L .578</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .259 AVG / .762 OPS (+0.091)">📈 .259/.762</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="1-for-6, 0 HR">.167/.334 (6AB)</span></td>
+            </tr><tr>
+              <td>Angel Martínez</td>
+              <td>.333</td>
+              <td>.409</td>
+              <td>.896</td>
+              <td><span style="color:#22c55e" title="SHB vs LHP (15AB)">S .534</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .476 AVG / 1.214 OPS (+0.318)">🔥 .476/1.214</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="1-for-2, 0 HR">.500/1.167 (2AB)</span></td>
+            </tr><tr>
+              <td>José Ramírez</td>
+              <td>.190</td>
+              <td>.288</td>
+              <td>.633</td>
+              <td><span style="color:#ef4444" title="SHB vs LHP (17AB)">S .925</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .217 AVG / .748 OPS (+0.115)">📈 .217/.748</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="0-for-5, 0 HR">.000/.167 (5AB)</span></td>
+            </tr><tr>
+              <td>Daniel Schneemann</td>
+              <td>.226</td>
+              <td>.250</td>
+              <td>.637</td>
+              <td><span style="color:#ef4444" title="LHB vs LHP (3AB)">L 1.000</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .235 AVG / .690 OPS (+0.053)">📈 .235/.690</span></td>
+              <td>0</td>
+              <td><span style="color:#22c55e" title="0-for-1, 0 HR">.000/.500 (1AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -2.0</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">STL batting at HOME</div><div class="tend-val" style="color:#ff5e5e">33% <span class="tend-sub">(5/15)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">CLE batting on ROAD</div><div class="tend-val" style="color:#ff5e5e">41% <span class="tend-sub">(7/17)</span></div><div class="tend-sub">overall 37% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 34% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 47.9</span>
+          <span>Lineup: 31.4</span>
+          <span>1st Inn: +12.0</span>
+          <span>BvP: +3.7</span>
+          <span>L/R: -2.0</span>
+          <span>Form: -3.0</span>
+          <span>Park: +0.0</span>
+          <span>Weather: +2.0</span>
+          <span>Team Tend: -2.0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">BOS @ MIN</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              30.4 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Target Field <span class="park-badge park-neutral" title="Park Factor: 101">⚾ 101</span> · 7:40 PM ET · 59°F · 8 mph wind · 31% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Garrett Crochet <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            60.2
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">3.12</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.04</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">11.4</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.5</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">17.1</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="19/25 clean 1st innings">1st Inn ERA: 3.54 · 75% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Bailey Ober <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            45.2
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">5.27</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.24</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">4.6</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.6</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.7</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">13.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="17/25 clean 1st innings">1st Inn ERA: 4.18 · 68% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Crochet) · Threat: 52.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .995 OPS · 20AB · 2HR — Batters own SP</span> <span class="bvp-badge bvp-warn">L7: .802 OPS (+0.123) · 3🔥 0🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs LHP: .736 OPS · 0dis/4adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Byron Buxton</td>
+              <td>.182</td>
+              <td>.258</td>
+              <td>.531</td>
+              <td><span style="color:#22c55e" title="RHB vs LHP (26AB)">R .481</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .207 AVG / .579 OPS (+0.048)">➖ .207/.579</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="1-for-8, 1 HR">.125/.800 (8AB)</span></td>
+            </tr><tr>
+              <td>Austin Martin</td>
+              <td>.300</td>
+              <td>.500</td>
+              <td>.833</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (24AB)">R .875</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .385 AVG / 1.041 OPS (+0.208)">🔥 .385/1.041</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="1-for-2, 0 HR">.500/1.667 (2AB)</span></td>
+            </tr><tr>
+              <td>Luke Keaschall</td>
+              <td>.213</td>
+              <td>.269</td>
+              <td>.548</td>
+              <td><span style="color:#eab308" title="RHB vs LHP (29AB)">R .654</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .240 AVG / .681 OPS (+0.133)">📈 .240/.681</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Ryan Jeffers</td>
+              <td>.270</td>
+              <td>.400</td>
+              <td>.805</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (19AB)">R 1.037</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .304 AVG / .907 OPS (+0.102)">📈 .304/.907</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="3-for-10, 1 HR">.300/1.017 (10AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Ober) · Threat: 40.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 5AB (limited)</span> <span class="bvp-badge bvp-warn">L7: .723 OPS (+0.109) · 2🔥 0🧊 — Heating up</span> <span class="bvp-badge bvp-good">vs RHP: .649 OPS · 2dis/2adv — SP has edge</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Roman Anthony</td>
+              <td>.200</td>
+              <td>.290</td>
+              <td>.599</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (41AB)">L .609</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .172 AVG / .549 OPS (-0.050)">➖ .172/.549</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Caleb Durbin</td>
+              <td>.106</td>
+              <td>.208</td>
+              <td>.336</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (35AB)">R .402</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .136 AVG / .478 OPS (+0.142)">📈 .136/.478</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Jarren Duran</td>
+              <td>.196</td>
+              <td>.302</td>
+              <td>.563</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (34AB)">L .602</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .214 AVG / .588 OPS (+0.025)">➖ .214/.588</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="1-for-3, 0 HR">.333/1.000 (3AB)</span></td>
+            </tr><tr>
+              <td>Willson Contreras</td>
+              <td>.302</td>
+              <td>.448</td>
+              <td>.957</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (42AB)">R .931</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .423 AVG / 1.276 OPS (+0.319)">🔥 .423/1.276</span></td>
+              <td>3</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.000 (2AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#1fb86e">Adj: +1.9</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">MIN batting at HOME</div><div class="tend-val" style="color:#1fb86e">13% <span class="tend-sub">(2/15)</span></div><div class="tend-sub">overall 20% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">BOS batting on ROAD</div><div class="tend-val" style="color:#1fb86e">20% <span class="tend-sub">(3/15)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 21% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 48.2</span>
+          <span>Lineup: 50.4</span>
+          <span>1st Inn: +7.0</span>
+          <span>BvP: -6.7</span>
+          <span>L/R: +0.0</span>
+          <span>Form: -7.0</span>
+          <span>Park: -0.6</span>
+          <span>Weather: +1.0</span>
+          <span>Team Tend: +1.9</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">AZ @ BAL</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              28.9 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Oriole Park at Camden Yards <span class="park-badge park-neutral" title="Park Factor: 101">⚾ 101</span> · 6:35 PM ET · 67°F · 7 mph wind · 2% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Ryne Nelson <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            47.6
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">4.20</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.07</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">7.2</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.6</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.4</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">15.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="21/25 clean 1st innings">1st Inn ERA: 3.86 · 82% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">TBD </div>
+          <div class="pitcher-score" style="color: #eab308">
+            50.0
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">—</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">—</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">—</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">—</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">—</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">—</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral">1st Inn: No data</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Nelson) · Threat: 56.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .702 OPS · 19AB · 5HR — Batters own SP</span> <span class="bvp-badge bvp-warn">L7: .843 OPS (+0.085) · 3🔥 1🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs RHP: .751 OPS · 2dis/2adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Gunnar Henderson</td>
+              <td>.242</td>
+              <td>.338</td>
+              <td>.919</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (52AB)">L .774</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .241 AVG / 1.023 OPS (+0.104)">📈 .241/1.023</span></td>
+              <td>6</td>
+              <td><span style="color:#ef4444" title="2-for-4, 1 HR">.500/1.750 (4AB)</span></td>
+            </tr><tr>
+              <td>Taylor Ward</td>
+              <td>.356</td>
+              <td>.443</td>
+              <td>.968</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (54AB)">R .919</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .429 AVG / 1.179 OPS (+0.211)">🔥 .429/1.179</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="1-for-4, 0 HR">.250/.833 (4AB)</span></td>
+            </tr><tr>
+              <td>Pete Alonso</td>
+              <td>.190</td>
+              <td>.288</td>
+              <td>.581</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (48AB)">R .642</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .148 AVG / .517 OPS (-0.064)">📉 .148/.517</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="5-for-11, 4 HR">.455/2.000 (11AB)</span></td>
+            </tr><tr>
+              <td>Samuel Basallo</td>
+              <td>.150</td>
+              <td>.261</td>
+              <td>.561</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (31AB)">L .590</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .154 AVG / .652 OPS (+0.091)">📈 .154/.652</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs TBD) · Threat: 33.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: No history</span> <span class="bvp-badge bvp-neutral">L7: .673 OPS (+0.024) · 2🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-neutral">L/R: No data</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Ketel Marte</td>
+              <td>.197</td>
+              <td>.269</td>
+              <td>.597</td>
+              <td><span style="color:#6b7280">—</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .250 AVG / .729 OPS (+0.132)">📈 .250/.729</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Geraldo Perdomo</td>
+              <td>.157</td>
+              <td>.286</td>
+              <td>.541</td>
+              <td><span style="color:#6b7280">—</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .100 AVG / .410 OPS (-0.131)">📉 .100/.410</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Corbin Carroll</td>
+              <td>.327</td>
+              <td>.414</td>
+              <td>1.067</td>
+              <td><span style="color:#6b7280">—</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .360 AVG / 1.107 OPS (+0.040)">➖ .360/1.107</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Nolan Arenado</td>
+              <td>.180</td>
+              <td>.192</td>
+              <td>.392</td>
+              <td><span style="color:#6b7280">—</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .192 AVG / .445 OPS (+0.053)">📈 .192/.445</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -0.3</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">BAL batting at HOME</div><div class="tend-val" style="color:#1fb86e">19% <span class="tend-sub">(3/16)</span></div><div class="tend-sub">overall 17% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">AZ batting on ROAD</div><div class="tend-val" style="color:#ff5e5e">36% <span class="tend-sub">(5/14)</span></div><div class="tend-sub">overall 43% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 28% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 48.1</span>
+          <span>Lineup: 48.6</span>
+          <span>1st Inn: +6.0</span>
+          <span>BvP: -7.0</span>
+          <span>L/R: -2.0</span>
+          <span>Form: -2.0</span>
+          <span>Park: -0.6</span>
+          <span>Weather: +1.0</span>
+          <span>Team Tend: -0.3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">LAA @ NYY</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              26.6 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Yankee Stadium <span class="park-badge park-hitter" title="Park Factor: 105">⚾ 105 Hitter-friendly</span> · 7:05 PM ET · 68°F · 8 mph wind · 0% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Yusei Kikuchi <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            40.7
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">6.75</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.77</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">9.8</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.7</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.6</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">14.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="16/25 clean 1st innings">1st Inn ERA: 6.11 · 64% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Will Warren <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            51.8
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">3.07</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.30</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">8.6</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.2</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">14.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="19/25 clean 1st innings">1st Inn ERA: 5.79 · 75% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Kikuchi) · Threat: 82.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-good">BvP: .603 OPS · 49AB · 2HR — SP has edge</span> <span class="bvp-badge bvp-good">L7: .728 OPS (-0.146) · 0🔥 3🧊 — Cooling off</span> <span class="bvp-badge bvp-good">vs LHP: .615 OPS · 2dis/2adv — SP has edge</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Ben Rice</td>
+              <td>.356</td>
+              <td>.500</td>
+              <td>1.256</td>
+              <td><span style="color:#22c55e" title="LHB vs LHP (9AB)">L .522</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .350 AVG / 1.269 OPS (+0.013)">➖ .350/1.269</span></td>
+              <td>4</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Aaron Judge</td>
+              <td>.218</td>
+              <td>.328</td>
+              <td>.783</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (12AB)">R 1.218</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .208 AVG / .720 OPS (-0.063)">📉 .208/.720</span></td>
+              <td>4</td>
+              <td><span style="color:#ef4444" title="5-for-26, 2 HR">.192/.805 (26AB)</span></td>
+            </tr><tr>
+              <td>Cody Bellinger</td>
+              <td>.241</td>
+              <td>.338</td>
+              <td>.690</td>
+              <td><span style="color:#22c55e" title="LHB vs LHP (11AB)">L .234</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .192 AVG / .459 OPS (-0.231)">🧊 .192/.459</span></td>
+              <td>1</td>
+              <td><span style="color:#eab308" title="1-for-4, 0 HR">.250/.750 (4AB)</span></td>
+            </tr><tr>
+              <td>Giancarlo Stanton</td>
+              <td>.300</td>
+              <td>.364</td>
+              <td>.764</td>
+              <td><span style="color:#22c55e" title="RHB vs LHP (7AB)">R .300</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .182 AVG / .462 OPS (-0.302)">🧊 .182/.462</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="2-for-19, 0 HR">.105/.295 (19AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Warren) · Threat: 33.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .905 OPS · 14AB · 1HR — Batters own SP</span> <span class="bvp-badge bvp-warn">L7: .733 OPS (+0.085) · 2🔥 1🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs RHP: .765 OPS · 3dis/1adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Zach Neto</td>
+              <td>.250</td>
+              <td>.368</td>
+              <td>.899</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (54AB)">R .800</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .267 AVG / .904 OPS (+0.005)">➖ .267/.904</span></td>
+              <td>5</td>
+              <td><span style="color:#ef4444" title="3-for-6, 1 HR">.500/1.667 (6AB)</span></td>
+            </tr><tr>
+              <td>Bryce Teodosio</td>
+              <td>.077</td>
+              <td>.143</td>
+              <td>.220</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (3AB)">R .000</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .111 AVG / .311 OPS (+0.091)">📈 .111/.311</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Nolan Schanuel</td>
+              <td>.232</td>
+              <td>.323</td>
+              <td>.698</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (47AB)">L .685</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .222 AVG / .609 OPS (-0.089)">📉 .222/.609</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="1-for-5, 0 HR">.200/.533 (5AB)</span></td>
+            </tr><tr>
+              <td>Jorge Soler</td>
+              <td>.211</td>
+              <td>.319</td>
+              <td>.775</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (47AB)">R .853</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .292 AVG / 1.108 OPS (+0.333)">🔥 .292/1.108</span></td>
+              <td>4</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -2.5</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">NYY batting at HOME</div><div class="tend-val" style="color:#ff5e5e">58% <span class="tend-sub">(7/12)</span></div><div class="tend-sub">overall 50% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">LAA batting on ROAD</div><div class="tend-val" style="color:#1fb86e">17% <span class="tend-sub">(3/18)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 35% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 42.9</span>
+          <span>Lineup: 27.8</span>
+          <span>1st Inn: -2.0</span>
+          <span>BvP: +1.3</span>
+          <span>L/R: +2.0</span>
+          <span>Form: +3.0</span>
+          <span>Park: -3.0</span>
+          <span>Weather: +1.0</span>
+          <span>Team Tend: -2.5</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">CHC @ PHI</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              26.5 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Citizens Bank Park <span class="park-badge park-hitter" title="Park Factor: 104">⚾ 104 Hitter-friendly</span> · 6:40 PM ET · 69°F · 11 mph wind · 2% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Javier Assad <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            53.2
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">0.00</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.53</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">4.8</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.2</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">5.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-good" title="7/8 clean 1st innings">1st Inn ERA: 1.00 · 89% clean (8GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Cristopher Sánchez <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            57.8
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">1.65</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.35</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">12.7</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.2</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.1</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-good" title="20/25 clean 1st innings">1st Inn ERA: 2.25 · 79% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Assad) · Threat: 64.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .918 OPS · 20AB · 1HR — Batters own SP</span> <span class="bvp-badge bvp-neutral">L7: .806 OPS (+0.011) · 1🔥 3🧊 — Steady</span> <span class="bvp-badge bvp-danger">vs RHP: .907 OPS · 1dis/3adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Trea Turner</td>
+              <td>.254</td>
+              <td>.299</td>
+              <td>.664</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (46AB)">R .811</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .207 AVG / .578 OPS (-0.086)">📉 .207/.578</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="1-for-5, 1 HR">.200/1.000 (5AB)</span></td>
+            </tr><tr>
+              <td>Kyle Schwarber</td>
+              <td>.212</td>
+              <td>.379</td>
+              <td>.879</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (32AB)">L 1.130</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .217 AVG / .770 OPS (-0.109)">📉 .217/.770</span></td>
+              <td>4</td>
+              <td><span style="color:#ef4444" title="2-for-5, 0 HR">.400/1.225 (5AB)</span></td>
+            </tr><tr>
+              <td>Bryce Harper</td>
+              <td>.273</td>
+              <td>.375</td>
+              <td>.902</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (35AB)">L .990</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .435 AVG / 1.291 OPS (+0.389)">🔥 .435/1.291</span></td>
+              <td>3</td>
+              <td><span style="color:#ef4444" title="3-for-6, 0 HR">.500/1.071 (6AB)</span></td>
+            </tr><tr>
+              <td>Brandon Marsh</td>
+              <td>.269</td>
+              <td>.291</td>
+              <td>.733</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (46AB)">L .784</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .222 AVG / .584 OPS (-0.149)">📉 .222/.584</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="0-for-4, 0 HR">.000/.200 (4AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Sánchez) · Threat: 61.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .143 OPS · 14AB · 2HR — Batters own SP</span> <span class="bvp-badge bvp-neutral">L7: .795 OPS (+0.019) · 2🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-warn">vs LHP: .764 OPS · 0dis/4adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Nico Hoerner</td>
+              <td>.316</td>
+              <td>.420</td>
+              <td>.911</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (14AB)">R 1.143</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .355 AVG / .977 OPS (+0.066)">📈 .355/.977</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="2-for-5, 1 HR">.400/1.400 (5AB)</span></td>
+            </tr><tr>
+              <td>Alex Bregman</td>
+              <td>.213</td>
+              <td>.290</td>
+              <td>.618</td>
+              <td><span style="color:#22c55e" title="RHB vs LHP (18AB)">R .544</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .241 AVG / .579 OPS (-0.039)">➖ .241/.579</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="1-for-4, 0 HR">.250/.500 (4AB)</span></td>
+            </tr><tr>
+              <td>Ian Happ</td>
+              <td>.192</td>
+              <td>.300</td>
+              <td>.762</td>
+              <td><span style="color:#eab308" title="SHB vs LHP (19AB)">S .760</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .179 AVG / .602 OPS (-0.160)">🧊 .179/.602</span></td>
+              <td>4</td>
+              <td><span style="color:#ef4444" title="2-for-5, 1 HR">.400/1.400 (5AB)</span></td>
+            </tr><tr>
+              <td>Carson Kelly</td>
+              <td>.308</td>
+              <td>.426</td>
+              <td>.811</td>
+              <td><span style="color:#eab308" title="RHB vs LHP (14AB)">R .675</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .391 AVG / 1.022 OPS (+0.211)">🔥 .391/1.022</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -1.6</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">PHI batting at HOME</div><div class="tend-val" style="color:#ff5e5e">44% <span class="tend-sub">(8/18)</span></div><div class="tend-sub">overall 40% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">CHC batting on ROAD</div><div class="tend-val" style="color:#9bd15a">21% <span class="tend-sub">(3/14)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 32% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 54.1</span>
+          <span>Lineup: 36.6</span>
+          <span>1st Inn: +12.4</span>
+          <span>BvP: -10.4</span>
+          <span>L/R: -10.0</span>
+          <span>Form: +1.0</span>
+          <span>Park: -2.4</span>
+          <span>Weather: +3.0</span>
+          <span>Team Tend: -1.6</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">MIA @ ATL</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              20.1 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Truist Park <span class="park-badge park-neutral" title="Park Factor: 102">⚾ 102</span> · 7:15 PM ET · 67°F · 4 mph wind · 1% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Eury Pérez <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            40.1
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">5.06</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.38</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">10.1</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">5.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.2</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="13/23 clean 1st innings">1st Inn ERA: 7.96 · 54% clean (23GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Grant Holmes <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">
+            54.2
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">2.55</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.08</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">7.1</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">4.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">17.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="20/24 clean 1st innings">1st Inn ERA: 2.67 · 85% clean (24GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Pérez) · Threat: 69.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .576 OPS · 16AB · 3HR — Batters own SP</span> <span class="bvp-badge bvp-warn">L7: .911 OPS (+0.104) · 3🔥 0🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs RHP: .775 OPS · 2dis/2adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Ronald Acuña Jr.</td>
+              <td>.237</td>
+              <td>.324</td>
+              <td>.697</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (38AB)">R .611</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .321 AVG / .916 OPS (+0.219)">🔥 .321/.916</span></td>
+              <td>1</td>
+              <td><span style="color:#ef4444" title="2-for-3, 1 HR">.667/2.750 (3AB)</span></td>
+            </tr><tr>
+              <td>Drake Baldwin</td>
+              <td>.323</td>
+              <td>.391</td>
+              <td>.988</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (41AB)">L 1.012</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .407 AVG / 1.115 OPS (+0.127)">📈 .407/1.115</span></td>
+              <td>5</td>
+              <td><span style="color:#ef4444" title="2-for-4, 2 HR">.500/2.600 (4AB)</span></td>
+            </tr><tr>
+              <td>Matt Olson</td>
+              <td>.276</td>
+              <td>.373</td>
+              <td>.976</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (37AB)">L 1.030</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .217 AVG / .944 OPS (-0.032)">➖ .217/.944</span></td>
+              <td>4</td>
+              <td><span style="color:#eab308" title="2-for-6, 0 HR">.333/.762 (6AB)</span></td>
+            </tr><tr>
+              <td>Austin Riley</td>
+              <td>.208</td>
+              <td>.323</td>
+              <td>.568</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (34AB)">R .397</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .238 AVG / .671 OPS (+0.103)">📈 .238/.671</span></td>
+              <td>0</td>
+              <td><span style="color:#eab308" title="1-for-3, 0 HR">.333/.666 (3AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Holmes) · Threat: 47.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-safe">BvP: .424 OPS · 12AB · 0HR — SP dominates</span> <span class="bvp-badge bvp-safe">L7: .548 OPS (-0.169) · 1🔥 2🧊 — Ice cold</span> <span class="bvp-badge bvp-warn">vs RHP: .738 OPS · 1dis/3adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Jakob Marsee</td>
+              <td>.145</td>
+              <td>.250</td>
+              <td>.476</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (39AB)">L .308</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .179 AVG / .531 OPS (+0.055)">📈 .179/.531</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Xavier Edwards</td>
+              <td>.350</td>
+              <td>.400</td>
+              <td>.917</td>
+              <td><span style="color:#ef4444" title="SHB vs RHP (41AB)">S 1.054</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .192 AVG / .622 OPS (-0.295)">🧊 .192/.622</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="1-for-7, 0 HR">.143/.393 (7AB)</span></td>
+            </tr><tr>
+              <td>Agustín Ramírez</td>
+              <td>.214</td>
+              <td>.313</td>
+              <td>.617</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (37AB)">R .579</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .207 AVG / .578 OPS (-0.039)">➖ .207/.578</span></td>
+              <td>0</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr><tr>
+              <td>Liam Hicks</td>
+              <td>.279</td>
+              <td>.347</td>
+              <td>.859</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (31AB)">L 1.050</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .211 AVG / .461 OPS (-0.398)">🧊 .211/.461</span></td>
+              <td>3</td>
+              <td><span style="color:#ef4444" title="1-for-2, 0 HR">.500/1.167 (2AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -1.6</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">ATL batting at HOME</div><div class="tend-val" style="color:#ff5e5e">47% <span class="tend-sub">(7/15)</span></div><div class="tend-sub">overall 40% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">MIA batting on ROAD</div><div class="tend-val" style="color:#1fb86e">20% <span class="tend-sub">(3/15)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 32% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 42.9</span>
+          <span>Lineup: 35.4</span>
+          <span>1st Inn: +2.0</span>
+          <span>BvP: -2.3</span>
+          <span>L/R: -4.0</span>
+          <span>Form: -1.0</span>
+          <span>Park: -1.2</span>
+          <span>Weather: +0.0</span>
+          <span>Team Tend: -1.6</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">WSH @ PIT</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              19.3 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">PNC Park <span class="park-badge park-neutral" title="Park Factor: 99">⚾ 99</span> · 6:40 PM ET · 67°F · 8 mph wind · 8% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Cade Cavalli <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            47.6
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">2.51</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.47</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">6.9</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">5.7</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">14.1</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="8/13 clean 1st innings">1st Inn ERA: 7.88 · 56% clean (13GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Paul Skenes <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            44.6
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">5.25</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.25</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">9.0</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">4.5</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.8</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">12.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="24/25 clean 1st innings">1st Inn ERA: 3.21 · 93% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Cavalli) · Threat: 82.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 5AB (limited)</span> <span class="bvp-badge bvp-good">L7: .872 OPS (-0.066) · 1🔥 2🧊 — Cooling off</span> <span class="bvp-badge bvp-danger">vs RHP: .975 OPS · 0dis/4adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Oneil Cruz</td>
+              <td>.339</td>
+              <td>.400</td>
+              <td>1.044</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (42AB)">L .848</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .393 AVG / 1.183 OPS (+0.139)">📈 .393/1.183</span></td>
+              <td>5</td>
+              <td><span style="color:#ef4444" title="1-for-2, 0 HR">.500/1.000 (2AB)</span></td>
+            </tr><tr>
+              <td>Brandon Lowe</td>
+              <td>.245</td>
+              <td>.373</td>
+              <td>.965</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (30AB)">L 1.400</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .179 AVG / .696 OPS (-0.269)">🧊 .179/.696</span></td>
+              <td>5</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Bryan Reynolds</td>
+              <td>.259</td>
+              <td>.343</td>
+              <td>.774</td>
+              <td><span style="color:#eab308" title="SHB vs RHP (37AB)">S .727</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .250 AVG / .742 OPS (-0.032)">➖ .250/.742</span></td>
+              <td>3</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr><tr>
+              <td>Ryan O'Hearn</td>
+              <td>.333</td>
+              <td>.419</td>
+              <td>.968</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (33AB)">L 1.028</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .308 AVG / .867 OPS (-0.101)">📉 .308/.867</span></td>
+              <td>3</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Skenes) · Threat: 69.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 2AB (limited)</span> <span class="bvp-badge bvp-warn">L7: .943 OPS (+0.135) · 2🔥 2🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs RHP: .769 OPS · 2dis/2adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>James Wood</td>
+              <td>.274</td>
+              <td>.392</td>
+              <td>1.005</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (40AB)">L 1.066</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .500 AVG / 1.695 OPS (+0.690)">🔥 .500/1.695</span></td>
+              <td>5</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.333 (2AB)</span></td>
+            </tr><tr>
+              <td>Curtis Mead</td>
+              <td>.280</td>
+              <td>.379</td>
+              <td>.859</td>
+              <td><span style="color:#eab308" title="RHB vs RHP (12AB)">R .774</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .333 AVG / .988 OPS (+0.129)">📈 .333/.988</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Brady House</td>
+              <td>.250</td>
+              <td>.311</td>
+              <td>.722</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (38AB)">R .630</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .192 AVG / .607 OPS (-0.115)">📉 .192/.607</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Daylen Lile</td>
+              <td>.273</td>
+              <td>.314</td>
+              <td>.647</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (47AB)">L .626</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .200 AVG / .483 OPS (-0.164)">🧊 .200/.483</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -2.6</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">PIT batting at HOME</div><div class="tend-val" style="color:#ff5e5e">42% <span class="tend-sub">(5/12)</span></div><div class="tend-sub">overall 33% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">WSH batting on ROAD</div><div class="tend-val" style="color:#ff5e5e">40% <span class="tend-sub">(6/15)</span></div><div class="tend-sub">overall 33% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 36% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 45.2</span>
+          <span>Lineup: 20.6</span>
+          <span>1st Inn: +3.8</span>
+          <span>BvP: +0.0</span>
+          <span>L/R: -8.0</span>
+          <span>Form: -2.0</span>
+          <span>Park: +0.6</span>
+          <span>Weather: +1.0</span>
+          <span>Team Tend: -2.6</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">NYM @ LAD</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              18.2 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">UNIQLO Field at Dodger Stadium <span class="park-badge park-neutral" title="Park Factor: 99">⚾ 99</span> · 10:10 PM ET · 52°F · 4 mph wind · 0% rain</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">David Peterson <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            40.7
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">6.14</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.84</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">8.6</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.7</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">14.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="20/25 clean 1st innings">1st Inn ERA: 3.86 · 75% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Justin Wrobleski <span class="hand-badge hand-left" title="Left-handed pitcher">LHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            49.3
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">4.00</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.22</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">4.0</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">5.0</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">9.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="1/3 clean 1st innings">1st Inn ERA: 9.00 · 25% clean (3GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Peterson) · Threat: 69.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .873 OPS · 64AB · 4HR — Batters own SP</span> <span class="bvp-badge bvp-warn">L7: .933 OPS (+0.108) · 2🔥 1🧊 — Heating up</span> <span class="bvp-badge bvp-danger">vs LHP: .865 OPS · 2dis/2adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Shohei Ohtani</td>
+              <td>.286</td>
+              <td>.425</td>
+              <td>.996</td>
+              <td><span style="color:#ef4444" title="LHB vs LHP (20AB)">L 1.041</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .333 AVG / 1.272 OPS (+0.276)">🔥 .333/1.272</span></td>
+              <td>5</td>
+              <td><span style="color:#22c55e" title="4-for-15, 0 HR">.267/.534 (15AB)</span></td>
+            </tr><tr>
+              <td>Miguel Rojas</td>
+              <td>.292</td>
+              <td>.333</td>
+              <td>.666</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (11AB)">R 1.083</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .222 AVG / .564 OPS (-0.102)">📉 .222/.564</span></td>
+              <td>0</td>
+              <td><span style="color:#ef4444" title="7-for-18, 1 HR">.389/1.172 (18AB)</span></td>
+            </tr><tr>
+              <td>Teoscar Hernández</td>
+              <td>.306</td>
+              <td>.327</td>
+              <td>.858</td>
+              <td><span style="color:#22c55e" title="RHB vs LHP (13AB)">R .421</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .357 AVG / 1.137 OPS (+0.279)">🔥 .357/1.137</span></td>
+              <td>3</td>
+              <td><span style="color:#ef4444" title="3-for-10, 1 HR">.300/1.000 (10AB)</span></td>
+            </tr><tr>
+              <td>Freddie Freeman</td>
+              <td>.258</td>
+              <td>.313</td>
+              <td>.781</td>
+              <td><span style="color:#ef4444" title="LHB vs LHP (15AB)">L .856</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .276 AVG / .758 OPS (-0.023)">➖ .276/.758</span></td>
+              <td>3</td>
+              <td><span style="color:#eab308" title="5-for-21, 2 HR">.238/.797 (21AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Wrobleski) · Threat: 40.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: No history</span> <span class="bvp-badge bvp-neutral">L7: .656 OPS (-0.003) · 2🔥 2🧊 — Steady</span> <span class="bvp-badge bvp-warn">vs LHP: .721 OPS · 0dis/4adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Francisco Lindor</td>
+              <td>.188</td>
+              <td>.307</td>
+              <td>.573</td>
+              <td><span style="color:#22c55e" title="SHB vs LHP (17AB)">S .509</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .219 AVG / .469 OPS (-0.104)">📉 .219/.469</span></td>
+              <td>0</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Luis Robert Jr.</td>
+              <td>.319</td>
+              <td>.458</td>
+              <td>.905</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (10AB)">R 1.571</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .360 AVG / .964 OPS (+0.059)">📈 .360/.964</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Jorge Polanco</td>
+              <td>.184</td>
+              <td>.259</td>
+              <td>.565</td>
+              <td><span style="color:#22c55e" title="SHB vs LHP (12AB)">S .077</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .167 AVG / .467 OPS (-0.098)">📉 .167/.467</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Bo Bichette</td>
+              <td>.235</td>
+              <td>.284</td>
+              <td>.593</td>
+              <td><span style="color:#ef4444" title="RHB vs LHP (20AB)">R .864</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .259 AVG / .725 OPS (+0.132)">📈 .259/.725</span></td>
+              <td>1</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#ff5e5e">Adj: -2.3</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">LAD batting at HOME</div><div class="tend-val" style="color:#1fb86e">19% <span class="tend-sub">(3/16)</span></div><div class="tend-sub">overall 23% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">NYM batting on ROAD</div><div class="tend-val" style="color:#ff5e5e">54% <span class="tend-sub">(7/13)</span></div><div class="tend-sub">overall 50% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 35% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 42.4</span>
+          <span>Lineup: 36.8</span>
+          <span>1st Inn: +3.6</span>
+          <span>BvP: -5.0</span>
+          <span>L/R: -6.0</span>
+          <span>Form: -3.0</span>
+          <span>Park: +0.6</span>
+          <span>Weather: +2.0</span>
+          <span>Team Tend: -2.3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-color: #ef4444">
+      <div class="game-header" style="background: #450a0a">
+        <div class="matchup-row">
+          <span class="matchup">TEX @ ATH</span>
+          <span class="header-badges">
+            
+            <span class="nrfi-badge" style="background:#ef4444;color:#000;font-weight:700">
+              9.0 FADE
+            </span>
+          </span>
+        </div>
+        <div class="game-meta">Sutter Health Park <span class="park-badge park-neutral" title="Park Factor: 100">⚾ 100</span> · 9:40 PM ET · —</div>
+      </div>
+
+      <div class="game-body">
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Nathan Eovaldi <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            39.8
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">7.98</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.84</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">11.7</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">3.1</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.5</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">14.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="20/25 clean 1st innings">1st Inn ERA: 3.21 · 75% clean (25GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Luis Severino <span class="hand-badge hand-right" title="Right-handed pitcher">RHP</span></div>
+          <div class="pitcher-score" style="color: #ef4444">
+            41.6
+          </div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">5.40</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">1.80</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">11.5</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">8.8</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">0.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">13.1</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="18/25 clean 1st innings">1st Inn ERA: 5.14 · 71% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Eovaldi) · Threat: 47.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .9 OPS · 28AB · 1HR — Batters own SP</span> <span class="bvp-badge bvp-neutral">L7: .715 OPS (+0.013) · 2🔥 2🧊 — Steady</span> <span class="bvp-badge bvp-warn">vs RHP: .776 OPS · 1dis/3adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Lawrence Butler</td>
+              <td>.174</td>
+              <td>.255</td>
+              <td>.516</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (33AB)">L .611</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .154 AVG / .459 OPS (-0.057)">📉 .154/.459</span></td>
+              <td>1</td>
+              <td><span style="color:#eab308" title="2-for-8, 0 HR">.250/.775 (8AB)</span></td>
+            </tr><tr>
+              <td>Nick Kurtz</td>
+              <td>.204</td>
+              <td>.381</td>
+              <td>.687</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (35AB)">L .721</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .320 AVG / 1.005 OPS (+0.318)">🔥 .320/1.005</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.000 (2AB)</span></td>
+            </tr><tr>
+              <td>Shea Langeliers</td>
+              <td>.293</td>
+              <td>.328</td>
+              <td>.914</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (46AB)">R .932</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .258 AVG / .581 OPS (-0.333)">🧊 .258/.581</span></td>
+              <td>5</td>
+              <td><span style="color:#ef4444" title="4-for-12, 1 HR">.333/1.083 (12AB)</span></td>
+            </tr><tr>
+              <td>Tyler Soderstrom</td>
+              <td>.220</td>
+              <td>.281</td>
+              <td>.688</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (44AB)">L .782</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .233 AVG / .814 OPS (+0.126)">📈 .233/.814</span></td>
+              <td>2</td>
+              <td><span style="color:#ef4444" title="2-for-6, 0 HR">.333/1.000 (6AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Severino) · Threat: 69.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-danger">BvP: .053 OPS · 36AB · 3HR — Batters own SP</span> <span class="bvp-badge bvp-safe">L7: .654 OPS (-0.151) · 0🔥 2🧊 — Ice cold</span> <span class="bvp-badge bvp-danger">vs RHP: .851 OPS · 1dis/3adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Brandon Nimmo</td>
+              <td>.367</td>
+              <td>.433</td>
+              <td>1.033</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (42AB)">L 1.088</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .357 AVG / 1.043 OPS (+0.010)">➖ .357/1.043</span></td>
+              <td>3</td>
+              <td><span style="color:#ef4444" title="5-for-10, 1 HR">.500/1.615 (10AB)</span></td>
+            </tr><tr>
+              <td>Evan Carter</td>
+              <td>.233</td>
+              <td>.365</td>
+              <td>.807</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (35AB)">L .962</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .190 AVG / .796 OPS (-0.011)">➖ .190/.796</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Corey Seager</td>
+              <td>.204</td>
+              <td>.308</td>
+              <td>.734</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (40AB)">L .792</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .125 AVG / .491 OPS (-0.243)">🧊 .125/.491</span></td>
+              <td>4</td>
+              <td><span style="color:#22c55e" title="1-for-10, 0 HR">.100/.200 (10AB)</span></td>
+            </tr><tr>
+              <td>Jake Burger</td>
+              <td>.230</td>
+              <td>.254</td>
+              <td>.647</td>
+              <td><span style="color:#22c55e" title="RHB vs RHP (47AB)">R .607</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .107 AVG / .286 OPS (-0.361)">🧊 .107/.286</span></td>
+              <td>2</td>
+              <td><span style="color:#ef4444" title="5-for-16, 2 HR">.313/1.234 (16AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        
+        <div class="tend-panel">
+          <div class="tend-header">
+            <span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#1fb86e">Adj: +1.1</span>
+          </div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">ATH batting at HOME</div><div class="tend-val" style="color:#1fb86e">17% <span class="tend-sub">(2/12)</span></div><div class="tend-sub">overall 10% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">TEX batting on ROAD</div><div class="tend-val" style="color:#ff5e5e">33% <span class="tend-sub">(6/18)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 23% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+        
+
+        <div class="score-breakdown">
+          <span>Pitching: 40.2</span>
+          <span>Lineup: 35.4</span>
+          <span>1st Inn: +5.0</span>
+          <span>BvP: -17.5</span>
+          <span>L/R: -10.0</span>
+          <span>Form: +3.0</span>
+          <span>Park: +0.0</span>
+          <span>Weather: +0.0</span>
+          <span>Team Tend: +1.1</span>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="methodology">
+  <h3>Scoring Methodology</h3>
+  <p>Each game is scored 0-100 based on a base composite plus six adjustment factors:</p>
+  <p style="margin-top:8px"><strong>Pitching (45%):</strong> Weighted toward the weaker starter (the "chain" model — NRFI needs BOTH pitchers to perform). Factors: ERA, WHIP, K/9, BB/9, HR/9.</p>
+  <p style="margin-top:4px"><strong>Lineup Threat (25%):</strong> Top-of-order OPS and OBP for both teams. Weighted toward the more dangerous lineup. Lower threat = higher NRFI score.</p>
+  <p style="margin-top:4px"><strong>First-Inning ERA:</strong> How each pitcher performs specifically in the first inning, computed from game logs and linescores. Adjusts -10 to +10. A pitcher with a sub-2.00 first-inning ERA and 85%+ clean first innings gets a significant NRFI boost. Confidence-scaled by starts (15+ = full weight).</p>
+  <p style="margin-top:4px"><strong>Batter vs Pitcher:</strong> Career matchup history for each top-of-order batter against the opposing starter. Adjusts -10 to +10 based on OPS in head-to-head at-bats. Confidence-scaled by sample size (30+ AB = full weight).</p>
+  <p style="margin-top:4px"><strong>L/R Platoon Splits:</strong> How each batter's top of the order performs against the opposing pitcher's handedness. Same-hand matchups (e.g., LHB vs LHP) favor the pitcher; opposite-hand matchups favor the batter. Adjusts -6 to +6.</p>
+  <p style="margin-top:4px"><strong>Recent Form:</strong> Compares each batter's last 7 games OPS to their season OPS. Adjusts -6 to +6. Icons: 🔥 hot, 📈 warm, ➖ steady, 📉 cool, 🧊 cold.</p>
+  <p style="margin-top:4px"><strong>Weather/Park:</strong> Temperature, wind, indoor status, and park factor (94-115 scale). Cold + calm + pitcher-friendly park = NRFI boost.</p>
+  <p style="margin-top:4px"><strong>Team 1st-Inning Tendency:</strong> Each team's rolling 30-game rate of scoring in the 1st inning, split by home/away role. The home team's HOME rate and the away team's AWAY rate are used (since that's the role they'll be in tonight). Both rates are Bayesian-shrunk toward the team overall (k=10) and then league average ~27% (k=5) so a 14-15 game side sample doesn't dominate. Adjusts ±3 — a deliberately light weight to avoid double-counting the lineup-threat signal already in the model. Acts as a stabilizing prior, especially valuable in early April when individual stats are noisy.</p>
+  <p style="margin-top:8px;color:#ef4444"><strong>Disclaimer:</strong> This is an analytical tool, not financial advice. All sports betting carries risk. Use this data to inform your own judgment.</p>
+</div>
+
+<script>
+function filterTier(tier) {
+  const cards = document.querySelectorAll('.game-card');
+  const btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(b => b.classList.remove('active'));
+
+  if (tier === 'ALL') {
+    cards.forEach(c => c.style.display = 'block');
+    btns[0].classList.add('active');
+  } else if (tier === 'PICKS') {
+    cards.forEach(c => {
+      const badge = c.querySelector('.nrfi-badge').textContent.trim();
+      c.style.display = (badge.includes('STRONG') || badge.includes('LEAN')) ? 'block' : 'none';
+    });
+    btns[1].classList.add('active');
+  } else {
+    cards.forEach(c => {
+      const badge = c.querySelector('.nrfi-badge').textContent.trim();
+      c.style.display = badge.includes(tier) ? 'block' : 'none';
+    });
+  }
+}
+</script>
+
+</body>
+</html>
