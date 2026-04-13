@@ -17,6 +17,8 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit output files back to the repo
 
     steps:
       # ── 1. Check out the repo (full history so we can push back) ──────────

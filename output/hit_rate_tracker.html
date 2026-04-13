@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NRFI / F5 Hit Rate Tracker</title>
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0f1117;
+    --surface:  #1a1d27;
+    --surface2: #222636;
+    --border:   #2e3347;
+    --text:     #e2e8f0;
+    --muted:    #94a3b8;
+    --accent:   #4ade80;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 24px 20px 48px;
+    min-height: 100vh;
+  }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+  .header-title { font-size: 1.4em; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+  .header-sub   { color: var(--muted); font-size: 0.85em; }
+
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .stat-label { color: var(--muted); font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.6em; font-weight: 700; color: var(--text); }
+  .stat-sub   { color: var(--muted); font-size: 0.75em; margin-top: 2px; }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: 20px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 16px;
+    overflow: hidden;
+  }
+  .chart-title { font-size: 1em; font-weight: 700; margin-bottom: 2px; }
+  .chart-sub   { color: var(--muted); font-size: 0.78em; margin-bottom: 14px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-bottom: 14px;
+  }
+  .legend-item  { display: flex; align-items: center; gap: 6px; font-size: 0.8em; }
+  .legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { color: var(--muted); }
+  .legend-n     { color: var(--muted); font-size: 0.9em; }
+
+  .chart-svg { display: block; width: 100%; overflow: visible; }
+  .chart-svg text { font-family: inherit; }
+
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: #1e2235;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.82em;
+    line-height: 1.6;
+    white-space: nowrap;
+    z-index: 999;
+    display: none;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+  #tooltip .tt-date { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  #tooltip .tt-row  { display: flex; justify-content: space-between; gap: 20px; color: var(--muted); }
+  #tooltip .tt-hit  { font-weight: 600; }
+
+  .no-data       { text-align: center; padding: 80px 24px; color: var(--muted); }
+  .no-data-icon  { font-size: 3em; margin-bottom: 16px; }
+  .no-data-title { font-size: 1.2em; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .no-data-sub   { font-size: 0.9em; line-height: 1.7; }
+  code { background: var(--surface2); padding: 1px 6px; border-radius: 4px; font-size: 0.95em; }
+
+  @media (max-width: 600px) {
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+
+</style>
+</head>
+<body>
+<div class="header"><span class="header-title">NRFI / F5 Hit Rate Tracker</span><span class="header-sub">Cumulative accuracy over time · pushes = losses</span></div>
+<div class="summary-row"><div class="stat-card"><div class="stat-label">Resolved Games</div><div class="stat-value">45</div><div class="stat-sub">2026-04-10 → 2026-04-12</div></div><div class="stat-card"><div class="stat-label">NRFI Hit Rate</div><div class="stat-value">44.4%</div><div class="stat-sub">45 graded predictions</div></div><div class="stat-card"><div class="stat-label">Days of Data</div><div class="stat-value">3</div><div class="stat-sub">game-days resolved</div></div><div class="stat-card"><div class="stat-label">Break-Even</div><div class="stat-value">52.4%</div><div class="stat-sub">for -110 lines</div></div></div>
+<div class="charts-grid" id="chartsGrid"></div>
+<div id="tooltip"></div>
+<script>
+const CHARTS_DATA = {"nrfi": {"TOSS-UP": [{"date": "2026-04-10", "day_hits": 2, "day_n": 2, "cum_hits": 2, "cum_n": 2, "cum_rate": 100.0}, {"date": "2026-04-11", "day_hits": 0, "day_n": 1, "cum_hits": 2, "cum_n": 3, "cum_rate": 66.7}, {"date": "2026-04-12", "day_hits": 1, "day_n": 1, "cum_hits": 3, "cum_n": 4, "cum_rate": 75.0}], "FADE": [{"date": "2026-04-10", "day_hits": 8, "day_n": 13, "cum_hits": 8, "cum_n": 13, "cum_rate": 61.5}, {"date": "2026-04-11", "day_hits": 5, "day_n": 14, "cum_hits": 13, "cum_n": 27, "cum_rate": 48.1}, {"date": "2026-04-12", "day_hits": 4, "day_n": 14, "cum_hits": 17, "cum_n": 41, "cum_rate": 41.5}]}, "f5_ml": {}, "f5_spread": {}, "f5_total": {"STRONG OVER": [{"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}], "LEAN OVER": [{"date": "2026-04-12", "day_hits": 4, "day_n": 5, "cum_hits": 4, "cum_n": 5, "cum_rate": 80.0}], "STRONG UNDER": [{"date": "2026-04-12", "day_hits": 1, "day_n": 2, "cum_hits": 1, "cum_n": 2, "cum_rate": 50.0}], "LEAN UNDER": [{"date": "2026-04-12", "day_hits": 2, "day_n": 2, "cum_hits": 2, "cum_n": 2, "cum_rate": 100.0}]}};
+const MARKET_CONFIGS = [{"key": "nrfi", "title": "NRFI Hit Rate", "subtitle": "No Run First Inning \u2014 by confidence tier", "tiers": [{"key": "TOSS-UP", "label": "Toss-Up", "color": "#94a3b8"}, {"key": "FADE", "label": "Fade", "color": "#f87171"}]}, {"key": "f5_ml", "title": "F5 Moneyline Hit Rate", "subtitle": "First 5 innings ML \u2014 by confidence tier (ties = loss)", "tiers": []}, {"key": "f5_spread", "title": "F5 Spread Hit Rate", "subtitle": "First 5 innings spread \u2014 by confidence (pushes = loss)", "tiers": []}, {"key": "f5_total", "title": "F5 Total Hit Rate", "subtitle": "First 5 innings total \u2014 by lean & confidence (pushes = loss)", "tiers": [{"key": "STRONG OVER", "label": "Strong Over", "color": "#4ade80"}, {"key": "LEAN OVER", "label": "Lean Over", "color": "#86efac"}, {"key": "STRONG UNDER", "label": "Strong Under", "color": "#818cf8"}, {"key": "LEAN UNDER", "label": "Lean Under", "color": "#a5b4fc"}]}];
+
+const PAD = { top: 18, right: 28, bottom: 46, left: 50 };
+const VW  = 560;
+const VH  = 260;
+
+function xOf(allDates, dateStr) {
+  const n = allDates.length;
+  const i = allDates.indexOf(dateStr);
+  if (n <= 1) return PAD.left + (VW - PAD.left - PAD.right) / 2;
+  return PAD.left + (i / (n - 1)) * (VW - PAD.left - PAD.right);
+}
+function yOf(rate) {
+  return PAD.top + (1 - rate / 100) * (VH - PAD.top - PAD.bottom);
+}
+
+function rollingPoints(series, W) {
+  W = W || 7;
+  var pts = [];
+  for (var i = W - 1; i < series.length; i++) {
+    var rh = 0, rn = 0;
+    for (var j = i - W + 1; j <= i; j++) { rh += series[j].day_hits; rn += series[j].day_n; }
+    if (rn > 0) pts.push({ date: series[i].date, rate: 100 * rh / rn });
+  }
+  return pts;
+}
+
+function svgEl(tag, attrs, inner) {
+  var attrStr = Object.keys(attrs).map(function(k) { return k + '="' + attrs[k] + '"'; }).join(' ');
+  return inner !== undefined
+    ? '<' + tag + ' ' + attrStr + '>' + inner + '</' + tag + '>'
+    : '<' + tag + ' ' + attrStr + '/>';
+}
+
+function buildChart(cfg) {
+  var marketData = CHARTS_DATA[cfg.key] || {};
+  var tiers = cfg.tiers.filter(function(t) { return (marketData[t.key] || []).length > 0; });
+  if (!tiers.length) return null;
+
+  var dateSet = {};
+  tiers.forEach(function(t) {
+    (marketData[t.key] || []).forEach(function(p) { dateSet[p.date] = 1; });
+  });
+  var allDates = Object.keys(dateSet).sort();
+  var nDates   = allDates.length;
+  var innerW   = VW - PAD.left - PAD.right;
+  var innerH   = VH - PAD.top  - PAD.bottom;
+
+  var els = [];
+
+  // Background
+  els.push(svgEl('rect', { x:0, y:0, width:VW, height:VH, fill:'#1a1d27', rx:0 }));
+
+  // Gridlines + Y labels
+  [0, 25, 50, 75, 100].forEach(function(v) {
+    var y = yOf(v).toFixed(1);
+    els.push(svgEl('line', { x1:PAD.left, y1:y, x2:VW-PAD.right, y2:y,
+      stroke: v === 50 ? '#334155' : '#1e2435', 'stroke-width': v === 50 ? 1 : 0.8 }));
+    els.push(svgEl('text', { x: PAD.left - 6, y: (parseFloat(y)+4).toFixed(1),
+      'text-anchor':'end', fill:'#475569', 'font-size':10 }, v + '%'));
+  });
+
+  // Reference line at 52.4%
+  var refY = yOf(52.4).toFixed(1);
+  els.push(svgEl('line', { x1:PAD.left, y1:refY, x2:VW-PAD.right, y2:refY,
+    stroke:'rgba(250,204,21,0.45)', 'stroke-width':'1.2', 'stroke-dasharray':'5,4' }));
+  els.push(svgEl('text', { x: VW-PAD.right+4, y: (parseFloat(refY)+4).toFixed(1),
+    fill:'rgba(250,204,21,0.6)', 'font-size':9 }, '52.4%'));
+
+  // X-axis ticks + labels
+  var tickEvery = nDates > 14 ? 7 : nDates > 7 ? 3 : 1;
+  allDates.forEach(function(d, i) {
+    if (i % tickEvery !== 0 && i !== nDates - 1) return;
+    var x = xOf(allDates, d).toFixed(1);
+    var axisY = (PAD.top + innerH).toFixed(1);
+    els.push(svgEl('line', { x1:x, y1:axisY, x2:x, y2:(parseFloat(axisY)+4).toFixed(1),
+      stroke:'#334155', 'stroke-width':1 }));
+    els.push(svgEl('text', { x:x, y:(parseFloat(axisY)+15).toFixed(1),
+      'text-anchor':'middle', fill:'#475569', 'font-size':'9.5' }, d.slice(5)));
+  });
+
+  // Axes
+  els.push(svgEl('line', { x1:PAD.left, y1:PAD.top, x2:PAD.left, y2:PAD.top+innerH,
+    stroke:'#334155', 'stroke-width':1 }));
+  els.push(svgEl('line', { x1:PAD.left, y1:PAD.top+innerH, x2:VW-PAD.right, y2:PAD.top+innerH,
+    stroke:'#334155', 'stroke-width':1 }));
+
+  // Lines + dots per tier
+  var dotData = [];
+  tiers.forEach(function(t) {
+    var series = marketData[t.key] || [];
+    if (!series.length) return;
+    var col = t.color;
+
+    // Cumulative solid line
+    if (series.length > 1) {
+      var pts = series.map(function(p) {
+        return xOf(allDates, p.date).toFixed(1) + ',' + yOf(p.cum_rate).toFixed(1);
+      }).join(' ');
+      els.push(svgEl('polyline', { points:pts, fill:'none', stroke:col,
+        'stroke-width':'2.2', 'stroke-linejoin':'round', 'stroke-linecap':'round' }));
+    }
+
+    // 7-day rolling dashed line
+    var roll = rollingPoints(series, 7);
+    if (roll.length > 1) {
+      var rpts = roll.map(function(p) {
+        return xOf(allDates, p.date).toFixed(1) + ',' + yOf(p.rate).toFixed(1);
+      }).join(' ');
+      els.push(svgEl('polyline', { points:rpts, fill:'none', stroke:col,
+        'stroke-width':'1.4', 'stroke-dasharray':'5,3', opacity:'0.5',
+        'stroke-linejoin':'round' }));
+    }
+
+    // Collect dots
+    series.forEach(function(p) {
+      dotData.push(Object.assign({}, p, { tier: t.label, color: col }));
+    });
+  });
+
+  // Dots on top (so they render above lines)
+  dotData.forEach(function(p) {
+    var x = xOf(allDates, p.date).toFixed(1);
+    var y = yOf(p.cum_rate).toFixed(1);
+    var enc = encodeURIComponent(JSON.stringify(p));
+    els.push('<circle cx="' + x + '" cy="' + y + '" r="4" fill="' + p.color +
+      '" stroke="#1a1d27" stroke-width="1.5" class="chart-dot" data-pt="' + enc +
+      '" style="cursor:pointer"/>');
+  });
+
+  return '<svg class="chart-svg" viewBox="0 0 ' + VW + ' ' + VH +
+    '" preserveAspectRatio="xMidYMid meet">' + els.join('') + '</svg>';
+}
+
+function buildLegend(cfg) {
+  var marketData = CHARTS_DATA[cfg.key] || {};
+  var tiers = cfg.tiers.filter(function(t) { return (marketData[t.key] || []).length > 0; });
+  if (!tiers.length) return '';
+  var items = tiers.map(function(t) {
+    var series = marketData[t.key] || [];
+    var last = series[series.length - 1];
+    var n = last ? last.cum_n : 0;
+    return '<div class="legend-item">' +
+      '<span class="legend-dot" style="background:' + t.color + '"></span>' +
+      '<span class="legend-label">' + t.label + '</span>' +
+      '<span class="legend-n">(' + n + ')</span>' +
+      '</div>';
+  });
+  items.push('<div class="legend-item" style="margin-left:8px;opacity:0.55">' +
+    '<span style="display:inline-block;width:18px;height:0;border-top:2px dashed #94a3b8;vertical-align:middle"></span>' +
+    '&nbsp;<span class="legend-label" style="font-size:0.85em">7-day rolling</span>' +
+    '</div>');
+  return '<div class="legend">' + items.join('') + '</div>';
+}
+
+function renderCharts() {
+  var grid = document.getElementById('chartsGrid');
+  if (!grid) return;
+  MARKET_CONFIGS.forEach(function(cfg) {
+    var svgHtml = buildChart(cfg);
+    if (!svgHtml) return;
+    var card = document.createElement('div');
+    card.className = 'chart-card';
+    card.innerHTML =
+      '<div class="chart-title">' + cfg.title + '</div>' +
+      '<div class="chart-sub">' + cfg.subtitle + '</div>' +
+      buildLegend(cfg) + svgHtml;
+    grid.appendChild(card);
+  });
+}
+
+function initTooltip() {
+  var tt = document.getElementById('tooltip');
+  document.addEventListener('mousemove', function(e) {
+    var dot = e.target.closest('.chart-dot');
+    if (!dot) { tt.style.display = 'none'; return; }
+    var p = JSON.parse(decodeURIComponent(dot.dataset.pt));
+    var dayRate = p.day_n ? (100 * p.day_hits / p.day_n).toFixed(1) : '—';
+    tt.innerHTML =
+      '<div class="tt-date">' + p.date + '</div>' +
+      '<div class="tt-row"><span>' + p.tier + '</span></div>' +
+      '<div class="tt-row"><span>Cumulative</span>' +
+        '<span class="tt-hit" style="color:' + p.color + '">' + p.cum_rate + '%</span></div>' +
+      '<div class="tt-row"><span>Today</span>' +
+        '<span class="tt-hit">' + dayRate + '% (' + p.day_hits + '/' + p.day_n + ')</span></div>' +
+      '<div class="tt-row"><span>Total</span>' +
+        '<span>' + p.cum_hits + '/' + p.cum_n + '</span></div>';
+    tt.style.display = 'block';
+    var margin = 14;
+    var left = e.clientX + margin;
+    var top  = e.clientY - tt.offsetHeight / 2;
+    if (left + tt.offsetWidth > window.innerWidth - 8) left = e.clientX - tt.offsetWidth - margin;
+    if (top < 8) top = 8;
+    tt.style.left = left + 'px';
+    tt.style.top  = top  + 'px';
+  });
+}
+
+renderCharts();
+initTooltip();
+
+</script>
+</body>
+</html>

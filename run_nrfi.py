@@ -13,7 +13,8 @@ Usage:
 
 import sys
 import os
-from datetime import date
+import glob
+from datetime import date, timedelta
 
 # Ensure scripts dir is on path
 script_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
@@ -23,6 +24,7 @@ from nrfi_analyzer import analyze_date
 from dashboard import generate_dashboard
 from predictions_log import log_predictions
 from odds import fetch_nrfi_odds, match_odds_to_games
+from hit_rate_tracker import generate_hit_rate_dashboard
 import json
 from datetime import datetime
 
@@ -82,6 +84,12 @@ def main():
     # 3. Generate dashboard
     dash_path = os.path.join(output_dir, f"nrfi_dashboard_{target_date}.html")
     generate_dashboard(data, dash_path)
+
+    # 3b. Generate hit rate tracker
+    tracker_path = os.path.join(output_dir, "hit_rate_tracker.html")
+    outcomes_csv = os.path.join(output_dir, "outcomes.csv")
+    generate_hit_rate_dashboard(predictions_csv, outcomes_csv, tracker_path)
+    print(f"Hit rate tracker: {tracker_path}")
 
     # 4. Print summary
     print(f"\n{'='*60}")
@@ -154,6 +162,24 @@ def main():
 
     print(f"\n{'─'*60}")
     print(f"Dashboard: {dash_path}")
+
+    # 5. Clean up output files older than 5 days
+    cutoff = date.today() - timedelta(days=5)
+    removed = []
+    for pattern in ("nrfi_*.json", "nrfi_dashboard_*.html"):
+        for filepath in glob.glob(os.path.join(output_dir, pattern)):
+            fname = os.path.basename(filepath)
+            # Extract date string from filename (nrfi_YYYY-MM-DD.json or nrfi_dashboard_YYYY-MM-DD.html)
+            try:
+                date_str = fname.replace("nrfi_dashboard_", "").replace("nrfi_", "").split(".")[0]
+                file_date = date.fromisoformat(date_str)
+                if file_date < cutoff:
+                    os.remove(filepath)
+                    removed.append(fname)
+            except (ValueError, IndexError):
+                pass  # skip files that don't match expected naming
+    if removed:
+        print(f"Cleaned up {len(removed)} old output file(s): {', '.join(removed)}")
 
 
 if __name__ == "__main__":
