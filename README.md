@@ -4,7 +4,7 @@ MLB betting analysis system for **NRFI** (No Run First Inning) and **F5** (First
 
 ### Quick Links
 
-Open the **[NRFI Hub](output/index.html)** in your browser — one page with links to the latest dashboard, hit-rate tracker, predictions log, and outcomes.
+**[NRFI Hub →](https://evanossege.github.io/NRFI/)** — live dashboard, hit-rate tracker, and prediction log. Updated daily at noon ET.
 
 ## Setup
 

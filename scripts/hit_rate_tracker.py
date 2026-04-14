@@ -534,9 +534,9 @@ _CSS = """
   /* ---- Chart cards (same as before, improved) ---- */
   .chart-section {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: minmax(340px, 420px) 1fr;
     gap: 16px;
-    align-items: start;
+    align-items: stretch;
   }
   .chart-card {
     background: var(--surface);
@@ -596,9 +596,10 @@ _CSS = """
 """
 
 _JS = """
-const PAD = { top: 18, right: 28, bottom: 46, left: 50 };
-const VW  = 560;
-const VH  = 260;
+const PAD = { top: 18, right: 36, bottom: 46, left: 50 };
+const VW  = 720;
+const VH  = 280;
+const BREAK_EVEN = 52.4;
 
 function xOf(allDates, dateStr) {
   const n = allDates.length;
@@ -749,19 +750,109 @@ function buildLegend(cfg) {
   return '<div class="legend">' + items.join('') + '</div>';
 }
 
+function rateClass(rate) {
+  if (rate >= BREAK_EVEN + 2) return 'above';
+  if (rate <= BREAK_EVEN - 2) return 'below';
+  return 'neutral';
+}
+function barColor(rate) {
+  if (rate >= BREAK_EVEN + 2) return '#4ade80';
+  if (rate <= BREAK_EVEN - 2) return '#f87171';
+  return '#facc15';
+}
+
+function buildTierTable(cfg) {
+  var marketData = CHARTS_DATA[cfg.key] || {};
+  var tiers = cfg.tiers.filter(function(t) { return (marketData[t.key] || []).length > 0; });
+  if (!tiers.length) return '';
+
+  // Sort tiers by sample size descending for easier reading
+  tiers.sort(function(a, b) {
+    var sa = marketData[a.key] || [];
+    var sb = marketData[b.key] || [];
+    var na = sa.length ? sa[sa.length - 1].cum_n : 0;
+    var nb = sb.length ? sb[sb.length - 1].cum_n : 0;
+    return nb - na;
+  });
+
+  var rows = tiers.map(function(t) {
+    var series = marketData[t.key] || [];
+    if (!series.length) return '';
+    var last = series[series.length - 1];
+    var rate = last.cum_rate;
+    var n = last.cum_n;
+    var hits = last.cum_hits;
+    var rCls = rateClass(rate);
+    var barW = Math.min(100, Math.max(0, rate));
+    // ROI at -110: win 100/110 per win, lose 110 per loss
+    //   per unit risked: (hits * (100/110) - losses) / n * 100  (as percent)
+    var losses = n - hits;
+    var unitsWon = hits * (100 / 110) - losses;
+    var roi = n ? (unitsWon / n) * 100 : 0;
+    var roiCls = roi > 0 ? 'above' : (roi < 0 ? 'below' : 'neutral');
+    var roiStr = (roi > 0 ? '+' : '') + roi.toFixed(1) + '%';
+    return '<tr>' +
+      '<td><span class="tier-dot" style="background:' + t.color + '"></span>' +
+        '<span class="tier-name">' + t.label + '</span></td>' +
+      '<td><div class="bar-bg"><div class="bar-fill" style="width:' + barW + '%;background:' + barColor(rate) + '"></div></div></td>' +
+      '<td class="tier-rate ' + rCls + '">' + rate.toFixed(1) + '%</td>' +
+      '<td style="color:var(--muted);white-space:nowrap">' + hits + '&thinsp;/&thinsp;' + n + '</td>' +
+      '<td class="tier-rate ' + roiCls + '" style="font-size:0.95em">' + roiStr + '</td>' +
+      '</tr>';
+  });
+
+  return '<table class="tier-table">' +
+    '<thead><tr>' +
+      '<th>Tier</th>' +
+      '<th colspan="2">Hit Rate</th>' +
+      '<th>Record</th>' +
+      '<th title="Return on investment at -110 odds">ROI</th>' +
+    '</tr></thead>' +
+    '<tbody>' + rows.join('') + '</tbody></table>';
+}
+
 function renderCharts() {
-  var grid = document.getElementById('chartsGrid');
-  if (!grid) return;
+  var container = document.getElementById('marketsContainer');
+  if (!container) return;
   MARKET_CONFIGS.forEach(function(cfg) {
     var svgHtml = buildChart(cfg);
     if (!svgHtml) return;
-    var card = document.createElement('div');
-    card.className = 'chart-card';
-    card.innerHTML =
-      '<div class="chart-title">' + cfg.title + '</div>' +
-      '<div class="chart-sub">' + cfg.subtitle + '</div>' +
-      buildLegend(cfg) + svgHtml;
-    grid.appendChild(card);
+    var summary = (MARKET_SUMMARIES || {})[cfg.key] || {};
+    var overallRate = typeof summary.rate === 'number' ? summary.rate : 0;
+    var overallCls = rateClass(overallRate);
+    var overallTxt = summary.n ? overallRate.toFixed(1) + '% <span style="color:var(--muted);font-weight:500;font-size:0.7em">(' + summary.hits + '/' + summary.n + ')</span>' : '—';
+
+    // Overall ROI at -110
+    var overallROI = summary.n ? ((summary.hits * (100/110) - (summary.n - summary.hits)) / summary.n) * 100 : 0;
+    var roiCls = overallROI > 0 ? 'above' : (overallROI < 0 ? 'below' : 'neutral');
+    var roiStr = (overallROI > 0 ? '+' : '') + overallROI.toFixed(1) + '%';
+    var roiBadge = summary.n
+      ? '<span style="color:var(--muted);margin:0 6px 0 14px">ROI:</span><span class="tier-rate ' + roiCls + '">' + roiStr + '</span>'
+      : '';
+
+    var section = document.createElement('div');
+    section.className = 'market-section';
+    section.innerHTML =
+      '<div class="market-header">' +
+        '<span class="market-title">' + cfg.title + '</span>' +
+        '<span class="market-subtitle">' + cfg.subtitle + '</span>' +
+        '<span style="margin-left:auto;font-size:0.88em;white-space:nowrap">' +
+          '<span style="color:var(--muted);margin-right:6px">Overall:</span>' +
+          '<span class="tier-rate ' + overallCls + '">' + overallTxt + '</span>' +
+          roiBadge +
+        '</span>' +
+      '</div>' +
+      '<div class="chart-section">' +
+        '<div class="chart-card">' +
+          '<div class="chart-title" style="font-size:0.82em;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Tier Breakdown</div>' +
+          buildTierTable(cfg) +
+        '</div>' +
+        '<div class="chart-card">' +
+          '<div class="chart-title" style="font-size:0.82em;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Accuracy Over Time</div>' +
+          buildLegend(cfg) + svgHtml +
+        '</div>' +
+      '</div>';
+    container.appendChild(section);
   });
 }
 
@@ -800,11 +891,11 @@ initTooltip();
 def _build_html(data):
     summary = data.get("summary", {})
     total   = summary.get("total_resolved", 0)
-    nrfi_rate = summary.get("overall_nrfi_rate", 0.0)
-    nrfi_n    = summary.get("overall_nrfi_n", 0)
-    days      = summary.get("days", 0)
-    first_d   = summary.get("first_date", "—")
-    last_d    = summary.get("last_date", "—")
+    days    = summary.get("days", 0)
+    first_d = summary.get("first_date", "—")
+    last_d  = summary.get("last_date", "—")
+
+    market_summaries = data.get("market_summaries", {})
 
     has_data = bool(total)
 
@@ -836,8 +927,30 @@ def _build_html(data):
         for cfg in MARKET_CONFIG
     ])
 
-    nrfi_rate_str = f"{nrfi_rate:.1f}%" if nrfi_n else "—"
-    date_range    = f"{first_d} \u2192 {last_d}" if first_d and first_d != "—" else "—"
+    market_summaries_json = json.dumps(market_summaries)
+
+    date_range = f"{first_d} \u2192 {last_d}" if first_d and first_d != "—" else "—"
+
+    def _rate_class(rate, n):
+        if not n:
+            return "neutral"
+        if rate >= 54.4:
+            return "green"
+        if rate <= 50.4:
+            return "red"
+        return "yellow"
+
+    def _stat_card(label, rate, n, hits, sub_override=None):
+        rate_str = f"{rate:.1f}%" if n else "—"
+        rcls = _rate_class(rate, n)
+        sub = sub_override if sub_override is not None else (f"{hits} / {n} hit" if n else "no graded picks yet")
+        return (
+            '<div class="stat-card">'
+            f'<div class="stat-label">{label}</div>'
+            f'<div class="stat-value {rcls}">{rate_str}</div>'
+            f'<div class="stat-sub">{sub}</div>'
+            '</div>'
+        )
 
     no_data_block = (
         ""
@@ -850,36 +963,50 @@ def _build_html(data):
         'Run <code>python backtest.py</code> to pull outcomes.</div>'
         '</div>'
     )
-    charts_block = '<div class="charts-grid" id="chartsGrid"></div>' if has_data else ""
+    charts_block = '<div id="marketsContainer"></div>' if has_data else ""
+
+    # Build summary cards — one per market, showing overall hit rate with
+    # color-coded break-even comparison
+    nrfi_s  = market_summaries.get("nrfi", {})
+    ml_s    = market_summaries.get("f5_ml", {})
+    sp_s    = market_summaries.get("f5_spread", {})
+    tot_s   = market_summaries.get("f5_total", {})
 
     summary_cards = (
         '<div class="summary-row">'
-        '<div class="stat-card">'
-        '<div class="stat-label">Resolved Games</div>'
-        '<div class="stat-value">' + str(total) + '</div>'
-        '<div class="stat-sub">' + date_range + '</div>'
-        '</div>'
-        '<div class="stat-card">'
-        '<div class="stat-label">NRFI Hit Rate</div>'
-        '<div class="stat-value">' + nrfi_rate_str + '</div>'
-        '<div class="stat-sub">' + str(nrfi_n) + ' graded predictions</div>'
-        '</div>'
-        '<div class="stat-card">'
-        '<div class="stat-label">Days of Data</div>'
-        '<div class="stat-value">' + str(days) + '</div>'
-        '<div class="stat-sub">game-days resolved</div>'
-        '</div>'
-        '<div class="stat-card">'
-        '<div class="stat-label">Break-Even</div>'
-        '<div class="stat-value">52.4%</div>'
-        '<div class="stat-sub">for -110 lines</div>'
-        '</div>'
-        '</div>'
+        + _stat_card("NRFI",       nrfi_s.get("rate", 0), nrfi_s.get("n", 0), nrfi_s.get("hits", 0))
+        + _stat_card("F5 Moneyline", ml_s.get("rate", 0), ml_s.get("n", 0),  ml_s.get("hits", 0))
+        + _stat_card("F5 Spread",    sp_s.get("rate", 0), sp_s.get("n", 0),  sp_s.get("hits", 0))
+        + _stat_card("F5 Total",    tot_s.get("rate", 0), tot_s.get("n", 0), tot_s.get("hits", 0))
+        + '</div>'
+        + '<div class="summary-row">'
+        + '<div class="stat-card">'
+        +   '<div class="stat-label">Resolved Games</div>'
+        +   f'<div class="stat-value neutral">{total}</div>'
+        +   f'<div class="stat-sub">across {days} day' + ("s" if days != 1 else "") + '</div>'
+        + '</div>'
+        + '<div class="stat-card">'
+        +   '<div class="stat-label">Date Range</div>'
+        +   f'<div class="stat-value neutral" style="font-size:1.05em">{date_range}</div>'
+        +   '<div class="stat-sub">first → last resolved</div>'
+        + '</div>'
+        + '<div class="stat-card">'
+        +   '<div class="stat-label">Break-Even</div>'
+        +   '<div class="stat-value yellow">52.4%</div>'
+        +   '<div class="stat-sub">for standard -110 lines</div>'
+        + '</div>'
+        + '<div class="stat-card">'
+        +   '<div class="stat-label">Push Handling</div>'
+        +   '<div class="stat-value neutral" style="font-size:1em">Pushes = Losses</div>'
+        +   '<div class="stat-sub">conservative grading</div>'
+        + '</div>'
+        + '</div>'
     )
 
     data_script = (
         "const CHARTS_DATA = " + charts_json + ";\n"
         "const MARKET_CONFIGS = " + market_configs_json + ";\n"
+        "const MARKET_SUMMARIES = " + market_summaries_json + ";\n"
     )
 
     return (

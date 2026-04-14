@@ -40,8 +40,53 @@ Each game result dict gets a new "f5" key containing:
 # F5 MONEYLINE — which side has the pitching/lineup advantage over 5 innings
 # ---------------------------------------------------------------------------
 
+def score_pitch_count_efficiency(pitch_eff: dict) -> float:
+    """
+    Score pitcher pitch-count efficiency for F5 side strength.
+
+    Returns adjustment from roughly -4 to +1.5.
+    Positive = efficient starter likely to work deeper into the game.
+    Negative = inefficient starter with elevated early-exit risk.
+    """
+    if not pitch_eff.get("has_data"):
+        return 0.0
+
+    ppi = pitch_eff.get("avg_pitches_per_inning")
+    starts = pitch_eff.get("starts_sample", 0) or 0
+    if ppi is None or starts <= 0:
+        return 0.0
+
+    adj = 0.0
+
+    # High P/IP increases likelihood of early hook before 5 full innings.
+    if ppi >= 19.0:
+        adj -= 4.0
+    elif ppi >= 18.0:
+        adj -= 3.0
+    elif ppi >= 17.0:
+        adj -= 2.0
+    elif ppi >= 16.0:
+        adj -= 1.0
+    elif ppi <= 13.0:
+        adj += 1.5
+    elif ppi <= 14.0:
+        adj += 0.8
+
+    # Extra penalty if inefficient starts are common in the sample.
+    high_ineff_rate = pitch_eff.get("high_inefficiency_rate")
+    if high_ineff_rate is not None:
+        if high_ineff_rate >= 0.65:
+            adj -= 1.0
+        elif high_ineff_rate >= 0.45:
+            adj -= 0.5
+
+    confidence = min(1.0, starts / 6.0)  # full confidence by ~6 starts
+    return round(adj * confidence, 1)
+
+
 def compute_f5_power_rating(pitcher_score, lineup_threat, fi_adj, bvp_adj,
-                            platoon_adj, streak_adj, rest_adj):
+                            platoon_adj, streak_adj, rest_adj,
+                            pitch_eff_adj=0.0):
     """
     Compute a per-side "power rating" for F5 purposes.
 
@@ -63,7 +108,8 @@ def compute_f5_power_rating(pitcher_score, lineup_threat, fi_adj, bvp_adj,
         bvp_adj * 1.0 +                              # BvP: full weight — carries across innings
         platoon_adj * 1.0 +                           # Platoon: full weight
         streak_adj * 0.8 +                            # Recent form: slight discount
-        rest_adj * 1.2                                # Rest: amplified over 5 innings
+        rest_adj * 1.2 +                               # Rest: amplified over 5 innings
+        pitch_eff_adj * 1.4                            # P/IP efficiency: early-exit risk
     )
     return round(rating, 2)
 
@@ -79,6 +125,8 @@ def compute_f5_moneyline(game: dict) -> dict:
     suppresses the home lineup. The "home side" measures the reverse.
     """
     nrfi = game.get("nrfi", {})
+    away_pitch_eff_adj = score_pitch_count_efficiency(game.get("away_pitch_eff", {}))
+    home_pitch_eff_adj = score_pitch_count_efficiency(game.get("home_pitch_eff", {}))
 
     away_rating = compute_f5_power_rating(
         pitcher_score=game.get("away_pitcher_score", 50),
@@ -88,6 +136,7 @@ def compute_f5_moneyline(game: dict) -> dict:
         platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
         streak_adj=nrfi.get("streak_adj", 0) * 0.5,
         rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        pitch_eff_adj=away_pitch_eff_adj,
     )
 
     home_rating = compute_f5_power_rating(
@@ -98,6 +147,7 @@ def compute_f5_moneyline(game: dict) -> dict:
         platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
         streak_adj=nrfi.get("streak_adj", 0) * 0.5,
         rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        pitch_eff_adj=home_pitch_eff_adj,
     )
 
     # Park and weather adjustments are symmetric (affect both sides equally
@@ -146,6 +196,8 @@ def compute_f5_moneyline(game: dict) -> dict:
         "pick": pick,
         "pick_full": pick_full,
         "confidence": confidence,
+        "away_pitch_eff_adj": away_pitch_eff_adj,
+        "home_pitch_eff_adj": home_pitch_eff_adj,
     }
 
 

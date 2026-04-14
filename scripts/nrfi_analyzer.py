@@ -371,6 +371,99 @@ def get_pitcher_hand(pitcher_id: int) -> str:
         return "?"
 
 
+def _safe_int(v, default=None):
+    """Best-effort int conversion for MLB stat payload values."""
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return default
+
+
+def _innings_pitched_to_outs(ip_raw) -> Optional[int]:
+    """
+    Convert MLB innings-pitched notation to outs.
+
+    MLB uses baseball notation (e.g. 5.1 = 5 and 1/3, not 5.1 decimal).
+    """
+    if ip_raw is None:
+        return None
+
+    s = str(ip_raw).strip()
+    if not s:
+        return None
+
+    if "." not in s:
+        whole = _safe_int(s)
+        return whole * 3 if whole is not None else None
+
+    whole_s, frac_s = s.split(".", 1)
+    whole = _safe_int(whole_s)
+    if whole is None:
+        return None
+
+    outs = whole * 3
+    frac = frac_s.strip()
+    if not frac or set(frac) == {"0"}:
+        return outs
+
+    # Primary MLB notation: .1 = 1 out, .2 = 2 outs.
+    if frac[0] == "1":
+        return outs + 1
+    if frac[0] == "2":
+        return outs + 2
+
+    # Defensive handling for decimal-like thirds from alternate feeds.
+    if frac.startswith("33") or frac[0] == "3":
+        return outs + 1
+    if frac.startswith("66") or frac.startswith("67") or frac[0] in ("6", "7"):
+        return outs + 2
+    return None
+
+
+# Per-run cache keyed by (pitcher_id, season); cleared in analyze_date().
+_pitcher_gamelog_cache: dict = {}
+
+
+def _get_pitcher_starts_from_gamelog(pitcher_id: int, season: int) -> list[dict]:
+    """Fetch and cache a pitcher's starts from MLB game logs."""
+    if not pitcher_id:
+        return []
+
+    key = (int(pitcher_id), int(season))
+    if key in _pitcher_gamelog_cache:
+        return _pitcher_gamelog_cache[key]
+
+    starts = []
+    try:
+        data = mlb_get(f"people/{pitcher_id}/stats", {
+            "stats": "gameLog",
+            "group": "pitching",
+            "season": season,
+        })
+        for sg in data.get("stats", []):
+            for split in sg.get("splits", []):
+                stat = split.get("stat", {}) or {}
+                games_started = _safe_int(stat.get("gamesStarted"), 0) or 0
+                if games_started <= 0:
+                    continue
+
+                pitches = stat.get("numberOfPitches")
+                if pitches is None:
+                    pitches = stat.get("pitchesThrown")
+
+                starts.append({
+                    "date": split.get("date", ""),
+                    "pitches": _safe_int(pitches),
+                    "ip_outs": _innings_pitched_to_outs(stat.get("inningsPitched")),
+                })
+    except Exception as e:
+        print(f"  ⚠ Could not fetch pitcher game logs for {pitcher_id}: {e}")
+
+    starts.sort(key=lambda s: s.get("date", ""), reverse=True)
+    _pitcher_gamelog_cache[key] = starts
+    return starts
+
+
 def get_pitcher_rest_and_workload(pitcher_id: int, game_date: str,
                                   season: Optional[int] = None) -> dict:
     """
@@ -394,45 +487,89 @@ def get_pitcher_rest_and_workload(pitcher_id: int, game_date: str,
         as_of = date.today()
     season = season or _season_for_date(game_date)
 
-    try:
-        data = mlb_get(f"people/{pitcher_id}/stats", {
-            "stats": "gameLog",
-            "group": "pitching",
-            "season": season,
-        })
-        starts = []
-        for sg in data.get("stats", []):
-            for split in sg.get("splits", []):
-                gs = split.get("stat", {}).get("gamesStarted", 0)
-                if gs > 0:
-                    game_date_str = split.get("date", "")
-                    pitches = split.get("stat", {}).get("numberOfPitches")
-                    if pitches is None:
-                        pitches = split.get("stat", {}).get("pitchesThrown")
-                    starts.append({
-                        "date": game_date_str,
-                        "pitches": int(pitches) if pitches else None,
-                    })
-
-        # Sort by date descending, find most recent start BEFORE as_of
-        starts.sort(key=lambda s: s["date"], reverse=True)
-        for s in starts:
-            try:
-                start_dt = date.fromisoformat(s["date"])
-            except Exception:
-                continue
-            if start_dt < as_of:
-                days_rest = (as_of - start_dt).days
-                return {
-                    "has_data": True,
-                    "days_rest": days_rest,
-                    "last_pitches": s["pitches"],
-                    "last_start_date": s["date"],
-                }
-    except Exception as e:
-        print(f"  ⚠ Could not fetch rest/workload for pitcher {pitcher_id}: {e}")
+    starts = _get_pitcher_starts_from_gamelog(pitcher_id, season)
+    for s in starts:
+        try:
+            start_dt = date.fromisoformat(s.get("date", ""))
+        except Exception:
+            continue
+        if start_dt < as_of:
+            days_rest = (as_of - start_dt).days
+            return {
+                "has_data": True,
+                "days_rest": days_rest,
+                "last_pitches": s.get("pitches"),
+                "last_start_date": s.get("date"),
+            }
 
     return {"has_data": False}
+
+
+PITCH_EFF_LOOKBACK_STARTS = 8
+
+
+def get_pitcher_pitch_efficiency(pitcher_id: int, game_date: str,
+                                 season: Optional[int] = None,
+                                 lookback_starts: int = PITCH_EFF_LOOKBACK_STARTS) -> dict:
+    """
+    Compute recent pitch-count efficiency from game logs.
+
+    Returns a dict with pitches-per-inning (P/IP) summary for recent starts.
+    Higher P/IP indicates inefficiency and elevated risk of early exit.
+    """
+    if not pitcher_id:
+        return {"has_data": False}
+
+    as_of = _parse_game_date(game_date)
+    season = season or _season_for_date(game_date)
+    starts = _get_pitcher_starts_from_gamelog(pitcher_id, season)
+    if not starts:
+        return {"has_data": False}
+
+    prior_starts = []
+    for s in starts:
+        try:
+            start_dt = date.fromisoformat(s.get("date", ""))
+        except Exception:
+            continue
+        if start_dt < as_of:
+            prior_starts.append(s)
+
+    if not prior_starts:
+        return {"has_data": False}
+
+    recent_starts = prior_starts[:max(1, lookback_starts)]
+    ppi_values = []
+    for s in recent_starts:
+        pitches = s.get("pitches")
+        ip_outs = s.get("ip_outs")
+        if pitches is None or ip_outs is None or ip_outs <= 0:
+            continue
+        ip = ip_outs / 3.0
+        ppi_values.append(pitches / ip)
+
+    if not ppi_values:
+        return {"has_data": False}
+
+    ppi_sorted = sorted(ppi_values)
+    n = len(ppi_sorted)
+    mid = n // 2
+    if n % 2 == 1:
+        median_ppi = ppi_sorted[mid]
+    else:
+        median_ppi = (ppi_sorted[mid - 1] + ppi_sorted[mid]) / 2.0
+
+    high_ineff = sum(1 for v in ppi_values if v >= 17.5)
+
+    return {
+        "has_data": True,
+        "starts_sample": n,
+        "starts_lookback": len(recent_starts),
+        "avg_pitches_per_inning": round(sum(ppi_values) / n, 2),
+        "median_pitches_per_inning": round(median_ppi, 2),
+        "high_inefficiency_starts": high_ineff,
+        "high_inefficiency_rate": round(high_ineff / n, 3),
+    }
 
 
 def score_rest(rest_info: dict) -> float:
@@ -2040,6 +2177,7 @@ def analyze_date(game_date: str) -> list[dict]:
 
     # Reset cross-function caches at the start of every run.
     _linescore_cache.clear()
+    _pitcher_gamelog_cache.clear()
     season = _season_for_date(game_date)
     stats_through = _stats_end_date(game_date)
 
@@ -2081,6 +2219,16 @@ def analyze_date(game_date: str) -> list[dict]:
         if home_rest.get("has_data"):
             print(f"  Rest: {info['home_pitcher_name']} — {home_rest['days_rest']}d rest, "
                   f"{home_rest['last_pitches'] or '?'}P last outing (adj {'+' if home_rest_adj >= 0 else ''}{home_rest_adj})")
+
+        print("  Fetching pitch-count efficiency...")
+        away_pitch_eff = get_pitcher_pitch_efficiency(info["away_pitcher_id"], game_date, season)
+        home_pitch_eff = get_pitcher_pitch_efficiency(info["home_pitcher_id"], game_date, season)
+        if away_pitch_eff.get("has_data"):
+            print(f"  P/IP: {info['away_pitcher_name']} — {away_pitch_eff['avg_pitches_per_inning']:.2f} "
+                  f"avg over {away_pitch_eff['starts_sample']} starts")
+        if home_pitch_eff.get("has_data"):
+            print(f"  P/IP: {info['home_pitcher_name']} — {home_pitch_eff['avg_pitches_per_inning']:.2f} "
+                  f"avg over {home_pitch_eff['starts_sample']} starts")
 
         print(f"  Fetching first-inning history...")
         away_fi = get_first_inning_stats(info["away_pitcher_id"], game_date, season)
@@ -2241,6 +2389,8 @@ def analyze_date(game_date: str) -> list[dict]:
             "team_tendency_meta": team_tendency_meta,
             "away_rest": away_rest,
             "home_rest": home_rest,
+            "away_pitch_eff": away_pitch_eff,
+            "home_pitch_eff": home_pitch_eff,
             "home_top_order": home_top,   # batters facing away pitcher
             "away_top_order": away_top,   # batters facing home pitcher
             "home_real_lineup": home_real_lineup,

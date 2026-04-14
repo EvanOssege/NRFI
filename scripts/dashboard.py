@@ -437,6 +437,19 @@ def generate_dashboard(data: dict, output_path: str):
         ml_edge = ml.get("edge", 0)
         ml_edge_str = f"{'+' if ml_edge > 0 else ''}{ml_edge}"
         ml_color = conf_color(ml_conf)
+        away_eff_adj = ml.get("away_pitch_eff_adj")
+        home_eff_adj = ml.get("home_pitch_eff_adj")
+
+        def fmt_signed(v):
+            try:
+                fv = float(v)
+                return f"{fv:+.1f}"
+            except (TypeError, ValueError):
+                return "n/a"
+
+        eff_sub = ""
+        if away_eff_adj is not None or home_eff_adj is not None:
+            eff_sub = f"<br/>P/IP adj A {fmt_signed(away_eff_adj)} · H {fmt_signed(home_eff_adj)}"
 
         # Spread cell
         sp_label = spread.get("recommended_label", "—")
@@ -476,7 +489,7 @@ def generate_dashboard(data: dict, output_path: str):
             <div class="f5-cell">
               <div class="f5-cell-label">MONEYLINE</div>
               <div class="f5-cell-val" style="color:{ml_color}">{ml_pick}</div>
-              <div class="f5-cell-sub">Edge: {ml_edge_str} · {ml_conf}</div>
+              <div class="f5-cell-sub">Edge: {ml_edge_str} · {ml_conf}{eff_sub}</div>
             </div>
             <div class="f5-cell">
               <div class="f5-cell-label">SPREAD</div>
@@ -1081,7 +1094,7 @@ def generate_dashboard(data: dict, output_path: str):
   <p style="margin-top:4px"><strong>Team 1st-Inning Tendency:</strong> Each team's rolling 30-game rate of scoring in the 1st inning, split by home/away role. The home team's HOME rate and the away team's AWAY rate are used (since that's the role they'll be in tonight). Both rates are Bayesian-shrunk toward the team overall (k=10) and then league average ~27% (k=5) so a 14-15 game side sample doesn't dominate. Adjusts ±3 — a deliberately light weight to avoid double-counting the lineup-threat signal already in the model. Acts as a stabilizing prior, especially valuable in early April when individual stats are noisy.</p>
   <h3 style="margin-top:16px">First 5 Innings (F5) Models</h3>
   <p style="margin-top:8px">F5 predictions extend the NRFI analysis to project outcomes over the first 5 innings, where starting pitcher quality dominates.</p>
-  <p style="margin-top:4px"><strong>F5 Moneyline:</strong> Power rating per side = 70% pitcher score + 30% inverted lineup threat + adjustments (BvP, platoon, streaks, rest). The differential between sides determines the pick and edge strength.</p>
+  <p style="margin-top:4px"><strong>F5 Moneyline:</strong> Power rating per side = 70% pitcher score + 30% inverted lineup threat + adjustments (BvP, platoon, streaks, rest, and pitch-count efficiency). High pitches-per-inning adds an early-exit penalty for that starter. The differential between sides determines the pick and edge strength.</p>
   <p style="margin-top:4px"><strong>F5 Spread:</strong> Derived from the ML edge. A moderate edge (&gt;1 point) supports -0.5; a large edge (&gt;5 points) supports -1.5 coverage.</p>
   <p style="margin-top:4px"><strong>F5 Total:</strong> Projects runs per side based on pitcher quality vs opposing lineup, then sums with park/weather environment adjustments. Compared against common lines (4.0, 4.5, 5.0, 5.5).</p>
   <p style="margin-top:4px"><strong>Confidence Tiers:</strong> STRONG = high-conviction play; LEAN/MODERATE = worth a look; SLIGHT/TOSS-UP = no actionable edge.</p>

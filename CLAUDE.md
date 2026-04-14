@@ -99,7 +99,7 @@ The F5 module consumes the same per-game data that the NRFI pipeline produces an
 
 ### F5 Moneyline
 
-Per-side power rating: `0.70 * pitcher_score + 0.30 * (100 - lineup_threat) + adjustments`. The differential between away and home ratings determines pick, edge, and confidence tier (STRONG / MODERATE / LEAN / TOSS-UP).
+Per-side power rating: `0.70 * pitcher_score + 0.30 * (100 - lineup_threat) + adjustments`. Adjustments include first-inning signal, matchup/context factors, rest, and pitch-count efficiency (pitches-per-inning) to penalize likely early hooks before 5 IP. The differential between away and home ratings determines pick, edge, and confidence tier (STRONG / MODERATE / LEAN / TOSS-UP).
 
 Key difference from NRFI: pitcher quality is weighted at 70% (vs 45% in NRFI) because over 5 innings the starting pitcher's dominance is the single strongest predictor.
 
@@ -115,6 +115,7 @@ Projects runs per side via `_estimate_f5_runs()` using pitcher quality vs opposi
 
 | Function | Purpose |
 |---|---|
+| `score_pitch_count_efficiency()` | Pitch-count efficiency adjustment for F5 side strength |
 | `compute_f5_power_rating()` | Per-side strength rating for ML/spread |
 | `compute_f5_moneyline()` | F5 ML pick and edge |
 | `compute_f5_spread()` | F5 spread coverage from ML edge |
