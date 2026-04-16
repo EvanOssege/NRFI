@@ -2408,6 +2408,18 @@ def analyze_date(game_date: str) -> list[dict]:
             "home_lineup_threat": round(home_lineup_threat, 1),
             "away_lineup_threat": round(away_lineup_threat, 1),
             "nrfi": nrfi,
+            # Per-side adjustments for F5 decomposition
+            # Convention: positive = run-suppressing (good for the pitcher's side)
+            "away_fi_adj": round(away_fi_adj, 1),
+            "home_fi_adj": round(home_fi_adj, 1),
+            "home_bvp_adj": round(home_bvp_adj, 1),   # home batters vs away pitcher
+            "away_bvp_adj": round(away_bvp_adj, 1),   # away batters vs home pitcher
+            "home_platoon_adj": round(home_platoon_adj, 1),
+            "away_platoon_adj": round(away_platoon_adj, 1),
+            "home_streak_adj": round(home_streak_adj, 1),
+            "away_streak_adj": round(away_streak_adj, 1),
+            "away_rest_adj": round(away_rest_adj, 1),
+            "home_rest_adj": round(home_rest_adj, 1),
         }
 
         # --- F5 (First 5 Innings) scoring ---

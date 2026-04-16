@@ -25,6 +25,7 @@ from dashboard import generate_dashboard
 from predictions_log import log_predictions
 from odds import fetch_nrfi_odds, match_odds_to_games
 from hit_rate_tracker import generate_hit_rate_dashboard
+from unit_sizing import compute_unit_sizing
 import json
 from datetime import datetime
 
@@ -62,6 +63,9 @@ def main():
         for g in results:
             g["odds"] = {"has_odds": False}
         print("  No odds available (set ODDS_API_KEY to enable)")
+
+    # 1c. Suggested unit sizing per bet (F5 ML + F5 Total)
+    compute_unit_sizing(results)
 
     # 2. Save JSON
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")

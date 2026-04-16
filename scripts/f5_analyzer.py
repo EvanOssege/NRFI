@@ -123,30 +123,43 @@ def compute_f5_moneyline(game: dict) -> dict:
 
     The "away side" power rating measures: how well the away pitcher
     suppresses the home lineup. The "home side" measures the reverse.
+
+    Per-side adjustment decomposition (fixed):
+    Each side's rating uses only the adjustments relevant to THAT matchup:
+      away_rating: away pitcher quality + adjustments from home-lineup-vs-away-pitcher
+      home_rating: home pitcher quality + adjustments from away-lineup-vs-home-pitcher
+    Previously, game-level sums were split 50/50 to both sides, which
+    caused all adjustments to cancel out in the differential.
     """
-    nrfi = game.get("nrfi", {})
     away_pitch_eff_adj = score_pitch_count_efficiency(game.get("away_pitch_eff", {}))
     home_pitch_eff_adj = score_pitch_count_efficiency(game.get("home_pitch_eff", {}))
 
+    # Away side: away pitcher suppressing the home lineup.
+    # - fi_adj: away pitcher's first-inning track record
+    # - bvp_adj: home batters vs away pitcher (positive = batters struggle = good for away side)
+    # - platoon_adj: home lineup's platoon situation vs away pitcher hand
+    # - streak_adj: home lineup's hot/cold streak (positive = cold = good for away side)
+    # - rest_adj: away pitcher's rest/workload
     away_rating = compute_f5_power_rating(
         pitcher_score=game.get("away_pitcher_score", 50),
-        lineup_threat=game.get("home_lineup_threat", 50),    # away P faces home lineup
-        fi_adj=nrfi.get("fi_adj", 0) * 0.5,                  # split: ~half is away P's FI
-        bvp_adj=game.get("nrfi", {}).get("bvp_adj", 0) * 0.5,
-        platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
-        streak_adj=nrfi.get("streak_adj", 0) * 0.5,
-        rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        lineup_threat=game.get("home_lineup_threat", 50),
+        fi_adj=game.get("away_fi_adj", 0),
+        bvp_adj=game.get("home_bvp_adj", 0),
+        platoon_adj=game.get("home_platoon_adj", 0),
+        streak_adj=game.get("home_streak_adj", 0),
+        rest_adj=game.get("away_rest_adj", 0),
         pitch_eff_adj=away_pitch_eff_adj,
     )
 
+    # Home side: home pitcher suppressing the away lineup.
     home_rating = compute_f5_power_rating(
         pitcher_score=game.get("home_pitcher_score", 50),
-        lineup_threat=game.get("away_lineup_threat", 50),    # home P faces away lineup
-        fi_adj=nrfi.get("fi_adj", 0) * 0.5,
-        bvp_adj=nrfi.get("bvp_adj", 0) * 0.5,
-        platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
-        streak_adj=nrfi.get("streak_adj", 0) * 0.5,
-        rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        lineup_threat=game.get("away_lineup_threat", 50),
+        fi_adj=game.get("home_fi_adj", 0),
+        bvp_adj=game.get("away_bvp_adj", 0),
+        platoon_adj=game.get("away_platoon_adj", 0),
+        streak_adj=game.get("away_streak_adj", 0),
+        rest_adj=game.get("home_rest_adj", 0),
         pitch_eff_adj=home_pitch_eff_adj,
     )
 
@@ -155,6 +168,7 @@ def compute_f5_moneyline(game: dict) -> dict:
     # Hitter-friendly parks benefit the better offense; pitcher-friendly
     # parks benefit the better pitcher. We apply park/weather as a slight
     # boost to the side with the offensive advantage.
+    nrfi = game.get("nrfi", {})
     park_adj = nrfi.get("park_adj", 0)
     weather_adj = nrfi.get("weather_adj", 0)
 
@@ -321,25 +335,27 @@ def compute_f5_total(game: dict) -> dict:
     nrfi = game.get("nrfi", {})
 
     # Runs allowed by away pitcher (to home lineup) over 5 innings
+    # Uses away pitcher's adjustments + home lineup's matchup adjustments
     home_runs = _estimate_f5_runs(
         pitcher_score=game.get("away_pitcher_score", 50),
         lineup_threat=game.get("home_lineup_threat", 50),
-        fi_adj=nrfi.get("fi_adj", 0) * 0.5,
-        bvp_adj=nrfi.get("bvp_adj", 0) * 0.5,
-        platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
-        streak_adj=nrfi.get("streak_adj", 0) * 0.5,
-        rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        fi_adj=game.get("away_fi_adj", 0),
+        bvp_adj=game.get("home_bvp_adj", 0),
+        platoon_adj=game.get("home_platoon_adj", 0),
+        streak_adj=game.get("home_streak_adj", 0),
+        rest_adj=game.get("away_rest_adj", 0),
     )
 
     # Runs allowed by home pitcher (to away lineup) over 5 innings
+    # Uses home pitcher's adjustments + away lineup's matchup adjustments
     away_runs = _estimate_f5_runs(
         pitcher_score=game.get("home_pitcher_score", 50),
         lineup_threat=game.get("away_lineup_threat", 50),
-        fi_adj=nrfi.get("fi_adj", 0) * 0.5,
-        bvp_adj=nrfi.get("bvp_adj", 0) * 0.5,
-        platoon_adj=nrfi.get("platoon_adj", 0) * 0.5,
-        streak_adj=nrfi.get("streak_adj", 0) * 0.5,
-        rest_adj=nrfi.get("rest_adj", 0) * 0.5,
+        fi_adj=game.get("home_fi_adj", 0),
+        bvp_adj=game.get("away_bvp_adj", 0),
+        platoon_adj=game.get("away_platoon_adj", 0),
+        streak_adj=game.get("away_streak_adj", 0),
+        rest_adj=game.get("home_rest_adj", 0),
     )
 
     # Park and weather: both shift total run environment

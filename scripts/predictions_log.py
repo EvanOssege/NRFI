@@ -72,6 +72,7 @@ PREDICTIONS_COLUMNS = [
     "f5_ml_pick",
     "f5_ml_edge",
     "f5_ml_confidence",
+    "f5_ml_units",
     "f5_away_pitch_eff_adj",
     "f5_home_pitch_eff_adj",
     "f5_spread_label",
@@ -80,6 +81,7 @@ PREDICTIONS_COLUMNS = [
     "f5_total_lean",
     "f5_total_confidence",
     "f5_total_line",
+    "f5_total_units",
 ]
 
 
@@ -170,6 +172,7 @@ def _row_from_game(prediction_date: str, g: dict) -> dict:
         "f5_ml_pick": (g.get("f5") or {}).get("ml", {}).get("pick", ""),
         "f5_ml_edge": (g.get("f5") or {}).get("ml", {}).get("edge", ""),
         "f5_ml_confidence": (g.get("f5") or {}).get("ml", {}).get("confidence", ""),
+        "f5_ml_units": (g.get("f5") or {}).get("ml", {}).get("units", ""),
         "f5_away_pitch_eff_adj": (g.get("f5") or {}).get("ml", {}).get("away_pitch_eff_adj", ""),
         "f5_home_pitch_eff_adj": (g.get("f5") or {}).get("ml", {}).get("home_pitch_eff_adj", ""),
         "f5_spread_label": (g.get("f5") or {}).get("spread", {}).get("recommended_label", ""),
@@ -178,6 +181,7 @@ def _row_from_game(prediction_date: str, g: dict) -> dict:
         "f5_total_lean": (g.get("f5") or {}).get("total", {}).get("lean", ""),
         "f5_total_confidence": (g.get("f5") or {}).get("total", {}).get("confidence", ""),
         "f5_total_line": (g.get("f5") or {}).get("total", {}).get("primary_line", ""),
+        "f5_total_units": (g.get("f5") or {}).get("total", {}).get("units", ""),
     }
 
 

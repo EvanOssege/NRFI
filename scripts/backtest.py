@@ -109,6 +109,31 @@ def fetch_outcome(game_pk: str) -> dict:
     """
     if not game_pk:
         return None
+
+    # Check actual game status via schedule API before processing linescore.
+    # Without this, in-progress games would be tagged "Final" as soon as the
+    # 1st inning completes, preventing re-fetch of F5 data once the game ends.
+    try:
+        sched = requests.get(
+            f"{MLB_BASE}/schedule", params={"gamePk": game_pk}, timeout=10
+        )
+        sched.raise_for_status()
+        sched_data = sched.json()
+        sched_games = []
+        for d in sched_data.get("dates", []):
+            sched_games.extend(d.get("games", []))
+        game_entry = next(
+            (g for g in sched_games if str(g.get("gamePk")) == str(game_pk)), None
+        )
+        abstract_state = (
+            (game_entry.get("status") or {}).get("abstractGameState", "")
+            if game_entry else ""
+        )
+    except Exception:
+        abstract_state = ""  # if schedule check fails, fall through to linescore
+
+    is_final = abstract_state == "Final"
+
     try:
         r = requests.get(f"{MLB_BASE}/game/{game_pk}/linescore", timeout=10)
         r.raise_for_status()
@@ -209,7 +234,7 @@ def fetch_outcome(game_pk: str) -> dict:
     return {
         "game_pk": game_pk,
         "fetched_at": datetime.now().isoformat(timespec="seconds"),
-        "game_status": "Final",
+        "game_status": "Final" if is_final else "In Progress",
         "away_runs_1st": away_1st,
         "home_runs_1st": home_1st,
         "nrfi_actual": nrfi_actual,
@@ -610,8 +635,8 @@ def f5_ml_results(joined: list) -> dict:
     F5 ML hit rate by confidence tier.
 
     A hit is when the model's pick side matches the actual winner side.
-    Ties (f5_ml_winner_side == 'tie') are excluded — the bet pushes.
-    PICK'em games (no directional call) are also excluded.
+    Ties (f5_ml_winner_side == 'tie') count as losses (matches dashboard policy).
+    PICK'em games (no directional call) are excluded.
     """
     # Only use rows with completed 5 innings AND a directional pick
     buckets = defaultdict(lambda: {"n": 0, "hits": 0, "pushes": 0})
@@ -625,6 +650,7 @@ def f5_ml_results(joined: list) -> dict:
             continue
         if winner == "tie":
             buckets[confidence]["pushes"] += 1
+            buckets[confidence]["n"] += 1  # push counts as loss (matches dashboard)
             continue
         buckets[confidence]["n"] += 1
         if pick_side == winner:
@@ -643,8 +669,8 @@ def f5_spread_results(joined: list) -> dict:
     Spread label examples: "NYY -0.5", "NYY -1.5", "No spread play".
     A -0.5 spread covers when the pick side wins by any margin (>=1 run).
     A -1.5 spread covers when the pick side wins by 2+ runs.
-    Ties are pushes for -0.5 (technically impossible on half-run lines, but
-    treated as pushes here); -1.5 pushes if the pick wins by exactly 1.
+    Pushes count as losses (consistent with dashboard). -0.5 pushes on ties;
+    -1.5 pushes when the pick wins by exactly 1.
     """
     buckets = defaultdict(lambda: {"n": 0, "hits": 0, "pushes": 0})
     for r in joined:
@@ -698,13 +724,13 @@ def f5_spread_results(joined: list) -> dict:
                 buckets[confidence]["hits"] += 1
             elif pick_margin == 0:
                 buckets[confidence]["pushes"] += 1
-                buckets[confidence]["n"] -= 1  # push doesn't count toward n
+                # push counts as loss (n already incremented, matches dashboard)
         elif line == -1.5:
             if pick_margin >= 2:
                 buckets[confidence]["hits"] += 1
             elif pick_margin == 1:
                 buckets[confidence]["pushes"] += 1
-                buckets[confidence]["n"] -= 1
+                # push counts as loss (n already incremented, matches dashboard)
     out = {}
     for conf, b in buckets.items():
         rate = (b["hits"] / b["n"]) if b["n"] else 0
@@ -741,13 +767,13 @@ def f5_total_results(joined: list) -> dict:
                 buckets[key]["hits"] += 1
             elif actual == line:
                 buckets[key]["pushes"] += 1
-                buckets[key]["n"] -= 1
+                # push counts as loss (n already incremented, matches dashboard)
         elif lean == "UNDER":
             if actual < line:
                 buckets[key]["hits"] += 1
             elif actual == line:
                 buckets[key]["pushes"] += 1
-                buckets[key]["n"] -= 1
+                # push counts as loss (n already incremented, matches dashboard)
     out = {}
     for key, b in buckets.items():
         rate = (b["hits"] / b["n"]) if b["n"] else 0
@@ -1104,7 +1130,7 @@ def print_report(joined: list):
                     print(f"  {conf:<12} {b['n']:>5} {b['hits']:>6} {b['pushes']:>8} {b['rate']:>7.1%}")
                 else:
                     print(f"  {conf:<12} {'-':>5} {'-':>6} {'-':>8} {'-':>8}")
-            print("  (Pushes = tie after 5 inn; excluded from N and rate.)\n")
+            print("  (Pushes = tie after 5 inn; counted as losses in rate.)\n")
         else:
             print("  No F5 ML picks with completed outcomes yet.\n")
 
@@ -1120,7 +1146,7 @@ def print_report(joined: list):
                     print(f"  {conf:<12} {b['n']:>5} {b['hits']:>6} {b['pushes']:>8} {b['rate']:>7.1%}")
                 else:
                     print(f"  {conf:<12} {'-':>5} {'-':>6} {'-':>8} {'-':>8}")
-            print("  (Pushes = exact margin on -1.5 line; excluded from N and rate.)\n")
+            print("  (Pushes = exact margin on -1.5 line; counted as losses in rate.)\n")
         else:
             print("  No F5 Spread picks with completed outcomes yet.\n")
 
