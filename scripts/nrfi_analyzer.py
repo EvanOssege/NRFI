@@ -1029,6 +1029,7 @@ def extract_pitcher_metrics(stats: dict) -> dict:
     walks = to_float(stats.get("baseOnBalls"))
     strikeouts = to_float(stats.get("strikeOuts"))
     games_started = to_float(stats.get("gamesStarted"))
+    games_played = to_float(stats.get("gamesPlayed"))
     runs = to_float(stats.get("runs"))
     earned_runs = to_float(stats.get("earnedRuns"))
 
@@ -1043,9 +1044,68 @@ def extract_pitcher_metrics(stats: dict) -> dict:
         "walks": walks,
         "strikeouts": strikeouts,
         "games_started": games_started,
+        "games_played": games_played,
         "runs": runs,
         "earned_runs": earned_runs,
     }
+
+
+def detect_bullpen_game(metrics: dict) -> dict:
+    """
+    Detect whether a pitcher is likely a reliever making a spot start
+    (i.e., a bullpen game) based on season stats.
+
+    Uses games_started vs games_played ratio from season-to-date stats.
+    A traditional starter will have GS ≈ GP.  A reliever pressed into a
+    start will have many more GP than GS.
+
+    Returns:
+        {
+            "is_bullpen": bool,
+            "reason": str | None,        # human-readable explanation
+            "games_started": int,
+            "games_played": int,
+            "relief_appearances": int,
+        }
+    """
+    gs = int(metrics.get("games_started") or 0)
+    gp = int(metrics.get("games_played") or 0)
+    relief = max(0, gp - gs)
+
+    result = {
+        "is_bullpen": False,
+        "reason": None,
+        "games_started": gs,
+        "games_played": gp,
+        "relief_appearances": relief,
+    }
+
+    # No stats at all — TBD pitcher or just called up.
+    # Not flagged as bullpen; sample-size regression already handles this.
+    if gp == 0:
+        return result
+
+    # Pure reliever: zero starts this season, multiple relief outings.
+    if gs == 0 and relief >= 3:
+        result["is_bullpen"] = True
+        result["reason"] = f"reliever (0 GS, {gp} G this season)"
+        return result
+
+    # Mostly reliever: 1-2 starts but ≥5 relief appearances.
+    # These are often "openers" or emergency spot starts.
+    if gs <= 2 and relief >= 5:
+        result["is_bullpen"] = True
+        result["reason"] = f"primary reliever ({gs} GS, {relief} relief apps)"
+        return result
+
+    # Low-start pitcher with high relief ratio.
+    # E.g., 3 starts and 10 relief appearances — still a reliever profile.
+    if gs <= 3 and gp >= 8 and (relief / gp) >= 0.65:
+        result["is_bullpen"] = True
+        result["reason"] = f"reliever profile ({gs} GS, {relief} relief in {gp} G)"
+        return result
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -2107,6 +2167,8 @@ def compute_nrfi_score(
     team_tendency_adj: float = 0.0,   # blended team 1st-inning scoring tendency
     rest_away_adj: float = 0.0,       # away pitcher days-rest adjustment
     rest_home_adj: float = 0.0,       # home pitcher days-rest adjustment
+    away_bullpen_game: bool = False,   # away side is a bullpen game
+    home_bullpen_game: bool = False,   # home side is a bullpen game
 ) -> dict:
     """
     Combine all factors into a single NRFI confidence score (0-100).
@@ -2131,11 +2193,24 @@ def compute_nrfi_score(
     fi_adj = fi_away_adj + fi_home_adj
     rest_adj = rest_away_adj + rest_home_adj
 
+    # --- Bullpen game penalty ---
+    # A reliever pressed into a starting role introduces uncertainty.
+    # For NRFI this is moderate: relievers can handle 1 inning fine, but
+    # their first-inning stats as a "starter" are unreliable, and managers
+    # sometimes use openers for just 1-2 batters before a quick hook.
+    # Penalty: -6 per bullpen side (max -12 if both).
+    bullpen_adj = 0.0
+    if away_bullpen_game:
+        bullpen_adj -= 6.0
+    if home_bullpen_game:
+        bullpen_adj -= 6.0
+
     # Combine: 45% pitching, 25% lineup, adjustments for everything else
     raw = (0.45 * pitcher_component +
            0.25 * lineup_component +
            fi_adj + bvp_adj + platoon_adj + streak_adj +
-           weather_adj + park_adj + team_tendency_adj + rest_adj)
+           weather_adj + park_adj + team_tendency_adj + rest_adj +
+           bullpen_adj)
 
     # Clamp
     final = max(0, min(100, raw))
@@ -2163,6 +2238,7 @@ def compute_nrfi_score(
         "weather_adj": round(weather_adj, 1),
         "team_tendency_adj": round(team_tendency_adj, 1),
         "rest_adj": round(rest_adj, 1),
+        "bullpen_adj": round(bullpen_adj, 1),
     }
 
 
@@ -2206,6 +2282,14 @@ def analyze_date(game_date: str) -> list[dict]:
         away_hand = get_pitcher_hand(info["away_pitcher_id"])
         home_hand = get_pitcher_hand(info["home_pitcher_id"])
         print(f"  Pitcher hands: {info['away_pitcher_name']} ({away_hand}HP) vs {info['home_pitcher_name']} ({home_hand}HP)")
+
+        # Bullpen game detection
+        away_bp = detect_bullpen_game(away_p)
+        home_bp = detect_bullpen_game(home_p)
+        if away_bp["is_bullpen"]:
+            print(f"  ⚠ BULLPEN GAME: {info['away_pitcher_name']} — {away_bp['reason']}")
+        if home_bp["is_bullpen"]:
+            print(f"  ⚠ BULLPEN GAME: {info['home_pitcher_name']} — {home_bp['reason']}")
 
         # Pitcher rest + workload
         print(f"  Fetching pitcher rest & workload...")
@@ -2364,6 +2448,8 @@ def analyze_date(game_date: str) -> list[dict]:
             team_tendency_adj=team_tendency_adj,
             rest_away_adj=away_rest_adj,
             rest_home_adj=home_rest_adj,
+            away_bullpen_game=away_bp["is_bullpen"],
+            home_bullpen_game=home_bp["is_bullpen"],
         )
 
         result = {
@@ -2420,6 +2506,10 @@ def analyze_date(game_date: str) -> list[dict]:
             "away_streak_adj": round(away_streak_adj, 1),
             "away_rest_adj": round(away_rest_adj, 1),
             "home_rest_adj": round(home_rest_adj, 1),
+            # Bullpen game flags
+            "away_bullpen": away_bp,
+            "home_bullpen": home_bp,
+            "has_bullpen_game": away_bp["is_bullpen"] or home_bp["is_bullpen"],
         }
 
         # --- F5 (First 5 Innings) scoring ---

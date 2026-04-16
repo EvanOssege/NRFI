@@ -68,6 +68,10 @@ PREDICTIONS_COLUMNS = [
     # ---- lineup confidence at prediction time ----
     "home_real_lineup",
     "away_real_lineup",
+    # ---- bullpen game flags ----
+    "away_bullpen_game",
+    "home_bullpen_game",
+    "bullpen_adj",
     # ---- F5 predictions ----
     "f5_ml_pick",
     "f5_ml_edge",
@@ -168,6 +172,10 @@ def _row_from_game(prediction_date: str, g: dict) -> dict:
         "away_lineup_threat": g.get("away_lineup_threat", ""),
         "home_real_lineup": int(bool(g.get("home_real_lineup", False))),
         "away_real_lineup": int(bool(g.get("away_real_lineup", False))),
+        # Bullpen game flags
+        "away_bullpen_game": int(bool((g.get("away_bullpen") or {}).get("is_bullpen", False))),
+        "home_bullpen_game": int(bool((g.get("home_bullpen") or {}).get("is_bullpen", False))),
+        "bullpen_adj": nrfi.get("bullpen_adj", 0),
         # F5 predictions
         "f5_ml_pick": (g.get("f5") or {}).get("ml", {}).get("pick", ""),
         "f5_ml_edge": (g.get("f5") or {}).get("ml", {}).get("edge", ""),

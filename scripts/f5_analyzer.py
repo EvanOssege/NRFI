@@ -178,6 +178,22 @@ def compute_f5_moneyline(game: dict) -> dict:
     away_rating += park_adj * 0.3
     home_rating += park_adj * 0.3
 
+    # --- Bullpen game penalty (F5-specific, heavier than NRFI) ---
+    # Over 5 innings a reliever-turned-starter is very unlikely to go the
+    # distance. The team will churn through 2-4 bullpen arms, introducing
+    # massive variance that the model can't price.  Penalize the bullpen
+    # side's power rating by -10 (roughly equivalent to a 15-point swing
+    # in pitcher score).  This pulls the bullpen side toward "weak" and
+    # makes the model strongly favor the opposing side.
+    away_bp = (game.get("away_bullpen") or {}).get("is_bullpen", False)
+    home_bp = (game.get("home_bullpen") or {}).get("is_bullpen", False)
+    has_bullpen_game = away_bp or home_bp
+
+    if away_bp:
+        away_rating -= 10.0
+    if home_bp:
+        home_rating -= 10.0
+
     differential = away_rating - home_rating
 
     # Map differential to a pick and confidence.
@@ -192,6 +208,12 @@ def compute_f5_moneyline(game: dict) -> dict:
         confidence = "MODERATE"
     else:
         confidence = "STRONG"
+
+    # Cap confidence when a bullpen game is involved.
+    # Even a large differential is unreliable when one side is churning
+    # through relievers — the variance makes STRONG/MODERATE misleading.
+    if has_bullpen_game and confidence in ("STRONG", "MODERATE"):
+        confidence = "LEAN"
 
     if differential > 0.5:
         pick = game.get("away_abbr", "AWAY")
@@ -210,6 +232,7 @@ def compute_f5_moneyline(game: dict) -> dict:
         "pick": pick,
         "pick_full": pick_full,
         "confidence": confidence,
+        "has_bullpen_game": has_bullpen_game,
         "away_pitch_eff_adj": away_pitch_eff_adj,
         "home_pitch_eff_adj": home_pitch_eff_adj,
     }
@@ -249,6 +272,12 @@ def compute_f5_spread(game: dict, f5_ml: dict) -> dict:
         spread_confidence = "SLIGHT"
     else:
         spread_confidence = "TOSS-UP"
+
+    # Cap spread confidence for bullpen games — variance makes spread
+    # coverage unreliable even with a large edge.
+    has_bullpen_game = f5_ml.get("has_bullpen_game", False)
+    if has_bullpen_game and spread_confidence in ("STRONG", "LEAN"):
+        spread_confidence = "SLIGHT"
 
     # Which line to recommend
     if cover_1_5:
@@ -375,6 +404,21 @@ def compute_f5_total(game: dict) -> dict:
 
     projected_total = max(1.0, round(projected_total, 1))
 
+    # --- Bullpen game: bump total projection ---
+    # When a reliever is "starting", the bullpen behind them tends to allow
+    # more runs over 5 innings than a true starter would. Add ~0.5 runs per
+    # bullpen side to reflect the bullpen-churn run environment.
+    away_bp = (game.get("away_bullpen") or {}).get("is_bullpen", False)
+    home_bp = (game.get("home_bullpen") or {}).get("is_bullpen", False)
+    has_bullpen_game = away_bp or home_bp
+    bullpen_run_bump = 0.0
+    if away_bp:
+        bullpen_run_bump += 0.5  # away pitcher side → more home runs
+    if home_bp:
+        bullpen_run_bump += 0.5  # home pitcher side → more away runs
+    projected_total += bullpen_run_bump
+    projected_total = max(1.0, round(projected_total, 1))
+
     # Compare against common lines
     common_lines = [4.0, 4.5, 5.0, 5.5]
     line_calls = {}
@@ -395,6 +439,12 @@ def compute_f5_total(game: dict) -> dict:
         else:
             lean = "PUSH"
             conf = "TOSS-UP"
+
+        # Cap total confidence for bullpen games — the projection bump is
+        # directionally correct but imprecise.
+        if has_bullpen_game and conf in ("STRONG",):
+            conf = "LEAN"
+
         line_calls[str(line)] = {"lean": lean, "confidence": conf, "diff": round(diff, 1)}
 
     # Primary recommendation: use 4.5 as the default F5 line

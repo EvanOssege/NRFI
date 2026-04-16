@@ -571,9 +571,22 @@ def generate_dashboard(data: dict, output_path: str):
             yrfi_badge = f'<span class="headline-badge yrfi-badge" style="background:{yrfi_color};color:#000">⚡ {yrfi_label}</span>'
         nrfi_chip = f'<span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid {nrfi_tier_c};color:{nrfi_tier_c}">NRFI {score}</span>'
 
+        # Bullpen game badge
+        has_bullpen = g.get("has_bullpen_game", False)
+        bullpen_badge_html = ''
+        if has_bullpen:
+            bullpen_badge_html = '<span class="headline-badge bullpen-badge" style="background:#ff6b35;color:#fff" title="One or both pitchers are relievers — elevated variance">⚠ BULLPEN</span>'
+
+        # Pitcher section labels — flag which side is the bullpen game
+        away_bp_flag = (g.get("away_bullpen") or {}).get("is_bullpen", False)
+        home_bp_flag = (g.get("home_bullpen") or {}).get("is_bullpen", False)
+        away_sp_label = "AWAY RP ⚠ (faces home lineup)" if away_bp_flag else "AWAY SP (faces home lineup)"
+        home_sp_label = "HOME RP ⚠ (faces away lineup)" if home_bp_flag else "HOME SP (faces away lineup)"
+
         return f"""
     <div class="game-card" style="border-left-color: {f5_color}"
-         data-f5="{f5_filter}" data-yrfi="{yrfi_filter}" data-nrfi="{nrfi_filter}">
+         data-f5="{f5_filter}" data-yrfi="{yrfi_filter}" data-nrfi="{nrfi_filter}"
+         data-bullpen="{'yes' if has_bullpen else 'no'}">
 
       <div class="game-header">
         <div class="matchup-row">
@@ -582,6 +595,7 @@ def generate_dashboard(data: dict, output_path: str):
             {f5_badge}
             {yrfi_badge}
             {nrfi_chip}
+            {bullpen_badge_html}
             {odds_badge(g)}
           </span>
         </div>
@@ -593,12 +607,12 @@ def generate_dashboard(data: dict, output_path: str):
 
         <div class="pitchers-row">
           <div class="pitcher-section">
-            <div class="section-label">AWAY SP (faces home lineup)</div>
+            <div class="section-label">{away_sp_label}</div>
             {pitcher_card(g['away_pitcher'], g['away_pitcher_stats'], g['away_pitcher_score'], g.get('away_pitcher_hand', '?'), g.get('away_fi'))}
           </div>
           <div class="vs-divider">vs</div>
           <div class="pitcher-section">
-            <div class="section-label">HOME SP (faces away lineup)</div>
+            <div class="section-label">{home_sp_label}</div>
             {pitcher_card(g['home_pitcher'], g['home_pitcher_stats'], g['home_pitcher_score'], g.get('home_pitcher_hand', '?'), g.get('home_fi'))}
           </div>
         </div>
@@ -1180,6 +1194,7 @@ def generate_dashboard(data: dict, output_path: str):
   <button class="filter-btn" onclick="filterF5Picks(this)">F5 Picks Only</button>
   <button class="filter-btn" onclick="filterYRFIAny(this)">YRFI Watch</button>
   <button class="filter-btn" onclick="filterNRFIPicks(this)">NRFI Picks</button>
+  <button class="filter-btn" onclick="filterBullpen(this)" style="color:#ff6b35">⚠ Bullpen</button>
 </div>
 
 <div id="games-container">
@@ -1195,6 +1210,9 @@ def generate_dashboard(data: dict, output_path: str):
 
   <h3 style="margin-top:18px">⚡ YRFI Watch</h3>
   <p>Calibrated against logged outcomes: when the NRFI score is below {YRFI_STRONG_MAX} the historical YRFI hit rate is ~78% (n=27); scores from {YRFI_STRONG_MAX} to {YRFI_LEAN_MAX-1} hit ~100% in a small sample (n=5). Above {YRFI_LEAN_MAX}, the edge over the ~46% league YRFI baseline disappears, so no flag is shown. STRONG = play with confidence; LEAN = treat as a soft tip and re-check after lineups post. These map naturally to 1st-inning over 0.5 / YRFI prop bets. Re-calibrate thresholds as the log grows.</p>
+
+  <h3 style="margin-top:18px">⚠ Bullpen Games</h3>
+  <p>When a listed "starter" is actually a reliever (0-2 GS with 5+ relief appearances this season), the game is flagged as a bullpen game. NRFI scores receive a -6 penalty per bullpen side. F5 predictions are penalized harder: the bullpen side's power rating drops by 10 points, run projections bump +0.5 per bullpen side, and all F5 confidence tiers are capped (never STRONG/MODERATE). These games have elevated variance — treat with extra caution.</p>
 
   <h3 style="margin-top:18px">NRFI (Secondary) — Scoring Inputs</h3>
   <p>NRFI score (0-100) = composite of pitching (45%, weakest-link weighted), lineup threat (25%, most-dangerous weighted), and adjustments. Higher = more likely no run scores in the 1st. Tiers: STRONG ≥72, LEAN 62-71.9, TOSS-UP 50-61.9, FADE &lt;50.</p>
@@ -1233,6 +1251,13 @@ function filterNRFIPicks(el) {{
   document.querySelectorAll('.game-card').forEach(c => {{
     const v = c.dataset.nrfi;
     c.style.display = (v === 'strong' || v === 'lean') ? 'block' : 'none';
+  }});
+  _activeBtn(el);
+}}
+
+function filterBullpen(el) {{
+  document.querySelectorAll('.game-card').forEach(c => {{
+    c.style.display = (c.dataset.bullpen === 'yes') ? 'block' : 'none';
   }});
   _activeBtn(el);
 }}

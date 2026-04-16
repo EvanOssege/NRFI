@@ -1,6 +1,8 @@
 .env
 __pycache__/
 *.pyc
+.DS_Store
+*-debug.log
 
 # Track output/ so GitHub Actions can commit daily results back to the repo.
 # Exclude only the odds cache — it changes every run and has no analytical value.

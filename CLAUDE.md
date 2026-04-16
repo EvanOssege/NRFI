@@ -69,6 +69,7 @@ raw = 0.45 * pitcher_component + 0.25 * lineup_component + adjustments
 - **Park factor:** -8 to +8. `(100 - park_factor) * 0.6`.
 - **Weather:** -10 to +10. Temperature + park-aware wind direction. Uses `PARK_ORIENTATION` (compass degrees to center field) and Open-Meteo `winddirection_10m` to compute whether wind is blowing out (bad — ball carries), blowing in (good — suppresses fly balls), or crosswind (neutral). Replaces the old speed-only wind logic.
 - **Pitcher rest:** -3 to +3 per pitcher (total -6 to +6). `score_rest()` evaluates days since last start and pitch count from that outing. Short rest (≤4 days) with high workload (100+ pitches) is penalized; standard 5-day rest is neutral; extra rest (6 days) is a slight positive.
+- **Bullpen game:** -6 per bullpen side (total -12 if both). `detect_bullpen_game()` flags relievers making spot starts using `gamesStarted` vs `gamesPlayed` ratio from season stats. Detection criteria: (1) 0 GS + 3+ relief appearances, (2) ≤2 GS + 5+ relief appearances, or (3) ≤3 GS in 8+ games with ≥65% relief ratio. F5 penalty is heavier: -10 power rating per bullpen side, +0.5 projected runs per side, and all F5 confidence tiers capped at LEAN. Dashboard shows orange "⚠ BULLPEN" badge and marks the pitcher section as "RP ⚠".
 
 ## Key Functions (nrfi_analyzer.py)
 
@@ -78,6 +79,7 @@ raw = 0.45 * pitcher_component + 0.25 * lineup_component + adjustments
 | `parse_game_info()` | ~196 | Extract structured game info |
 | `get_pitcher_season_stats()` | ~243 | Season pitching stats |
 | `get_pitcher_hand()` | ~277 | Throwing hand lookup |
+| `detect_bullpen_game()` | ~1053 | Detect reliever-as-starter (bullpen game) |
 | `get_pitcher_rest_and_workload()` | ~289 | Days rest + pitch count from last start |
 | `score_rest()` | ~355 | Rest/workload adjustment (-3 to +3) |
 | `get_first_inning_stats()` | ~395 | First-inning ERA + clean% with recency weighting |
