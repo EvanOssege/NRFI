@@ -503,6 +503,147 @@ def generate_dashboard(data: dict, output_path: str):
           </div>
         </div>"""
 
+    # ---------------- Bet Selection Panel (new) ----------------
+    def _bet_row_html(game_pk, matchup, market, pick, label,
+                      default_units, default_odds,
+                      model_confidence="", model_units=None, model_score=None,
+                      line_options=None, default_line=None, lean=None):
+        key = f"{game_pk}:{market}"
+        if market == "F5_TOTAL" and default_line is not None:
+            key = f"{game_pk}:{market}:{lean}"
+
+        matchup_safe = (matchup or "").replace('"', '&quot;')
+        pick_safe = str(pick).replace('"', '&quot;')
+
+        line_selector = ""
+        if line_options:
+            opts = ""
+            for opt in line_options:
+                sel = " selected" if abs(opt - (default_line or 0)) < 1e-9 else ""
+                opts += f'<option value="{opt}"{sel}>{opt}</option>'
+            line_selector = (
+                f'<span class="bet-input-group">'
+                f'<span class="bet-input-lbl">Line</span>'
+                f'<select class="bet-line" data-role="line">{opts}</select>'
+                f'</span>'
+            )
+
+        mu_str = f"{float(model_units):.1f}" if model_units is not None else ""
+        ms_str = f"{float(model_score):.2f}" if model_score is not None else ""
+        units_val = f"{float(default_units):.1f}"
+        odds_val = str(int(default_odds)) if float(default_odds).is_integer() else str(default_odds)
+
+        return f"""
+      <label class="bet-row" data-bet-key="{key}"
+             data-game-pk="{game_pk}"
+             data-matchup="{matchup_safe}"
+             data-market="{market}"
+             data-pick="{pick_safe}"
+             data-lean="{lean or ''}"
+             data-model-confidence="{model_confidence}"
+             data-model-units="{mu_str}"
+             data-model-score="{ms_str}">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet {label}</span>
+        {line_selector}
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="{units_val}">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="{odds_val}">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>"""
+
+    def bet_panel(g):
+        game_pk = g.get("game_pk")
+        matchup = g.get("matchup", "")
+        f5 = g.get("f5") or {}
+        ml = f5.get("ml", {}) or {}
+        total = f5.get("total", {}) or {}
+        nrfi = g.get("nrfi") or {}
+        odds_data = g.get("odds") or {}
+
+        rows = []
+
+        # F5 Moneyline
+        ml_pick = ml.get("pick")
+        if ml_pick and ml_pick not in ("—", None, ""):
+            default_u = ml.get("units")
+            if default_u is None or default_u <= 0:
+                default_u = 1.0
+            rows.append(_bet_row_html(
+                game_pk, matchup, "F5_ML", ml_pick,
+                label=f"F5 ML: {ml_pick}",
+                default_units=default_u,
+                default_odds=-110,
+                model_confidence=ml.get("confidence", ""),
+                model_units=ml.get("units"),
+                model_score=ml.get("edge"),
+            ))
+
+        # F5 Total
+        t_lean = total.get("lean")
+        if t_lean in ("OVER", "UNDER"):
+            t_line = total.get("primary_line", 4.5)
+            default_u = total.get("units")
+            if default_u is None or default_u <= 0:
+                default_u = 1.0
+            rows.append(_bet_row_html(
+                game_pk, matchup, "F5_TOTAL", f"{t_lean} {t_line}",
+                label=f"F5 {t_lean}",
+                default_units=default_u,
+                default_odds=-110,
+                line_options=[4.0, 4.5, 5.0, 5.5],
+                default_line=float(t_line) if t_line is not None else 4.5,
+                lean=t_lean,
+                model_confidence=total.get("confidence", ""),
+                model_units=total.get("units"),
+                model_score=total.get("projected_total"),
+            ))
+
+        # NRFI or YRFI (mutually exclusive — show whichever signal fires)
+        score = nrfi.get("score")
+        tier = nrfi.get("tier")
+        if tier in ("STRONG", "LEAN"):
+            default_u = 2.0 if tier == "STRONG" else 1.0
+            nrfi_price = odds_data.get("nrfi_price")
+            default_odds = int(nrfi_price) if isinstance(nrfi_price, (int, float)) else -110
+            rows.append(_bet_row_html(
+                game_pk, matchup, "NRFI", "NRFI",
+                label="NRFI",
+                default_units=default_u,
+                default_odds=default_odds,
+                model_confidence=tier,
+                model_units=default_u,
+                model_score=score,
+            ))
+        else:
+            yrfi = yrfi_status(score) if score is not None else None
+            if yrfi:
+                _, _, yrfi_tier = yrfi
+                default_u = 2.0 if yrfi_tier == "STRONG" else 1.0
+                rows.append(_bet_row_html(
+                    game_pk, matchup, "YRFI", "YRFI",
+                    label="YRFI",
+                    default_units=default_u,
+                    default_odds=-110,
+                    model_confidence=yrfi_tier,
+                    model_units=default_u,
+                    model_score=score,
+                ))
+
+        if not rows:
+            return ""
+
+        return f"""
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          {''.join(rows)}
+        </div>"""
+
     # ---------------- NRFI compact panel (now secondary) ----------------
     def nrfi_compact_panel(g):
         nrfi = g["nrfi"]
@@ -604,6 +745,7 @@ def generate_dashboard(data: dict, output_path: str):
 
       <div class="game-body">
         {f5_headline(g)}
+        {bet_panel(g)}
 
         <div class="pitchers-row">
           <div class="pitcher-section">
@@ -644,6 +786,200 @@ def generate_dashboard(data: dict, output_path: str):
     </div>"""
 
     cards_html = "\n".join(game_card(g) for g in games)
+
+    # ---------------- Bet-selection JavaScript (plain string, no f-string escaping) ----------------
+    bet_js = r"""
+(function() {
+  const ANALYSIS_DATE = window.NRFI_DASHBOARD_DATE || "unknown";
+  const LS_UNIT_SIZE = "nrfi_unit_size_dollars";
+  const LS_SELECTIONS = "nrfi_selections:" + ANALYSIS_DATE;
+
+  function parseNum(v, fallback) {
+    const n = Number(v);
+    return (v === "" || v === null || v === undefined || !isFinite(n)) ? fallback : n;
+  }
+
+  function loadUnitSize() {
+    const v = localStorage.getItem(LS_UNIT_SIZE);
+    return v !== null ? parseNum(v, 50) : 50;
+  }
+  function saveUnitSize(v) { localStorage.setItem(LS_UNIT_SIZE, String(v)); }
+
+  function loadSelections() {
+    try {
+      const raw = localStorage.getItem(LS_SELECTIONS);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function saveSelections(s) {
+    localStorage.setItem(LS_SELECTIONS, JSON.stringify(s));
+  }
+
+  function hydrate() {
+    const unitSize = loadUnitSize();
+    const sizeInput = document.getElementById("unit-size-input");
+    if (sizeInput) sizeInput.value = unitSize;
+
+    const saved = loadSelections();
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const key = row.dataset.betKey;
+      const s = saved[key];
+      if (!s) return;
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      if (checkEl && typeof s.checked === "boolean") checkEl.checked = s.checked;
+      if (unitsEl && s.units !== undefined && s.units !== null) unitsEl.value = s.units;
+      if (oddsEl && s.odds !== undefined && s.odds !== null) oddsEl.value = s.odds;
+      if (lineEl && s.line !== undefined && s.line !== null) lineEl.value = s.line;
+    });
+  }
+
+  function persist() {
+    const state = {};
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const key = row.dataset.betKey;
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      const checked = checkEl ? checkEl.checked : false;
+      const entry = {
+        checked: checked,
+        units: unitsEl ? parseNum(unitsEl.value, 0) : 0,
+        odds: oddsEl ? parseNum(oddsEl.value, -110) : -110
+      };
+      if (lineEl) entry.line = parseNum(lineEl.value, null);
+      state[key] = entry;
+    });
+    saveSelections(state);
+  }
+
+  function recompute() {
+    const sizeInput = document.getElementById("unit-size-input");
+    const unitSize = parseNum(sizeInput ? sizeInput.value : 50, 50);
+    saveUnitSize(unitSize);
+
+    let nBets = 0, totalUnits = 0, totalDollars = 0;
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const dollarsEl = row.querySelector('[data-role="dollars"]');
+      const checked = checkEl ? checkEl.checked : false;
+      const units = unitsEl ? parseNum(unitsEl.value, 0) : 0;
+      const dollars = units * unitSize;
+      if (dollarsEl) dollarsEl.textContent = "$" + dollars.toFixed(2);
+      if (checked) {
+        nBets++;
+        totalUnits += units;
+        totalDollars += dollars;
+        row.classList.add("bet-row-selected");
+      } else {
+        row.classList.remove("bet-row-selected");
+      }
+    });
+
+    const pill = document.getElementById("bet-count");
+    if (pill) {
+      pill.textContent =
+        nBets + " bet" + (nBets === 1 ? "" : "s") + " selected · " +
+        totalUnits.toFixed(1) + "u · $" + totalDollars.toFixed(2);
+    }
+    persist();
+  }
+
+  function exportBets() {
+    const sizeInput = document.getElementById("unit-size-input");
+    const unitSize = parseNum(sizeInput ? sizeInput.value : 50, 50);
+
+    const bets = [];
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      if (!checkEl || !checkEl.checked) return;
+      const d = row.dataset;
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      const units = unitsEl ? parseNum(unitsEl.value, 0) : 0;
+      const odds = oddsEl ? parseNum(oddsEl.value, -110) : -110;
+      const line = lineEl ? parseNum(lineEl.value, null) : null;
+
+      let pick = d.pick;
+      if (d.market === "F5_TOTAL" && line !== null) {
+        pick = d.lean + " " + line;
+      }
+
+      bets.push({
+        game_pk: parseInt(d.gamePk, 10),
+        matchup: d.matchup || "",
+        market: d.market,
+        pick: pick,
+        line: line,
+        units: units,
+        odds: odds,
+        model_confidence: d.modelConfidence || null,
+        model_units: d.modelUnits ? parseFloat(d.modelUnits) : null,
+        model_score_or_edge: d.modelScore ? parseFloat(d.modelScore) : null
+      });
+    });
+
+    if (bets.length === 0) {
+      alert("No bets selected. Check at least one bet before exporting.");
+      return;
+    }
+
+    const payload = {
+      date: ANALYSIS_DATE,
+      unit_size_dollars: unitSize,
+      exported_at: new Date().toISOString(),
+      bets: bets
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bets_" + ANALYSIS_DATE + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function clearBets() {
+    if (!confirm("Clear all bet selections for " + ANALYSIS_DATE + "?")) return;
+    localStorage.removeItem(LS_SELECTIONS);
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      if (checkEl) checkEl.checked = false;
+    });
+    recompute();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    hydrate();
+    const sizeInput = document.getElementById("unit-size-input");
+    const exportBtn = document.getElementById("export-bets-btn");
+    const clearBtn = document.getElementById("clear-bets-btn");
+    if (sizeInput) sizeInput.addEventListener("input", recompute);
+    if (exportBtn) exportBtn.addEventListener("click", exportBets);
+    if (clearBtn) clearBtn.addEventListener("click", clearBets);
+
+    // Prevent clicking inside inputs from toggling the parent label's checkbox
+    document.querySelectorAll(".bet-row input:not(.bet-check), .bet-row select").forEach(el => {
+      el.addEventListener("click", (e) => e.stopPropagation());
+    });
+
+    document.querySelectorAll(".bet-row").forEach(row => {
+      row.addEventListener("change", recompute);
+      row.addEventListener("input", recompute);
+    });
+
+    recompute();
+  });
+})();
+"""
 
     # ---------------- HTML Shell ----------------
     html = f"""<!DOCTYPE html>
@@ -708,6 +1044,136 @@ def generate_dashboard(data: dict, output_path: str):
     letter-spacing: 0.2px;
   }}
   .meta-pill strong {{ color: var(--text-dim); font-weight: 600; }}
+
+  /* ---- Bet toolbar (sticky top) ---- */
+  .bet-toolbar {{
+    position: sticky;
+    top: 8px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  }}
+  .bet-toolbar-label {{
+    font-size: 0.78em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }}
+  .bet-toolbar input[type="number"] {{
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--surface2);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 0.95em;
+    width: 72px;
+    font-weight: 700;
+  }}
+  .bet-count-pill {{
+    flex: 1;
+    min-width: 220px;
+    font-size: 0.88em;
+    color: var(--text);
+    font-weight: 600;
+  }}
+  .btn-primary, .btn-ghost {{
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.82em;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.12s;
+  }}
+  .btn-primary {{ background: var(--f5-accent); color: #000; }}
+  .btn-primary:hover {{ opacity: 0.85; transform: translateY(-1px); }}
+  .btn-ghost {{
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--surface2);
+  }}
+  .btn-ghost:hover {{ background: var(--surface2); color: var(--text); }}
+
+  /* ---- Bet selection panel (inside each game card) ---- */
+  .bet-panel {{
+    background: rgba(56,189,248,0.04);
+    border: 1px dashed var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }}
+  .bet-panel-label {{
+    font-size: 0.7em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }}
+  .bet-row {{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-wrap: wrap;
+    font-size: 0.82em;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+  }}
+  .bet-row:hover {{ background: rgba(255,255,255,0.03); }}
+  .bet-row-selected {{
+    background: rgba(74,222,128,0.08);
+    border-left-color: var(--f5-accent);
+  }}
+  .bet-check {{ margin: 0; width: 16px; height: 16px; cursor: pointer; accent-color: var(--f5-accent); }}
+  .bet-label {{
+    font-weight: 600;
+    color: var(--text);
+    min-width: 150px;
+  }}
+  .bet-input-group {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }}
+  .bet-input-lbl {{
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }}
+  .bet-units, .bet-odds, .bet-line {{
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.88em;
+    width: 64px;
+  }}
+  .bet-line {{ width: 70px; }}
+  .bet-dollars {{
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--f5-accent);
+    font-size: 0.92em;
+    min-width: 62px;
+    text-align: right;
+  }}
 
   /* ---- Top summary (F5 + YRFI primary, NRFI secondary) ---- */
   .summary-section {{ margin-bottom: 20px; }}
@@ -1170,6 +1636,15 @@ def generate_dashboard(data: dict, output_path: str):
   </div>
 </div>
 
+<div class="bet-toolbar">
+  <label class="bet-toolbar-label">Unit size $
+    <input id="unit-size-input" type="number" min="0" step="5" value="50">
+  </label>
+  <span id="bet-count" class="bet-count-pill">0 bets selected · 0.0u · $0.00</span>
+  <button id="export-bets-btn" class="btn-primary">Export Bets</button>
+  <button id="clear-bets-btn" class="btn-ghost">Clear</button>
+</div>
+
 <div class="summary-section">
   <div class="summary-row">
     <span class="summary-row-label">F5 Conviction</span>
@@ -1283,6 +1758,11 @@ function filterNRFI(level) {{
   }});
   _activeBtn(null);
 }}
+</script>
+
+<script>window.NRFI_DASHBOARD_DATE = "{analysis_date}";</script>
+<script>
+{bet_js}
 </script>
 
 </body>

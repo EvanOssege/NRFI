@@ -1213,6 +1213,184 @@ def print_report(joined: list):
 
 
 # ---------------------------------------------------------------------------
+# Placed-bet grading
+# ---------------------------------------------------------------------------
+
+def _american_win_units(units, odds):
+    """Units profit on a winning bet at American odds."""
+    try:
+        u = float(units); o = float(odds)
+    except (TypeError, ValueError):
+        return 0.0
+    if o < 0:
+        return u * (100.0 / abs(o))
+    return u * (o / 100.0)
+
+
+def _grade_one_placed_bet(row, outcome):
+    """
+    Grade a single placed-bet row against an outcome row.
+    Returns (result, units_pl, dollars_pl).
+    result ∈ {"WIN", "LOSS", "PUSH", "NO_GRADE"}
+    """
+    market = (row.get("market") or "").strip().upper()
+    pick = (row.get("pick") or "").strip()
+    try:
+        units = float(row.get("units") or 0)
+        odds = float(row.get("odds") or -110)
+        unit_size = float(row.get("unit_size_dollars") or 0)
+    except (TypeError, ValueError):
+        return ("NO_GRADE", 0.0, 0.0)
+
+    status = (outcome.get("game_status") or "").strip() if outcome else ""
+    if not outcome or status != "Final":
+        return ("NO_GRADE", 0.0, 0.0)
+
+    # Build a pred-like dict so hit_rate_tracker helpers can parse matchup
+    pred_like = {
+        "matchup": row.get("matchup", ""),
+        "away_team": "",
+        "home_team": "",
+        "f5_ml_pick": pick,
+    }
+
+    # -- NRFI / YRFI --
+    if market in ("NRFI", "YRFI"):
+        nrfi_raw = (outcome.get("nrfi_actual") or "").strip()
+        if nrfi_raw not in ("0", "1"):
+            return ("NO_GRADE", 0.0, 0.0)
+        no_run_scored = (nrfi_raw == "1")
+        won = no_run_scored if market == "NRFI" else (not no_run_scored)
+        if won:
+            pl = _american_win_units(units, odds)
+            return ("WIN", pl, pl * unit_size)
+        return ("LOSS", -units, -units * unit_size)
+
+    # -- F5 markets need 5 innings complete --
+    if str(outcome.get("f5_innings_complete", "")).strip() != "1":
+        return ("NO_GRADE", 0.0, 0.0)
+    try:
+        away_f5 = float(outcome.get("away_runs_f5", ""))
+        home_f5 = float(outcome.get("home_runs_f5", ""))
+    except (TypeError, ValueError):
+        return ("NO_GRADE", 0.0, 0.0)
+
+    if market == "F5_ML":
+        from hit_rate_tracker import _normalize_side, _winner_from_f5_runs
+        winner = _normalize_side(outcome.get("f5_ml_winner_side", ""), pred_like)
+        if winner is None:
+            winner = _winner_from_f5_runs(away_f5, home_f5)
+        if winner is None:
+            return ("NO_GRADE", 0.0, 0.0)
+        if winner == "tie":
+            return ("PUSH", 0.0, 0.0)
+        pick_side = _normalize_side(pick, pred_like)
+        if pick_side is None:
+            return ("NO_GRADE", 0.0, 0.0)
+        if pick_side == winner:
+            pl = _american_win_units(units, odds)
+            return ("WIN", pl, pl * unit_size)
+        return ("LOSS", -units, -units * unit_size)
+
+    if market == "F5_TOTAL":
+        # pick looks like "OVER 4.5" / "UNDER 4.5"; line column is the source of truth
+        try:
+            line = float(row.get("line") or "")
+        except (TypeError, ValueError):
+            # Fallback: parse from pick
+            parts = pick.split()
+            try:
+                line = float(parts[-1])
+            except (ValueError, IndexError):
+                return ("NO_GRADE", 0.0, 0.0)
+        lean = pick.split()[0].upper() if pick else ""
+        actual_total = away_f5 + home_f5
+        if lean == "OVER":
+            if actual_total > line:
+                pl = _american_win_units(units, odds)
+                return ("WIN", pl, pl * unit_size)
+            if actual_total == line:
+                return ("PUSH", 0.0, 0.0)
+            return ("LOSS", -units, -units * unit_size)
+        if lean == "UNDER":
+            if actual_total < line:
+                pl = _american_win_units(units, odds)
+                return ("WIN", pl, pl * unit_size)
+            if actual_total == line:
+                return ("PUSH", 0.0, 0.0)
+            return ("LOSS", -units, -units * unit_size)
+        return ("NO_GRADE", 0.0, 0.0)
+
+    return ("NO_GRADE", 0.0, 0.0)
+
+
+def grade_placed_bets(placed_bets_csv, outcomes_csv, regrade_all=False):
+    """
+    Grade every ungraded row in placed_bets.csv against outcomes.csv.
+
+    regrade_all=True re-grades every row (useful if outcomes were corrected).
+
+    Returns a summary dict.
+    """
+    from log_bets import PLACED_BETS_COLUMNS  # canonical schema
+
+    if not os.path.exists(placed_bets_csv):
+        return {"checked": 0, "graded": 0, "total": 0, "csv_path": placed_bets_csv}
+
+    bets = []
+    with open(placed_bets_csv, newline="") as f:
+        for r in csv.DictReader(f):
+            bets.append({c: r.get(c, "") for c in PLACED_BETS_COLUMNS})
+
+    outcomes = []
+    if os.path.exists(outcomes_csv):
+        with open(outcomes_csv, newline="") as f:
+            for r in csv.DictReader(f):
+                outcomes.append(r)
+    outcome_map = {
+        str(r.get("game_pk", "")).strip(): r
+        for r in outcomes
+        if str(r.get("game_pk", "")).strip()
+    }
+
+    checked = 0
+    graded = 0
+    for row in bets:
+        existing_result = (row.get("result") or "").strip().upper()
+        if existing_result in ("WIN", "LOSS", "PUSH") and not regrade_all:
+            continue
+        checked += 1
+        outcome = outcome_map.get(str(row.get("game_pk", "")).strip())
+        result, units_pl, dollars_pl = _grade_one_placed_bet(row, outcome)
+        row["result"] = result
+        if result == "NO_GRADE":
+            # Keep pl blank so re-grading will re-attempt (game may go Final later)
+            row["units_pl"] = ""
+            row["dollars_pl"] = ""
+            # Leave result as "NO_GRADE" temporarily; clear it so next pass re-grades
+            row["result"] = ""
+        else:
+            row["units_pl"] = f"{units_pl:.4f}"
+            row["dollars_pl"] = f"{dollars_pl:.2f}"
+            graded += 1
+
+    tmp_path = placed_bets_csv + ".tmp"
+    with open(tmp_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=PLACED_BETS_COLUMNS, extrasaction="ignore")
+        writer.writeheader()
+        for row in bets:
+            writer.writerow(row)
+    os.replace(tmp_path, placed_bets_csv)
+
+    return {
+        "checked": checked,
+        "graded": graded,
+        "total": len(bets),
+        "csv_path": placed_bets_csv,
+    }
+
+
+# ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
 def main():
@@ -1224,12 +1402,20 @@ def main():
     output_dir = os.path.join(os.path.dirname(script_dir), "output")
     predictions_csv = os.path.join(output_dir, "predictions.csv")
     outcomes_csv = os.path.join(output_dir, "outcomes.csv")
+    placed_bets_csv = os.path.join(output_dir, "placed_bets.csv")
 
     if not report_only:
         print("Updating outcomes...")
         summary = update_outcomes(predictions_csv, outcomes_csv)
         print(f"Checked {summary['checked']} games, updated {summary['updated']} to Final, "
               f"{summary['total_outcomes']} total outcomes on file.")
+
+        # Grade any pending placed bets now that outcomes are fresh
+        if os.path.exists(placed_bets_csv):
+            pb_summary = grade_placed_bets(placed_bets_csv, outcomes_csv)
+            if pb_summary["checked"]:
+                print(f"Placed bets: checked {pb_summary['checked']} ungraded, "
+                      f"graded {pb_summary['graded']} (total on file: {pb_summary['total']}).")
 
     if update_only:
         return

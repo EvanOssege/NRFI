@@ -5,10 +5,11 @@ NRFI Daily Runner
 One-command script: fetches data, scores games, generates dashboard.
 
 Usage:
-  python run_nrfi.py                      # today's games
-  python run_nrfi.py 2026-04-15           # specific date
-  python run_nrfi.py --refresh-odds       # force fresh odds pull (bypass 2hr cache)
+  python run_nrfi.py                              # today's games
+  python run_nrfi.py 2026-04-15                   # specific date
+  python run_nrfi.py --refresh-odds               # force fresh odds pull (bypass 2hr cache)
   python run_nrfi.py 2026-04-15 --refresh-odds
+  python run_nrfi.py --log-bets <bets.json>       # log placed bets from dashboard export
 """
 
 import sys
@@ -40,8 +41,40 @@ def _stats_through_for_date(target_date: str) -> str:
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    flags = [a for a in sys.argv[1:] if a.startswith("--")]
+    raw_argv = sys.argv[1:]
+
+    # --- --log-bets <path>: short-circuit, log and exit ---
+    if "--log-bets" in raw_argv:
+        idx = raw_argv.index("--log-bets")
+        if idx + 1 >= len(raw_argv):
+            print("Error: --log-bets requires a path argument")
+            print("Usage: python run_nrfi.py --log-bets <path-to-bets.json>")
+            sys.exit(1)
+        from log_bets import log_bets as _log_bets
+        bets_path = raw_argv[idx + 1]
+        if not os.path.exists(bets_path):
+            print(f"Error: file not found: {bets_path}")
+            sys.exit(1)
+        result = _log_bets(bets_path)
+        print(
+            f"Logged bets for {result['date']}: "
+            f"{result['added']} added, {result['updated']} updated, "
+            f"{result['skipped']} skipped → {result['csv_path']}"
+        )
+        # Refresh hit rate tracker so new bets + any existing outcomes show up
+        try:
+            output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+            predictions_csv = os.path.join(output_dir, "predictions.csv")
+            outcomes_csv = os.path.join(output_dir, "outcomes.csv")
+            tracker_path = os.path.join(output_dir, "hit_rate_tracker.html")
+            generate_hit_rate_dashboard(predictions_csv, outcomes_csv, tracker_path)
+            print(f"Hit rate tracker refreshed: {tracker_path}")
+        except Exception as e:
+            print(f"(tracker refresh skipped: {e})")
+        return
+
+    args = [a for a in raw_argv if not a.startswith("--")]
+    flags = [a for a in raw_argv if a.startswith("--")]
     target_date = args[0] if args else date.today().isoformat()
     refresh_odds = "--refresh-odds" in flags
 

@@ -354,6 +354,113 @@ def compute_hit_rates(predictions_csv, outcomes_csv):
 
 
 # ---------------------------------------------------------------------------
+# Placed bets summary (user's actual wagers, not model predictions)
+# ---------------------------------------------------------------------------
+
+def compute_placed_bets(placed_bets_csv):
+    """
+    Summarise placed_bets.csv into overall + per-market stats plus a cumulative
+    $ P&L time series. Returns None when no placed-bet data exists.
+    """
+    rows = _load_csv(placed_bets_csv)
+    if not rows:
+        return None
+
+    def _f(v, default=0.0):
+        try:
+            return float(v) if v not in (None, "") else default
+        except (TypeError, ValueError):
+            return default
+
+    overall = {
+        "total": 0, "wins": 0, "losses": 0, "pushes": 0, "pending": 0,
+        "units_wagered": 0.0, "dollars_wagered": 0.0,
+        "units_pl": 0.0, "dollars_pl": 0.0,
+    }
+    by_market = defaultdict(lambda: {
+        "total": 0, "wins": 0, "losses": 0, "pushes": 0, "pending": 0,
+        "units_wagered": 0.0, "dollars_wagered": 0.0,
+        "units_pl": 0.0, "dollars_pl": 0.0,
+    })
+    daily_pl = defaultdict(float)  # date -> dollars pl on that day (graded only)
+
+    clean_rows = []
+    for r in rows:
+        market = (r.get("market") or "").strip().upper()
+        if not market:
+            continue
+        result = (r.get("result") or "").strip().upper()
+        units = _f(r.get("units"))
+        wager = _f(r.get("wager_dollars"))
+        units_pl = _f(r.get("units_pl"))
+        dollars_pl = _f(r.get("dollars_pl"))
+
+        overall["total"] += 1
+        by_market[market]["total"] += 1
+        overall["units_wagered"] += units
+        overall["dollars_wagered"] += wager
+        by_market[market]["units_wagered"] += units
+        by_market[market]["dollars_wagered"] += wager
+
+        if result == "WIN":
+            overall["wins"] += 1; by_market[market]["wins"] += 1
+        elif result == "LOSS":
+            overall["losses"] += 1; by_market[market]["losses"] += 1
+        elif result == "PUSH":
+            overall["pushes"] += 1; by_market[market]["pushes"] += 1
+        else:
+            overall["pending"] += 1; by_market[market]["pending"] += 1
+
+        if result in ("WIN", "LOSS", "PUSH"):
+            overall["units_pl"] += units_pl
+            overall["dollars_pl"] += dollars_pl
+            by_market[market]["units_pl"] += units_pl
+            by_market[market]["dollars_pl"] += dollars_pl
+            date = (r.get("date") or "").strip()
+            if date:
+                daily_pl[date] += dollars_pl
+
+        clean_rows.append(r)
+
+    def _roi(pl, wagered):
+        return round(100.0 * pl / wagered, 2) if wagered else 0.0
+
+    overall["roi"] = _roi(overall["dollars_pl"], overall["dollars_wagered"])
+    overall["graded"] = overall["wins"] + overall["losses"] + overall["pushes"]
+    overall["decidable"] = overall["wins"] + overall["losses"]
+    overall["win_rate"] = (
+        round(100.0 * overall["wins"] / overall["decidable"], 1)
+        if overall["decidable"] else 0.0
+    )
+    for m, v in by_market.items():
+        v["roi"] = _roi(v["dollars_pl"], v["dollars_wagered"])
+        v["graded"] = v["wins"] + v["losses"] + v["pushes"]
+        v["decidable"] = v["wins"] + v["losses"]
+        v["win_rate"] = (
+            round(100.0 * v["wins"] / v["decidable"], 1)
+            if v["decidable"] else 0.0
+        )
+
+    # Cumulative $ P&L series (sorted by date)
+    cum = 0.0
+    series = []
+    for d in sorted(daily_pl):
+        cum += daily_pl[d]
+        series.append({"date": d, "day_pl": round(daily_pl[d], 2), "cum_pl": round(cum, 2)})
+
+    # Recent bets (latest first), capped at 30
+    clean_rows.sort(key=lambda r: (r.get("date", ""), r.get("logged_at", "")), reverse=True)
+    recent = clean_rows[:30]
+
+    return {
+        "overall": overall,
+        "by_market": dict(by_market),
+        "daily_series": series,
+        "recent": recent,
+    }
+
+
+# ---------------------------------------------------------------------------
 # HTML generation
 # ---------------------------------------------------------------------------
 
@@ -593,6 +700,98 @@ _CSS = """
   @media (max-width: 600px) {
     .summary-row { grid-template-columns: 1fr; }
   }
+
+  /* ---- Placed bets section ---- */
+  .placed-section {
+    margin-top: 28px;
+    padding: 20px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--surface2);
+  }
+  .placed-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .placed-sub {
+    font-size: 0.85em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .placed-market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .placed-market-card {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .placed-mkt-name {
+    font-size: 0.78em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .placed-mkt-main {
+    font-size: 1.1em;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+  .placed-mkt-sub {
+    font-size: 0.75em;
+    color: var(--muted);
+  }
+  .placed-pl-pos { color: #4ade80; }
+  .placed-pl-neg { color: #f87171; }
+  .placed-pl-neu { color: var(--muted); }
+
+  .placed-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82em;
+    margin-top: 8px;
+  }
+  .placed-table th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--surface2);
+    text-transform: uppercase;
+    font-size: 0.72em;
+    letter-spacing: 0.04em;
+  }
+  .placed-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .placed-result-WIN { color: #4ade80; font-weight: 700; }
+  .placed-result-LOSS { color: #f87171; font-weight: 700; }
+  .placed-result-PUSH { color: #facc15; font-weight: 700; }
+  .placed-result-pending { color: var(--muted); font-style: italic; }
+
+  .placed-chart-wrap {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 18px;
+  }
+  .placed-chart-title {
+    font-size: 0.82em;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .placed-chart-wrap svg { width: 100%; height: auto; display: block; }
 """
 
 _JS = """
@@ -888,7 +1087,239 @@ initTooltip();
 """
 
 
-def _build_html(data):
+def _fmt_money(v):
+    if v is None:
+        return "—"
+    sign = "-" if v < 0 else ""
+    return f"{sign}${abs(v):,.2f}"
+
+
+def _pl_class(v):
+    if v > 0.01:
+        return "placed-pl-pos"
+    if v < -0.01:
+        return "placed-pl-neg"
+    return "placed-pl-neu"
+
+
+def _build_pl_chart_svg(series):
+    """Simple cumulative-$ P&L line chart. Returns inline SVG string."""
+    if not series:
+        return '<div class="placed-sub">No graded bets yet — chart will appear after first settlement.</div>'
+
+    W, H = 720, 240
+    pad_l, pad_r, pad_t, pad_b = 52, 20, 18, 34
+
+    xs = list(range(len(series)))
+    ys = [pt["cum_pl"] for pt in series]
+    y_min = min(ys + [0.0])
+    y_max = max(ys + [0.0])
+    if y_max == y_min:
+        y_max = y_min + 1.0
+
+    def sx(i):
+        if len(xs) == 1:
+            return pad_l + (W - pad_l - pad_r) / 2
+        return pad_l + (W - pad_l - pad_r) * i / (len(xs) - 1)
+
+    def sy(y):
+        return H - pad_b - (H - pad_t - pad_b) * (y - y_min) / (y_max - y_min)
+
+    zero_y = sy(0)
+
+    # Gridline labels (0, min, max)
+    labels = sorted({round(y_min, 2), 0.0, round(y_max, 2)})
+    grid = ""
+    for lv in labels:
+        y = sy(lv)
+        grid += (
+            f'<line x1="{pad_l}" x2="{W - pad_r}" y1="{y:.1f}" y2="{y:.1f}" '
+            f'stroke="rgba(255,255,255,0.08)" stroke-width="1"/>'
+            f'<text x="{pad_l - 8}" y="{y + 3:.1f}" fill="#94a3b8" '
+            f'font-size="10" text-anchor="end">${lv:,.0f}</text>'
+        )
+
+    # X-axis date labels (first, last, optionally middle)
+    def date_label(idx):
+        return series[idx]["date"][5:]  # MM-DD
+    if len(series) == 1:
+        x_labels = [(0, series[0]["date"])]
+    elif len(series) == 2:
+        x_labels = [(0, series[0]["date"]), (len(series) - 1, series[-1]["date"])]
+    else:
+        mid = len(series) // 2
+        x_labels = [
+            (0, series[0]["date"]),
+            (mid, series[mid]["date"]),
+            (len(series) - 1, series[-1]["date"]),
+        ]
+    x_axis = ""
+    for idx, d in x_labels:
+        x_axis += (
+            f'<text x="{sx(idx):.1f}" y="{H - pad_b + 16}" fill="#94a3b8" '
+            f'font-size="10" text-anchor="middle">{d}</text>'
+        )
+
+    # Line path
+    points = " ".join(f"{sx(i):.1f},{sy(y):.1f}" for i, y in enumerate(ys))
+    final_pl = ys[-1] if ys else 0.0
+    line_color = "#4ade80" if final_pl >= 0 else "#f87171"
+
+    # Point dots
+    dots = ""
+    for i, pt in enumerate(series):
+        dots += (
+            f'<circle cx="{sx(i):.1f}" cy="{sy(pt["cum_pl"]):.1f}" r="3" '
+            f'fill="{line_color}"><title>{pt["date"]}: cum ${pt["cum_pl"]:,.2f} '
+            f'(day {pt["day_pl"]:+,.2f})</title></circle>'
+        )
+
+    return (
+        f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg">'
+        f'{grid}'
+        f'<line x1="{pad_l}" x2="{W - pad_r}" y1="{zero_y:.1f}" y2="{zero_y:.1f}" '
+        f'stroke="rgba(255,255,255,0.25)" stroke-width="1" stroke-dasharray="3,3"/>'
+        f'<polyline points="{points}" fill="none" stroke="{line_color}" stroke-width="2"/>'
+        f'{dots}'
+        f'{x_axis}'
+        f'</svg>'
+    )
+
+
+def _build_placed_section(summary):
+    """Build the full 'My Placed Bets' section HTML. Returns '' if no bets."""
+    if not summary:
+        return ""
+    overall = summary["overall"]
+    if overall["total"] == 0:
+        return ""
+
+    by_market = summary["by_market"]
+    series = summary["daily_series"]
+    recent = summary["recent"]
+
+    # Ordered market list: show only markets that have bets
+    MARKET_LABELS = {
+        "F5_ML": "F5 Moneyline",
+        "F5_TOTAL": "F5 Total",
+        "NRFI": "NRFI",
+        "YRFI": "YRFI",
+    }
+
+    # --- Overall summary cards ---
+    o_pl_cls = _pl_class(overall["dollars_pl"])
+    o_roi_cls = _pl_class(overall["dollars_pl"])  # same sign as pl
+    overall_cards = (
+        '<div class="placed-market-grid">'
+        + '<div class="placed-market-card">'
+        +   '<div class="placed-mkt-name">Overall</div>'
+        +   f'<div class="placed-mkt-main {o_pl_cls}">{_fmt_money(overall["dollars_pl"])}</div>'
+        +   f'<div class="placed-mkt-sub">{overall["units_pl"]:+.2f}u · ROI <span class="{o_roi_cls}">{overall["roi"]:+.2f}%</span></div>'
+        + '</div>'
+        + '<div class="placed-market-card">'
+        +   '<div class="placed-mkt-name">Record</div>'
+        +   f'<div class="placed-mkt-main">{overall["wins"]}–{overall["losses"]}'
+        +   (f'–{overall["pushes"]}' if overall["pushes"] else '') + '</div>'
+        +   f'<div class="placed-mkt-sub">{overall["win_rate"]:.1f}% win rate · {overall["pending"]} pending</div>'
+        + '</div>'
+        + '<div class="placed-market-card">'
+        +   '<div class="placed-mkt-name">Wagered</div>'
+        +   f'<div class="placed-mkt-main">${overall["dollars_wagered"]:,.2f}</div>'
+        +   f'<div class="placed-mkt-sub">{overall["units_wagered"]:.1f}u across {overall["total"]} bets</div>'
+        + '</div>'
+        + '</div>'
+    )
+
+    # --- Per-market breakdown ---
+    market_cards = []
+    for mkey, mlabel in MARKET_LABELS.items():
+        mv = by_market.get(mkey)
+        if not mv or mv["total"] == 0:
+            continue
+        pl_cls = _pl_class(mv["dollars_pl"])
+        record = f'{mv["wins"]}–{mv["losses"]}' + (f'–{mv["pushes"]}' if mv["pushes"] else '')
+        market_cards.append(
+            '<div class="placed-market-card">'
+            + f'<div class="placed-mkt-name">{mlabel}</div>'
+            + f'<div class="placed-mkt-main {pl_cls}">{_fmt_money(mv["dollars_pl"])}</div>'
+            + f'<div class="placed-mkt-sub">{record} · {mv["win_rate"]:.1f}% · ROI {mv["roi"]:+.2f}%'
+            + (f' · {mv["pending"]} pending' if mv["pending"] else '')
+            + '</div></div>'
+        )
+    per_market_block = (
+        '<div class="placed-mkt-name" style="margin-top:4px;margin-bottom:6px">By Market</div>'
+        + '<div class="placed-market-grid">'
+        + "".join(market_cards)
+        + '</div>'
+    ) if market_cards else ""
+
+    # --- Chart ---
+    chart_block = (
+        '<div class="placed-chart-wrap">'
+        + '<div class="placed-chart-title">Cumulative $ P&amp;L</div>'
+        + _build_pl_chart_svg(series)
+        + '</div>'
+    )
+
+    # --- Recent bets table ---
+    rows_html = []
+    for r in recent:
+        result = (r.get("result") or "").strip().upper()
+        if result in ("WIN", "LOSS", "PUSH"):
+            cls = f"placed-result-{result}"
+            rdisp = result
+        else:
+            cls = "placed-result-pending"
+            rdisp = "pending"
+        pl_raw = r.get("dollars_pl", "")
+        try:
+            pl_val = float(pl_raw) if pl_raw not in ("", None) else None
+        except (TypeError, ValueError):
+            pl_val = None
+        pl_disp = _fmt_money(pl_val) if pl_val is not None else "—"
+        pl_cls = _pl_class(pl_val) if pl_val is not None else "placed-pl-neu"
+        units = r.get("units", "")
+        odds = r.get("odds", "")
+        odds_disp = f"+{odds}" if odds and odds.lstrip("+-").isdigit() and int(odds) > 0 else odds
+        rows_html.append(
+            "<tr>"
+            f"<td>{r.get('date', '')}</td>"
+            f"<td>{r.get('matchup', '')}</td>"
+            f"<td>{MARKET_LABELS.get(r.get('market', ''), r.get('market', ''))}</td>"
+            f"<td>{r.get('pick', '')}</td>"
+            f"<td>{units}u</td>"
+            f"<td>{odds_disp}</td>"
+            f'<td class="{cls}">{rdisp}</td>'
+            f'<td class="{pl_cls}">{pl_disp}</td>'
+            "</tr>"
+        )
+    recent_label = f"Recent Bets (last {len(recent)} of {overall['total']})" if overall['total'] > len(recent) else "Recent Bets"
+    table_block = (
+        f'<div class="placed-mkt-name" style="margin-top:4px;margin-bottom:6px">{recent_label}</div>'
+        '<table class="placed-table">'
+        '<thead><tr>'
+        '<th>Date</th><th>Matchup</th><th>Market</th><th>Pick</th>'
+        '<th>Units</th><th>Odds</th><th>Result</th><th>$ P&amp;L</th>'
+        '</tr></thead>'
+        f'<tbody>{"".join(rows_html)}</tbody>'
+        '</table>'
+    ) if rows_html else ""
+
+    return (
+        '<div class="placed-section">'
+        + '<div class="placed-title">My Placed Bets</div>'
+        + '<div class="placed-sub">Actual wagers placed (exported from the daily dashboard). '
+          'P&amp;L uses real odds; bets on unfinished games show as pending.</div>'
+        + overall_cards
+        + per_market_block
+        + chart_block
+        + table_block
+        + '</div>'
+    )
+
+
+def _build_html(data, placed_bets_summary=None):
+    placed_block = _build_placed_section(placed_bets_summary)
     summary = data.get("summary", {})
     total   = summary.get("total_resolved", 0)
     days    = summary.get("days", 0)
@@ -1023,6 +1454,7 @@ def _build_html(data):
         '<span class="header-title">NRFI / F5 Hit Rate Tracker</span>'
         '<span class="header-sub">Cumulative accuracy over time \u00b7 pushes = losses</span>'
         '</div>\n'
+        + placed_block
         + summary_cards
         + no_data_block
         + "\n"
@@ -1035,14 +1467,19 @@ def _build_html(data):
         "</body>\n"
         "</html>\n"
     )
-def generate_hit_rate_dashboard(predictions_csv, outcomes_csv, output_path):
+def generate_hit_rate_dashboard(predictions_csv, outcomes_csv, output_path, placed_bets_csv=None):
     """
     Compute hit rates from predictions + outcomes CSVs and write a self-contained
     HTML dashboard to output_path. Safe to call even when CSVs are missing or empty.
+
+    If placed_bets_csv is None, defaults to `<outcomes_dir>/placed_bets.csv`.
     """
     try:
+        if placed_bets_csv is None:
+            placed_bets_csv = os.path.join(os.path.dirname(outcomes_csv), "placed_bets.csv")
         data = compute_hit_rates(predictions_csv, outcomes_csv)
-        html = _build_html(data)
+        placed_summary = compute_placed_bets(placed_bets_csv)
+        html = _build_html(data, placed_bets_summary=placed_summary)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w") as f:
             f.write(html)
