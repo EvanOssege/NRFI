@@ -61,6 +61,136 @@
   }
   .meta-pill strong { color: var(--text-dim); font-weight: 600; }
 
+  /* ---- Bet toolbar (sticky top) ---- */
+  .bet-toolbar {
+    position: sticky;
+    top: 8px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  }
+  .bet-toolbar-label {
+    font-size: 0.78em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .bet-toolbar input[type="number"] {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--surface2);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 0.95em;
+    width: 72px;
+    font-weight: 700;
+  }
+  .bet-count-pill {
+    flex: 1;
+    min-width: 220px;
+    font-size: 0.88em;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .btn-primary, .btn-ghost {
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.82em;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.12s;
+  }
+  .btn-primary { background: var(--f5-accent); color: #000; }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--surface2);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  /* ---- Bet selection panel (inside each game card) ---- */
+  .bet-panel {
+    background: rgba(56,189,248,0.04);
+    border: 1px dashed var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+  }
+  .bet-panel-label {
+    font-size: 0.7em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .bet-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-wrap: wrap;
+    font-size: 0.82em;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .bet-row:hover { background: rgba(255,255,255,0.03); }
+  .bet-row-selected {
+    background: rgba(74,222,128,0.08);
+    border-left-color: var(--f5-accent);
+  }
+  .bet-check { margin: 0; width: 16px; height: 16px; cursor: pointer; accent-color: var(--f5-accent); }
+  .bet-label {
+    font-weight: 600;
+    color: var(--text);
+    min-width: 150px;
+  }
+  .bet-input-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .bet-input-lbl {
+    font-size: 0.72em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bet-units, .bet-odds, .bet-line {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--surface2);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.88em;
+    width: 64px;
+  }
+  .bet-line { width: 70px; }
+  .bet-dollars {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--f5-accent);
+    font-size: 0.92em;
+    min-width: 62px;
+    text-align: right;
+  }
+
   /* ---- Top summary (F5 + YRFI primary, NRFI secondary) ---- */
   .summary-section { margin-bottom: 20px; }
   .summary-row {
@@ -516,23 +646,32 @@
 
 <div class="header">
   <h1>F5 + NRFI Dashboard</h1>
-  <div class="subtitle">2026-04-17 · Generated 05:01 PM · 15 games analyzed · F5 prioritized</div>
+  <div class="subtitle">2026-04-17 · Generated 05:37 PM · 15 games analyzed · F5 prioritized</div>
   <div class="header-meta">
     <span class="meta-pill"><strong>Stats Through</strong> 2026-04-16</span>
   </div>
+</div>
+
+<div class="bet-toolbar">
+  <label class="bet-toolbar-label">Unit size $
+    <input id="unit-size-input" type="number" min="0" step="5" value="50">
+  </label>
+  <span id="bet-count" class="bet-count-pill">0 bets selected · 0.0u · $0.00</span>
+  <button id="export-bets-btn" class="btn-primary">Export Bets</button>
+  <button id="clear-bets-btn" class="btn-ghost">Clear</button>
 </div>
 
 <div class="summary-section">
   <div class="summary-row">
     <span class="summary-row-label">F5 Conviction</span>
     <div class="summary-chip" style="background:#22c55e;color:#000" onclick="filterF5('lock')">F5 LOCK · 2</div>
-    <div class="summary-chip" style="background:#4ade80;color:#000" onclick="filterF5('strong')">F5 STRONG · 7</div>
-    <div class="summary-chip" style="background:#eab308;color:#000" onclick="filterF5('lean')">F5 LEAN · 5</div>
+    <div class="summary-chip" style="background:#4ade80;color:#000" onclick="filterF5('strong')">F5 STRONG · 6</div>
+    <div class="summary-chip" style="background:#eab308;color:#000" onclick="filterF5('lean')">F5 LEAN · 6</div>
   </div>
   <div class="summary-row">
     <span class="summary-row-label">YRFI Watch</span>
     <div class="summary-chip" style="background:#ef4444;color:#000" onclick="filterYRFI('strong')">⚡ YRFI STRONG · 4</div>
-    <div class="summary-chip" style="background:#fb923c;color:#000" onclick="filterYRFI('lean')">⚡ YRFI LEAN · 1</div>
+    <div class="summary-chip" style="background:#fb923c;color:#000" onclick="filterYRFI('lean')">⚡ YRFI LEAN · 2</div>
   </div>
   <div class="summary-row">
     <span class="summary-row-label">NRFI (secondary)</span>
@@ -566,7 +705,7 @@
             
           </span>
         </div>
-        <div class="game-meta">Citizens Bank Park <span class="park-badge park-hitter" title="Park Factor: 104">⚾ 104 Hitter-friendly</span> · 6:40 PM ET · 71°F · 5 mph wind · 2% rain</div>
+        <div class="game-meta">Citizens Bank Park <span class="park-badge park-hitter" title="Park Factor: 104">⚾ 104 Hitter-friendly</span> · 6:40 PM ET · 71°F · 8 mph wind · 2% rain</div>
       </div>
 
       <div class="game-body">
@@ -586,7 +725,7 @@
               <div class="f5-cell-sub"><strong>STRONG</strong></div>
             </div>
             <div class="f5-cell f5-cell-total">
-              <div class="f5-cell-label">F5 TOTAL · proj 6.1</div>
+              <div class="f5-cell-label">F5 TOTAL · proj 6.2</div>
               <div class="f5-cell-val" style="color:#ef4444">OVER 4.5</div>
               <div class="f5-cell-sub"><strong>STRONG</strong> <span class="f5-units-pill" style="background:#4ade80;color:#000">3.5u</span></div>
               <div class="f5-cell-extra">Proj: A 3.5 + H 2.2</div>
@@ -594,8 +733,79 @@
           </div>
           <div class="f5-lines-row">
             <span class="f5-lines-label">Line calls:</span>
-            <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span>
+            <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823476:F5_ML"
+             data-game-pk="823476"
+             data-matchup="ATL @ PHI"
+             data-market="F5_ML"
+             data-pick="ATL"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="5.0"
+             data-model-score="33.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: ATL</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="5.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823476:F5_TOTAL:OVER"
+             data-game-pk="823476"
+             data-matchup="ATL @ PHI"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="STRONG"
+             data-model-units="3.5"
+             data-model-score="6.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="3.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823476:YRFI"
+             data-game-pk="823476"
+             data-matchup="ATL @ PHI"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="2.0"
+             data-model-score="0.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -652,7 +862,7 @@
               <span>L/R: +4.0</span>
               <span>Form: -5.0</span>
               <span>Park: -2.4</span>
-              <span>Weather: +0.0</span>
+              <span>Weather: -1.0</span>
               <span>Team Tend: -3.0</span>
             </div>
             
@@ -794,6 +1004,77 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="825101:F5_ML"
+             data-game-pk="825101"
+             data-matchup="TOR @ AZ"
+             data-market="F5_ML"
+             data-pick="AZ"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="4.5"
+             data-model-score="-18.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: AZ</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="4.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="825101:F5_TOTAL:OVER"
+             data-game-pk="825101"
+             data-matchup="TOR @ AZ"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="LEAN"
+             data-model-units="1.5"
+             data-model-score="5.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="825101:YRFI"
+             data-game-pk="825101"
+             data-matchup="TOR @ AZ"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="28.50">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -962,7 +1243,7 @@
             
           </span>
         </div>
-        <div class="game-meta">Wrigley Field <span class="park-badge park-hitter" title="Park Factor: 103">⚾ 103 Hitter-friendly</span> · 2:20 PM ET · 76°F · 13 mph wind · 5% rain</div>
+        <div class="game-meta">Wrigley Field <span class="park-badge park-hitter" title="Park Factor: 103">⚾ 103 Hitter-friendly</span> · 2:20 PM ET · 78°F · 14 mph wind · 5% rain</div>
       </div>
 
       <div class="game-body">
@@ -992,6 +1273,55 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">4.0</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824693:F5_ML"
+             data-game-pk="824693"
+             data-matchup="NYM @ CHC"
+             data-market="F5_ML"
+             data-pick="CHC"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="4.5"
+             data-model-score="-18.90">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: CHC</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="4.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824693:F5_TOTAL:UNDER"
+             data-game-pk="824693"
+             data-matchup="NYM @ CHC"
+             data-market="F5_TOTAL"
+             data-pick="UNDER 4.5"
+             data-lean="UNDER"
+             data-model-confidence="SLIGHT"
+             data-model-units="1.0"
+             data-model-score="4.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 UNDER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -1191,6 +1521,33 @@
             <span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">4.5</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span>
           </div>
         </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824048:F5_ML"
+             data-game-pk="824048"
+             data-matchup="SD @ LAA"
+             data-market="F5_ML"
+             data-pick="LAA"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="4.0"
+             data-model-score="-16.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: LAA</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="4.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+        </div>
 
         <div class="pitchers-row">
           <div class="pitcher-section">
@@ -1353,12 +1710,12 @@
           <span class="header-badges">
             <span class="headline-badge f5-badge" style="background:#4ade80;color:#000">F5 STRONG</span>
             
-            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #f97316;color:#f97316">NRFI 53.6</span>
+            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #f97316;color:#f97316">NRFI 55.6</span>
             
             
           </span>
         </div>
-        <div class="game-meta">Yankee Stadium <span class="park-badge park-hitter" title="Park Factor: 105">⚾ 105 Hitter-friendly</span> · 7:05 PM ET · —</div>
+        <div class="game-meta">Yankee Stadium <span class="park-badge park-hitter" title="Park Factor: 105">⚾ 105 Hitter-friendly</span> · 7:05 PM ET · 58°F · 7 mph wind · 3% rain</div>
       </div>
 
       <div class="game-body">
@@ -1378,7 +1735,7 @@
               <div class="f5-cell-sub"><strong>TOSS-UP</strong></div>
             </div>
             <div class="f5-cell f5-cell-total">
-              <div class="f5-cell-label">F5 TOTAL · proj 3.3</div>
+              <div class="f5-cell-label">F5 TOTAL · proj 3.2</div>
               <div class="f5-cell-val" style="color:#22c55e">UNDER 4.5</div>
               <div class="f5-cell-sub"><strong>STRONG</strong> <span class="f5-units-pill" style="background:#eab308;color:#000">2.5u</span></div>
               <div class="f5-cell-extra">Proj: A 1.4 + H 1.5</div>
@@ -1388,6 +1745,55 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823559:F5_ML"
+             data-game-pk="823559"
+             data-matchup="KC @ NYY"
+             data-market="F5_ML"
+             data-pick="NYY"
+             data-lean=""
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="-4.90">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: NYY</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823559:F5_TOTAL:UNDER"
+             data-game-pk="823559"
+             data-matchup="KC @ NYY"
+             data-market="F5_TOTAL"
+             data-pick="UNDER 4.5"
+             data-lean="UNDER"
+             data-model-confidence="STRONG"
+             data-model-units="2.5"
+             data-model-score="3.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 UNDER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -1432,7 +1838,7 @@
         <details class="nrfi-secondary">
           <summary>
             <span class="nrfi-summary-label">NRFI Analysis</span>
-            <span class="nrfi-score-pill" style="background:#f97316;color:#000">53.6 · TOSS-UP</span>
+            <span class="nrfi-score-pill" style="background:#f97316;color:#000">55.6 · TOSS-UP</span>
             
           </summary>
           <div class="nrfi-body">
@@ -1444,7 +1850,7 @@
               <span>L/R: +0.0</span>
               <span>Form: +0.0</span>
               <span>Park: -3.0</span>
-              <span>Weather: +0.0</span>
+              <span>Weather: +2.0</span>
               <span>Team Tend: -3.0</span>
             </div>
             
@@ -1502,14 +1908,14 @@
             </div>
             <div class="lineup-section">
               <div class="section-label">AWAY lineup (vs Schlittler) · Threat: 33.0</div>
-              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: No history</span> <span class="bvp-badge bvp-neutral">L7: .579 OPS (-0.042) · 1🔥 2🧊 — Steady</span> <span class="bvp-badge bvp-good">vs RHP: .599 OPS · 3dis/1adv — SP has edge</span></div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: No history</span> <span class="bvp-badge bvp-neutral">L7: .596 OPS (-0.032) · 1🔥 2🧊 — Steady</span> <span class="bvp-badge bvp-good">vs RHP: .599 OPS · 3dis/1adv — SP has edge</span></div>
               <table class="batter-table">
                 <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
                 <tbody><tr>
               <td>Maikel Garcia</td>
-              <td>.267</td><td>.333</td><td>.746</td>
+              <td>.280</td><td>.345</td><td>.772</td>
               <td><span style="color:#22c55e" title="RHB vs RHP (57AB)">R .630</span></td>
-              <td><span style="color:#60a5fa" title="Last 7G: .207 AVG / .603 OPS (-0.143)">📉 .207/.603</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .241 AVG / .670 OPS (-0.102)">📉 .241/.670</span></td>
               <td>2</td>
               <td><span style="color:#6b7280">—</span></td>
             </tr><tr>
@@ -1556,7 +1962,7 @@
             
           </span>
         </div>
-        <div class="game-meta">Target Field <span class="park-badge park-neutral" title="Park Factor: 101">⚾ 101</span> · 8:10 PM ET · 37°F · 12 mph wind · 3% rain</div>
+        <div class="game-meta">Target Field <span class="park-badge park-neutral" title="Park Factor: 101">⚾ 101</span> · 8:10 PM ET · 38°F · 15 mph wind · 3% rain</div>
       </div>
 
       <div class="game-body">
@@ -1586,6 +1992,55 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823720:F5_ML"
+             data-game-pk="823720"
+             data-matchup="CIN @ MIN"
+             data-market="F5_ML"
+             data-pick="MIN"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="3.0"
+             data-model-score="-13.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: MIN</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="3.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823720:F5_TOTAL:UNDER"
+             data-game-pk="823720"
+             data-matchup="CIN @ MIN"
+             data-market="F5_TOTAL"
+             data-pick="UNDER 4.5"
+             data-lean="UNDER"
+             data-model-confidence="SLIGHT"
+             data-model-units="0.5"
+             data-model-score="4.30">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 UNDER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="0.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -1785,6 +2240,77 @@
             <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.5</span><span style="color:#ef4444;font-weight:700">OVER </span></span>
           </div>
         </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824207:F5_ML"
+             data-game-pk="824207"
+             data-matchup="STL @ HOU"
+             data-market="F5_ML"
+             data-pick="HOU"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="1.5"
+             data-model-score="-7.50">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: HOU</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824207:F5_TOTAL:OVER"
+             data-game-pk="824207"
+             data-matchup="STL @ HOU"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="STRONG"
+             data-model-units="3.0"
+             data-model-score="5.90">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="3.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824207:YRFI"
+             data-game-pk="824207"
+             data-matchup="STL @ HOU"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="2.0"
+             data-model-score="20.30">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+        </div>
 
         <div class="pitchers-row">
           <div class="pitcher-section">
@@ -1943,204 +2469,6 @@
 
       <div class="game-header">
         <div class="matchup-row">
-          <span class="matchup">LAD @ COL</span>
-          <span class="header-badges">
-            <span class="headline-badge f5-badge" style="background:#4ade80;color:#000">F5 STRONG</span>
-            
-            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #ef4444;color:#ef4444">NRFI 32.7</span>
-            
-            
-          </span>
-        </div>
-        <div class="game-meta">Coors Field <span class="park-badge park-hitter" title="Park Factor: 115">⚾ 115 Hitter-friendly</span> · 8:40 PM ET · 33°F · 5 mph wind · 0% rain</div>
-      </div>
-
-      <div class="game-body">
-        
-        <div class="f5-headline">
-          <div class="f5-headline-grid">
-            <div class="f5-cell f5-cell-ml">
-              <div class="f5-cell-label">F5 MONEYLINE</div>
-              <div class="f5-cell-val" style="color:#22c55e">LAD</div>
-              <div class="f5-cell-sub">Edge +12.9 · <strong>STRONG</strong> <span class="f5-units-pill" style="background:#4ade80;color:#000">3.0u</span></div>
-              <div class="f5-cell-extra">Rating: A 57.9 vs H 45.1</div>
-              <div class="f5-cell-extra">P/IP adj: A -0.5 · H +0.4</div>
-            </div>
-            <div class="f5-cell f5-cell-spread">
-              <div class="f5-cell-label">F5 SPREAD</div>
-              <div class="f5-cell-val" style="color:#eab308">LAD -1.5</div>
-              <div class="f5-cell-sub"><strong>LEAN</strong></div>
-            </div>
-            <div class="f5-cell f5-cell-total">
-              <div class="f5-cell-label">F5 TOTAL · proj 4.5</div>
-              <div class="f5-cell-val" style="color:#94a3b8">PUSH 4.5</div>
-              <div class="f5-cell-sub"><strong>TOSS-UP</strong> <span class="f5-units-pill" style="background:#64748b;color:#000">0.0u</span></div>
-              <div class="f5-cell-extra">Proj: A 2.5 + H 1.8</div>
-            </div>
-          </div>
-          <div class="f5-lines-row">
-            <span class="f5-lines-label">Line calls:</span>
-            <span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">4.5</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span>
-          </div>
-        </div>
-
-        <div class="pitchers-row">
-          <div class="pitcher-section">
-            <div class="section-label">AWAY SP (faces home lineup)</div>
-            
-        <div class="pitcher-card">
-          <div class="pitcher-name">Tyler Glasnow <span class="hand-badge hand-right">RHP</span></div>
-          <div class="pitcher-score" style="color: #eab308">60.2</div>
-          <div class="stat-grid">
-            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">4.00</span></div>
-            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.94</span></div>
-            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">11.0</span></div>
-            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.0</span></div>
-            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.0</span></div>
-            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">18.0</span></div>
-          </div>
-          <div class="fi-row"><span class="fi-badge fi-neutral" title="17/21 clean 1st innings">1st ERA 3.38 · 79% clean (21GS)</span></div>
-        </div>
-          </div>
-          <div class="vs-divider">vs</div>
-          <div class="pitcher-section">
-            <div class="section-label">HOME SP (faces away lineup)</div>
-            
-        <div class="pitcher-card">
-          <div class="pitcher-name">Tomoyuki Sugano <span class="hand-badge hand-right">RHP</span></div>
-          <div class="pitcher-score" style="color: #eab308">58.7</div>
-          <div class="stat-grid">
-            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">2.16</span></div>
-            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.78</span></div>
-            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">6.5</span></div>
-            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">1.6</span></div>
-            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.2</span></div>
-            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.2</span></div>
-          </div>
-          <div class="fi-row"><span class="fi-badge fi-bad" title="14/25 clean 1st innings">1st ERA 5.79 · 61% clean (25GS)</span></div>
-        </div>
-          </div>
-        </div>
-
-        
-        <details class="nrfi-secondary">
-          <summary>
-            <span class="nrfi-summary-label">NRFI Analysis</span>
-            <span class="nrfi-score-pill" style="background:#ef4444;color:#000">32.7 · FADE</span>
-            
-          </summary>
-          <div class="nrfi-body">
-            <div class="score-breakdown">
-              <span>Pitching: 59.0</span>
-              <span>Lineup: 35.4</span>
-              <span>1st Inn: +1.0</span>
-              <span>BvP: +4.0</span>
-              <span>L/R: -4.0</span>
-              <span>Form: -1.0</span>
-              <span>Park: -8</span>
-              <span>Weather: +5.0</span>
-              <span>Team Tend: +0.3</span>
-            </div>
-            
-        <div class="tend-panel">
-          <div class="tend-header"><span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
-            <span class="tend-adj" style="color:#1fb86e">Adj: +0.3</span></div>
-          <div class="tend-grid">
-            <div class="tend-cell"><div class="tend-label">COL batting at HOME</div><div class="tend-val" style="color:#ffb84d">27% <span class="tend-sub">(3/11)</span></div><div class="tend-sub">overall 23% · 30g</div></div>
-            <div class="tend-cell"><div class="tend-label">LAD batting on ROAD</div><div class="tend-val" style="color:#9bd15a">25% <span class="tend-sub">(3/12)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
-          </div>
-          <div class="tend-foot">Blended 26% vs league 27% · shrunk toward team-overall + league prior</div>
-        </div>
-          </div>
-        </details>
-        
-
-        <details class="lineup-details">
-          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
-          <div class="lineups-row">
-            <div class="lineup-section">
-              <div class="section-label">HOME lineup (vs Glasnow) · Threat: 47.0</div>
-              <div class="badge-row"><span class="bvp-badge bvp-safe">BvP: .242 OPS · 11AB · 0HR — SP dominates</span> <span class="bvp-badge bvp-neutral">L7: .752 OPS (+0.040) · 3🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-warn">vs RHP: .744 OPS · 1dis/3adv — Lineup hits well</span></div>
-              <table class="batter-table">
-                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
-                <tbody><tr>
-              <td>Edouard Julien</td>
-              <td>.256</td><td>.347</td><td>.696</td>
-              <td><span style="color:#eab308" title="LHB vs RHP (40AB)">L .745</span></td>
-              <td><span style="color:#fb923c" title="Last 7G: .250 AVG / .775 OPS (+0.079)">📈 .250/.775</span></td>
-              <td>1</td>
-              <td><span style="color:#22c55e" title="1-for-5, 0 HR">.200/.533 (5AB)</span></td>
-            </tr><tr>
-              <td>Jake McCarthy</td>
-              <td>.171</td><td>.275</td><td>.561</td>
-              <td><span style="color:#22c55e" title="LHB vs RHP (31AB)">L .444</span></td>
-              <td><span style="color:#ef4444" title="Last 7G: .250 AVG / .854 OPS (+0.293)">🔥 .250/.854</span></td>
-              <td>0</td>
-              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
-            </tr><tr>
-              <td>TJ Rumfield</td>
-              <td>.266</td><td>.333</td><td>.739</td>
-              <td><span style="color:#eab308" title="LHB vs RHP (56AB)">L .773</span></td>
-              <td><span style="color:#38bdf8" title="Last 7G: .115 AVG / .294 OPS (-0.445)">🧊 .115/.294</span></td>
-              <td>2</td>
-              <td><span style="color:#6b7280">—</span></td>
-            </tr><tr>
-              <td>Hunter Goodman</td>
-              <td>.258</td><td>.338</td><td>.853</td>
-              <td><span style="color:#ef4444" title="RHB vs RHP (54AB)">R .887</span></td>
-              <td><span style="color:#ef4444" title="Last 7G: .273 AVG / 1.087 OPS (+0.234)">🔥 .273/1.087</span></td>
-              <td>5</td>
-              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
-            </tr></tbody>
-              </table>
-            </div>
-            <div class="lineup-section">
-              <div class="section-label">AWAY lineup (vs Sugano) · Threat: 69.0</div>
-              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 5AB (limited)</span> <span class="bvp-badge bvp-neutral">L7: .788 OPS (-0.011) · 1🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-danger">vs RHP: .81 OPS · 2dis/2adv — Lineup rakes</span></div>
-              <table class="batter-table">
-                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
-                <tbody><tr>
-              <td>Kyle Tucker</td>
-              <td>.239</td><td>.350</td><td>.693</td>
-              <td><span style="color:#eab308" title="LHB vs RHP (50AB)">L .665</span></td>
-              <td><span style="color:#9ca3af" title="Last 7G: .192 AVG / .651 OPS (-0.042)">➖ .192/.651</span></td>
-              <td>2</td>
-              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
-            </tr><tr>
-              <td>Freddie Freeman</td>
-              <td>.270</td><td>.325</td><td>.798</td>
-              <td><span style="color:#ef4444" title="LHB vs RHP (55AB)">L .801</span></td>
-              <td><span style="color:#60a5fa" title="Last 7G: .286 AVG / .712 OPS (-0.086)">📉 .286/.712</span></td>
-              <td>3</td>
-              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.000 (2AB)</span></td>
-            </tr><tr>
-              <td>Will Smith</td>
-              <td>.286</td><td>.375</td><td>.786</td>
-              <td><span style="color:#ef4444" title="RHB vs RHP (45AB)">R .804</span></td>
-              <td><span style="color:#fb923c" title="Last 7G: .364 AVG / .909 OPS (+0.123)">📈 .364/.909</span></td>
-              <td>2</td>
-              <td><span style="color:#6b7280">—</span></td>
-            </tr><tr>
-              <td>Teoscar Hernández</td>
-              <td>.310</td><td>.349</td><td>.918</td>
-              <td><span style="color:#ef4444" title="RHB vs RHP (44AB)">R .992</span></td>
-              <td><span style="color:#9ca3af" title="Last 7G: .250 AVG / .880 OPS (-0.038)">➖ .250/.880</span></td>
-              <td>4</td>
-              <td><span style="color:#6b7280">—</span></td>
-            </tr></tbody>
-              </table>
-            </div>
-          </div>
-        </details>
-      </div>
-    </div>
-
-    <div class="game-card" style="border-left-color: #4ade80"
-         data-f5="strong" data-yrfi="none" data-nrfi="fade"
-         data-bullpen="no">
-
-      <div class="game-header">
-        <div class="matchup-row">
           <span class="matchup">CWS @ ATH</span>
           <span class="header-badges">
             <span class="headline-badge f5-badge" style="background:#4ade80;color:#000">F5 STRONG</span>
@@ -2180,6 +2508,55 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="825019:F5_ML"
+             data-game-pk="825019"
+             data-matchup="CWS @ ATH"
+             data-market="F5_ML"
+             data-pick="CWS"
+             data-lean=""
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="5.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: CWS</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="825019:F5_TOTAL:UNDER"
+             data-game-pk="825019"
+             data-matchup="CWS @ ATH"
+             data-market="F5_TOTAL"
+             data-pick="UNDER 4.5"
+             data-lean="UNDER"
+             data-model-confidence="STRONG"
+             data-model-units="2.5"
+             data-model-score="3.30">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 UNDER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -2334,7 +2711,7 @@
     </div>
 
     <div class="game-card" style="border-left-color: #eab308"
-         data-f5="lean" data-yrfi="strong" data-nrfi="fade"
+         data-f5="lean" data-yrfi="lean" data-nrfi="fade"
          data-bullpen="no">
 
       <div class="game-header">
@@ -2342,13 +2719,13 @@
           <span class="matchup">BAL @ CLE</span>
           <span class="header-badges">
             <span class="headline-badge f5-badge" style="background:#eab308;color:#000">F5 LEAN</span>
-            <span class="headline-badge yrfi-badge" style="background:#ef4444;color:#000">⚡ YRFI STRONG</span>
-            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #ef4444;color:#ef4444">NRFI 24.8</span>
+            <span class="headline-badge yrfi-badge" style="background:#fb923c;color:#000">⚡ YRFI LEAN</span>
+            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #ef4444;color:#ef4444">NRFI 26.8</span>
             
             
           </span>
         </div>
-        <div class="game-meta">Progressive Field <span class="park-badge park-neutral" title="Park Factor: 98">⚾ 98</span> · 6:10 PM ET · —</div>
+        <div class="game-meta">Progressive Field <span class="park-badge park-neutral" title="Park Factor: 98">⚾ 98</span> · 6:10 PM ET · 61°F · 6 mph wind · 0% rain</div>
       </div>
 
       <div class="game-body">
@@ -2368,7 +2745,7 @@
               <div class="f5-cell-sub"><strong>SLIGHT</strong></div>
             </div>
             <div class="f5-cell f5-cell-total">
-              <div class="f5-cell-label">F5 TOTAL · proj 5.5</div>
+              <div class="f5-cell-label">F5 TOTAL · proj 5.4</div>
               <div class="f5-cell-val" style="color:#ef4444">OVER 4.5</div>
               <div class="f5-cell-sub"><strong>LEAN</strong> <span class="f5-units-pill" style="background:#eab308;color:#000">2.0u</span></div>
               <div class="f5-cell-extra">Proj: A 3.0 + H 2.6</div>
@@ -2378,6 +2755,77 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">5.5</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824454:F5_ML"
+             data-game-pk="824454"
+             data-matchup="BAL @ CLE"
+             data-market="F5_ML"
+             data-pick="BAL"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="2.0"
+             data-model-score="9.50">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: BAL</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824454:F5_TOTAL:OVER"
+             data-game-pk="824454"
+             data-matchup="BAL @ CLE"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="LEAN"
+             data-model-units="2.0"
+             data-model-score="5.40">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824454:YRFI"
+             data-game-pk="824454"
+             data-matchup="BAL @ CLE"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="26.80">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -2422,8 +2870,8 @@
         <details class="nrfi-secondary">
           <summary>
             <span class="nrfi-summary-label">NRFI Analysis</span>
-            <span class="nrfi-score-pill" style="background:#ef4444;color:#000">24.8 · FADE</span>
-            <span class="yrfi-inline" style="background:#ef4444;color:#000">⚡ YRFI STRONG</span>
+            <span class="nrfi-score-pill" style="background:#ef4444;color:#000">26.8 · FADE</span>
+            <span class="yrfi-inline" style="background:#fb923c;color:#000">⚡ YRFI LEAN</span>
           </summary>
           <div class="nrfi-body">
             <div class="score-breakdown">
@@ -2434,7 +2882,7 @@
               <span>L/R: -4.0</span>
               <span>Form: -3.0</span>
               <span>Park: +1.2</span>
-              <span>Weather: +0.0</span>
+              <span>Weather: +2.0</span>
               <span>Team Tend: +0.3</span>
             </div>
             
@@ -2576,6 +3024,55 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">5.0</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823397:F5_ML"
+             data-game-pk="823397"
+             data-matchup="TB @ PIT"
+             data-market="F5_ML"
+             data-pick="TB"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="2.0"
+             data-model-score="7.90">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: TB</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823397:F5_TOTAL:OVER"
+             data-game-pk="823397"
+             data-matchup="TB @ PIT"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="5.10">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -2775,6 +3272,55 @@
             <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span>
           </div>
         </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823883:F5_ML"
+             data-game-pk="823883"
+             data-matchup="MIL @ MIA"
+             data-market="F5_ML"
+             data-pick="MIL"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="2.5"
+             data-model-score="10.70">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: MIL</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823883:F5_TOTAL:OVER"
+             data-game-pk="823883"
+             data-matchup="MIL @ MIA"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="SLIGHT"
+             data-model-units="0.5"
+             data-model-score="4.80">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="0.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+        </div>
 
         <div class="pitchers-row">
           <div class="pitcher-section">
@@ -2973,6 +3519,55 @@
             <span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER ★</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#ef4444;font-weight:700">OVER </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span>
           </div>
         </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824778:F5_ML"
+             data-game-pk="824778"
+             data-matchup="DET @ BOS"
+             data-market="F5_ML"
+             data-pick="DET"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="1.5"
+             data-model-score="7.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: DET</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824778:F5_TOTAL:OVER"
+             data-game-pk="824778"
+             data-matchup="DET @ BOS"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="LEAN"
+             data-model-units="1.5"
+             data-model-score="5.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+        </div>
 
         <div class="pitchers-row">
           <div class="pitcher-section">
@@ -3131,6 +3726,275 @@
 
       <div class="game-header">
         <div class="matchup-row">
+          <span class="matchup">LAD @ COL</span>
+          <span class="header-badges">
+            <span class="headline-badge f5-badge" style="background:#eab308;color:#000">F5 LEAN</span>
+            <span class="headline-badge yrfi-badge" style="background:#ef4444;color:#000">⚡ YRFI STRONG</span>
+            <span class="headline-badge nrfi-mini" title="NRFI score" style="border:1px solid #ef4444;color:#ef4444">NRFI 24.3</span>
+            
+            
+          </span>
+        </div>
+        <div class="game-meta">Coors Field <span class="park-badge park-hitter" title="Park Factor: 115">⚾ 115 Hitter-friendly</span> · 8:40 PM ET · —</div>
+      </div>
+
+      <div class="game-body">
+        
+        <div class="f5-headline">
+          <div class="f5-headline-grid">
+            <div class="f5-cell f5-cell-ml">
+              <div class="f5-cell-label">F5 MONEYLINE</div>
+              <div class="f5-cell-val" style="color:#4ade80">LAD</div>
+              <div class="f5-cell-sub">Edge +7.4 · <strong>MODERATE</strong> <span class="f5-units-pill" style="background:#eab308;color:#000">1.5u</span></div>
+              <div class="f5-cell-extra">Rating: A 52.4 vs H 45.1</div>
+              <div class="f5-cell-extra">P/IP adj: A -0.5 · H +0.4</div>
+            </div>
+            <div class="f5-cell f5-cell-spread">
+              <div class="f5-cell-label">F5 SPREAD</div>
+              <div class="f5-cell-val" style="color:#fbbf24">LAD -0.5</div>
+              <div class="f5-cell-sub"><strong>SLIGHT</strong></div>
+            </div>
+            <div class="f5-cell f5-cell-total">
+              <div class="f5-cell-label">F5 TOTAL · proj 5.1</div>
+              <div class="f5-cell-val" style="color:#ef4444">OVER 4.5</div>
+              <div class="f5-cell-sub"><strong>LEAN</strong> <span class="f5-units-pill" style="background:#94a3b8;color:#000">1.0u</span></div>
+              <div class="f5-cell-extra">Proj: A 2.5 + H 2.0</div>
+            </div>
+          </div>
+          <div class="f5-lines-row">
+            <span class="f5-lines-label">Line calls:</span>
+            <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.5</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">5.0</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span>
+          </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="824373:F5_ML"
+             data-game-pk="824373"
+             data-matchup="LAD @ COL"
+             data-market="F5_ML"
+             data-pick="LAD"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="1.5"
+             data-model-score="7.40">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: LAD</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824373:F5_TOTAL:OVER"
+             data-game-pk="824373"
+             data-matchup="LAD @ COL"
+             data-market="F5_TOTAL"
+             data-pick="OVER 4.5"
+             data-lean="OVER"
+             data-model-confidence="LEAN"
+             data-model-units="1.0"
+             data-model-score="5.10">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 OVER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="824373:YRFI"
+             data-game-pk="824373"
+             data-matchup="LAD @ COL"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="2.0"
+             data-model-score="24.30">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+        </div>
+
+        <div class="pitchers-row">
+          <div class="pitcher-section">
+            <div class="section-label">AWAY SP (faces home lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Tyler Glasnow <span class="hand-badge hand-right">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">60.2</div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">4.00</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.94</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">11.0</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">2.0</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">1.0</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">18.0</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-neutral" title="17/21 clean 1st innings">1st ERA 3.38 · 79% clean (21GS)</span></div>
+        </div>
+          </div>
+          <div class="vs-divider">vs</div>
+          <div class="pitcher-section">
+            <div class="section-label">HOME SP (faces away lineup)</div>
+            
+        <div class="pitcher-card">
+          <div class="pitcher-name">Tomoyuki Sugano <span class="hand-badge hand-right">RHP</span></div>
+          <div class="pitcher-score" style="color: #eab308">58.7</div>
+          <div class="stat-grid">
+            <div class="stat"><span class="stat-label">ERA</span><span class="stat-value">2.16</span></div>
+            <div class="stat"><span class="stat-label">WHIP</span><span class="stat-value">0.78</span></div>
+            <div class="stat"><span class="stat-label">K/9</span><span class="stat-value">6.5</span></div>
+            <div class="stat"><span class="stat-label">BB/9</span><span class="stat-value">1.6</span></div>
+            <div class="stat"><span class="stat-label">HR/9</span><span class="stat-value">2.2</span></div>
+            <div class="stat"><span class="stat-label">IP</span><span class="stat-value">16.2</span></div>
+          </div>
+          <div class="fi-row"><span class="fi-badge fi-bad" title="14/25 clean 1st innings">1st ERA 5.79 · 61% clean (25GS)</span></div>
+        </div>
+          </div>
+        </div>
+
+        
+        <details class="nrfi-secondary">
+          <summary>
+            <span class="nrfi-summary-label">NRFI Analysis</span>
+            <span class="nrfi-score-pill" style="background:#ef4444;color:#000">24.3 · FADE</span>
+            <span class="yrfi-inline" style="background:#ef4444;color:#000">⚡ YRFI STRONG</span>
+          </summary>
+          <div class="nrfi-body">
+            <div class="score-breakdown">
+              <span>Pitching: 59.0</span>
+              <span>Lineup: 33.6</span>
+              <span>1st Inn: +1.0</span>
+              <span>BvP: +4.0</span>
+              <span>L/R: -6.0</span>
+              <span>Form: -2.0</span>
+              <span>Park: -8</span>
+              <span>Weather: +0.0</span>
+              <span>Team Tend: +0.3</span>
+            </div>
+            
+        <div class="tend-panel">
+          <div class="tend-header"><span class="tend-title">Team 1st-Inning Tendencies (last 30g)</span>
+            <span class="tend-adj" style="color:#1fb86e">Adj: +0.3</span></div>
+          <div class="tend-grid">
+            <div class="tend-cell"><div class="tend-label">COL batting at HOME</div><div class="tend-val" style="color:#ffb84d">27% <span class="tend-sub">(3/11)</span></div><div class="tend-sub">overall 23% · 30g</div></div>
+            <div class="tend-cell"><div class="tend-label">LAD batting on ROAD</div><div class="tend-val" style="color:#9bd15a">25% <span class="tend-sub">(3/12)</span></div><div class="tend-sub">overall 27% · 30g</div></div>
+          </div>
+          <div class="tend-foot">Blended 26% vs league 27% · shrunk toward team-overall + league prior</div>
+        </div>
+          </div>
+        </details>
+        
+
+        <details class="lineup-details">
+          <summary>Top-of-Order Batters & Matchup History <span class="lineup-src lineup-estimated">⚠ Estimated from roster</span></summary>
+          <div class="lineups-row">
+            <div class="lineup-section">
+              <div class="section-label">HOME lineup (vs Glasnow) · Threat: 56.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-safe">BvP: .242 OPS · 11AB · 0HR — SP dominates</span> <span class="bvp-badge bvp-warn">L7: .789 OPS (+0.064) · 3🔥 1🧊 — Heating up</span> <span class="bvp-badge bvp-warn">vs RHP: .755 OPS · 1dis/3adv — Lineup hits well</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Edouard Julien</td>
+              <td>.256</td><td>.347</td><td>.696</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (40AB)">L .745</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .250 AVG / .775 OPS (+0.079)">📈 .250/.775</span></td>
+              <td>1</td>
+              <td><span style="color:#22c55e" title="1-for-5, 0 HR">.200/.533 (5AB)</span></td>
+            </tr><tr>
+              <td>Jake McCarthy</td>
+              <td>.200</td><td>.300</td><td>.614</td>
+              <td><span style="color:#22c55e" title="LHB vs RHP (31AB)">L .504</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .333 AVG / 1.000 OPS (+0.386)">🔥 .333/1.000</span></td>
+              <td>0</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr><tr>
+              <td>TJ Rumfield</td>
+              <td>.266</td><td>.333</td><td>.739</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (56AB)">L .773</span></td>
+              <td><span style="color:#38bdf8" title="Last 7G: .115 AVG / .294 OPS (-0.445)">🧊 .115/.294</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Hunter Goodman</td>
+              <td>.258</td><td>.338</td><td>.853</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (54AB)">R .887</span></td>
+              <td><span style="color:#ef4444" title="Last 7G: .273 AVG / 1.087 OPS (+0.234)">🔥 .273/1.087</span></td>
+              <td>5</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+            <div class="lineup-section">
+              <div class="section-label">AWAY lineup (vs Sugano) · Threat: 69.0</div>
+              <div class="badge-row"><span class="bvp-badge bvp-neutral">BvP: 5AB (limited)</span> <span class="bvp-badge bvp-neutral">L7: .788 OPS (-0.011) · 1🔥 1🧊 — Steady</span> <span class="bvp-badge bvp-danger">vs RHP: .81 OPS · 2dis/2adv — Lineup rakes</span></div>
+              <table class="batter-table">
+                <thead><tr><th>Name</th><th>AVG</th><th>OBP</th><th>OPS</th><th>L/R</th><th>Last 7</th><th>HR</th><th>vs SP</th></tr></thead>
+                <tbody><tr>
+              <td>Kyle Tucker</td>
+              <td>.239</td><td>.350</td><td>.693</td>
+              <td><span style="color:#eab308" title="LHB vs RHP (50AB)">L .665</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .192 AVG / .651 OPS (-0.042)">➖ .192/.651</span></td>
+              <td>2</td>
+              <td><span style="color:#22c55e" title="0-for-3, 0 HR">.000/.000 (3AB)</span></td>
+            </tr><tr>
+              <td>Freddie Freeman</td>
+              <td>.270</td><td>.325</td><td>.798</td>
+              <td><span style="color:#ef4444" title="LHB vs RHP (55AB)">L .801</span></td>
+              <td><span style="color:#60a5fa" title="Last 7G: .286 AVG / .712 OPS (-0.086)">📉 .286/.712</span></td>
+              <td>3</td>
+              <td><span style="color:#22c55e" title="0-for-2, 0 HR">.000/.000 (2AB)</span></td>
+            </tr><tr>
+              <td>Will Smith</td>
+              <td>.286</td><td>.375</td><td>.786</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (45AB)">R .804</span></td>
+              <td><span style="color:#fb923c" title="Last 7G: .364 AVG / .909 OPS (+0.123)">📈 .364/.909</span></td>
+              <td>2</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr><tr>
+              <td>Teoscar Hernández</td>
+              <td>.310</td><td>.349</td><td>.918</td>
+              <td><span style="color:#ef4444" title="RHB vs RHP (44AB)">R .992</span></td>
+              <td><span style="color:#9ca3af" title="Last 7G: .250 AVG / .880 OPS (-0.038)">➖ .250/.880</span></td>
+              <td>4</td>
+              <td><span style="color:#6b7280">—</span></td>
+            </tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="game-card" style="border-left-color: #eab308"
+         data-f5="lean" data-yrfi="strong" data-nrfi="fade"
+         data-bullpen="no">
+
+      <div class="game-header">
+        <div class="matchup-row">
           <span class="matchup">TEX @ SEA</span>
           <span class="header-badges">
             <span class="headline-badge f5-badge" style="background:#eab308;color:#000">F5 LEAN</span>
@@ -3170,6 +4034,77 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">4.0</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">4.5</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span><span class="f5-line-pill" style="opacity:1.0" title="STRONG"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER ★</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="823152:F5_ML"
+             data-game-pk="823152"
+             data-matchup="TEX @ SEA"
+             data-market="F5_ML"
+             data-pick="TEX"
+             data-lean=""
+             data-model-confidence="MODERATE"
+             data-model-units="2.5"
+             data-model-score="10.00">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: TEX</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.5">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823152:F5_TOTAL:UNDER"
+             data-game-pk="823152"
+             data-matchup="TEX @ SEA"
+             data-market="F5_TOTAL"
+             data-pick="UNDER 4.5"
+             data-lean="UNDER"
+             data-model-confidence="SLIGHT"
+             data-model-units="1.0"
+             data-model-score="4.10">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 UNDER</span>
+        <span class="bet-input-group"><span class="bet-input-lbl">Line</span><select class="bet-line" data-role="line"><option value="4.0">4.0</option><option value="4.5" selected>4.5</option><option value="5.0">5.0</option><option value="5.5">5.5</option></select></span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
+      <label class="bet-row" data-bet-key="823152:YRFI"
+             data-game-pk="823152"
+             data-matchup="TEX @ SEA"
+             data-market="YRFI"
+             data-pick="YRFI"
+             data-lean=""
+             data-model-confidence="STRONG"
+             data-model-units="2.0"
+             data-model-score="23.20">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet YRFI</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="2.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -3338,7 +4273,7 @@
             
           </span>
         </div>
-        <div class="game-meta">Nationals Park <span class="park-badge park-neutral" title="Park Factor: 99">⚾ 99</span> · 6:45 PM ET · 70°F · 4 mph wind · 0% rain</div>
+        <div class="game-meta">Nationals Park <span class="park-badge park-neutral" title="Park Factor: 99">⚾ 99</span> · 6:45 PM ET · 70°F · 6 mph wind · 0% rain</div>
       </div>
 
       <div class="game-body">
@@ -3368,6 +4303,33 @@
             <span class="f5-lines-label">Line calls:</span>
             <span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">4.0</span><span style="color:#ef4444;font-weight:700">OVER •</span></span><span class="f5-line-pill" style="opacity:0.55" title="TOSS-UP"><span class="f5-line-num">4.5</span><span style="color:#94a3b8;font-weight:700">PUSH </span></span><span class="f5-line-pill" style="opacity:0.55" title="SLIGHT"><span class="f5-line-num">5.0</span><span style="color:#22c55e;font-weight:700">UNDER </span></span><span class="f5-line-pill" style="opacity:1.0" title="LEAN"><span class="f5-line-num">5.5</span><span style="color:#22c55e;font-weight:700">UNDER •</span></span>
           </div>
+        </div>
+        
+        <div class="bet-panel">
+          <div class="bet-panel-label">Place Bets</div>
+          
+      <label class="bet-row" data-bet-key="822752:F5_ML"
+             data-game-pk="822752"
+             data-matchup="SF @ WSH"
+             data-market="F5_ML"
+             data-pick="WSH"
+             data-lean=""
+             data-model-confidence="TOSS-UP"
+             data-model-units="0.0"
+             data-model-score="-0.50">
+        <input type="checkbox" class="bet-check" data-role="check">
+        <span class="bet-label">Bet F5 ML: WSH</span>
+        
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Units</span>
+          <input type="number" class="bet-units" data-role="units" step="0.5" min="0" value="1.0">
+        </span>
+        <span class="bet-input-group">
+          <span class="bet-input-lbl">Odds</span>
+          <input type="number" class="bet-odds" data-role="odds" step="5" value="-110">
+        </span>
+        <span class="bet-dollars" data-role="dollars">$0</span>
+      </label>
         </div>
 
         <div class="pitchers-row">
@@ -3604,6 +4566,202 @@ function filterNRFI(level) {
   });
   _activeBtn(null);
 }
+</script>
+
+<script>window.NRFI_DASHBOARD_DATE = "2026-04-17";</script>
+<script>
+
+(function() {
+  const ANALYSIS_DATE = window.NRFI_DASHBOARD_DATE || "unknown";
+  const LS_UNIT_SIZE = "nrfi_unit_size_dollars";
+  const LS_SELECTIONS = "nrfi_selections:" + ANALYSIS_DATE;
+
+  function parseNum(v, fallback) {
+    const n = Number(v);
+    return (v === "" || v === null || v === undefined || !isFinite(n)) ? fallback : n;
+  }
+
+  function loadUnitSize() {
+    const v = localStorage.getItem(LS_UNIT_SIZE);
+    return v !== null ? parseNum(v, 50) : 50;
+  }
+  function saveUnitSize(v) { localStorage.setItem(LS_UNIT_SIZE, String(v)); }
+
+  function loadSelections() {
+    try {
+      const raw = localStorage.getItem(LS_SELECTIONS);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function saveSelections(s) {
+    localStorage.setItem(LS_SELECTIONS, JSON.stringify(s));
+  }
+
+  function hydrate() {
+    const unitSize = loadUnitSize();
+    const sizeInput = document.getElementById("unit-size-input");
+    if (sizeInput) sizeInput.value = unitSize;
+
+    const saved = loadSelections();
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const key = row.dataset.betKey;
+      const s = saved[key];
+      if (!s) return;
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      if (checkEl && typeof s.checked === "boolean") checkEl.checked = s.checked;
+      if (unitsEl && s.units !== undefined && s.units !== null) unitsEl.value = s.units;
+      if (oddsEl && s.odds !== undefined && s.odds !== null) oddsEl.value = s.odds;
+      if (lineEl && s.line !== undefined && s.line !== null) lineEl.value = s.line;
+    });
+  }
+
+  function persist() {
+    const state = {};
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const key = row.dataset.betKey;
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      const checked = checkEl ? checkEl.checked : false;
+      const entry = {
+        checked: checked,
+        units: unitsEl ? parseNum(unitsEl.value, 0) : 0,
+        odds: oddsEl ? parseNum(oddsEl.value, -110) : -110
+      };
+      if (lineEl) entry.line = parseNum(lineEl.value, null);
+      state[key] = entry;
+    });
+    saveSelections(state);
+  }
+
+  function recompute() {
+    const sizeInput = document.getElementById("unit-size-input");
+    const unitSize = parseNum(sizeInput ? sizeInput.value : 50, 50);
+    saveUnitSize(unitSize);
+
+    let nBets = 0, totalUnits = 0, totalDollars = 0;
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const dollarsEl = row.querySelector('[data-role="dollars"]');
+      const checked = checkEl ? checkEl.checked : false;
+      const units = unitsEl ? parseNum(unitsEl.value, 0) : 0;
+      const dollars = units * unitSize;
+      if (dollarsEl) dollarsEl.textContent = "$" + dollars.toFixed(2);
+      if (checked) {
+        nBets++;
+        totalUnits += units;
+        totalDollars += dollars;
+        row.classList.add("bet-row-selected");
+      } else {
+        row.classList.remove("bet-row-selected");
+      }
+    });
+
+    const pill = document.getElementById("bet-count");
+    if (pill) {
+      pill.textContent =
+        nBets + " bet" + (nBets === 1 ? "" : "s") + " selected · " +
+        totalUnits.toFixed(1) + "u · $" + totalDollars.toFixed(2);
+    }
+    persist();
+  }
+
+  function exportBets() {
+    const sizeInput = document.getElementById("unit-size-input");
+    const unitSize = parseNum(sizeInput ? sizeInput.value : 50, 50);
+
+    const bets = [];
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      if (!checkEl || !checkEl.checked) return;
+      const d = row.dataset;
+      const unitsEl = row.querySelector('[data-role="units"]');
+      const oddsEl = row.querySelector('[data-role="odds"]');
+      const lineEl = row.querySelector('[data-role="line"]');
+      const units = unitsEl ? parseNum(unitsEl.value, 0) : 0;
+      const odds = oddsEl ? parseNum(oddsEl.value, -110) : -110;
+      const line = lineEl ? parseNum(lineEl.value, null) : null;
+
+      let pick = d.pick;
+      if (d.market === "F5_TOTAL" && line !== null) {
+        pick = d.lean + " " + line;
+      }
+
+      bets.push({
+        game_pk: parseInt(d.gamePk, 10),
+        matchup: d.matchup || "",
+        market: d.market,
+        pick: pick,
+        line: line,
+        units: units,
+        odds: odds,
+        model_confidence: d.modelConfidence || null,
+        model_units: d.modelUnits ? parseFloat(d.modelUnits) : null,
+        model_score_or_edge: d.modelScore ? parseFloat(d.modelScore) : null
+      });
+    });
+
+    if (bets.length === 0) {
+      alert("No bets selected. Check at least one bet before exporting.");
+      return;
+    }
+
+    const payload = {
+      date: ANALYSIS_DATE,
+      unit_size_dollars: unitSize,
+      exported_at: new Date().toISOString(),
+      bets: bets
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bets_" + ANALYSIS_DATE + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function clearBets() {
+    if (!confirm("Clear all bet selections for " + ANALYSIS_DATE + "?")) return;
+    localStorage.removeItem(LS_SELECTIONS);
+    document.querySelectorAll(".bet-row").forEach(row => {
+      const checkEl = row.querySelector('[data-role="check"]');
+      if (checkEl) checkEl.checked = false;
+    });
+    recompute();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    hydrate();
+    const sizeInput = document.getElementById("unit-size-input");
+    const exportBtn = document.getElementById("export-bets-btn");
+    const clearBtn = document.getElementById("clear-bets-btn");
+    if (sizeInput) sizeInput.addEventListener("input", recompute);
+    if (exportBtn) exportBtn.addEventListener("click", exportBets);
+    if (clearBtn) clearBtn.addEventListener("click", clearBets);
+
+    // Prevent clicking inside inputs from toggling the parent label's checkbox
+    document.querySelectorAll(".bet-row input:not(.bet-check), .bet-row select").forEach(el => {
+      el.addEventListener("click", (e) => e.stopPropagation());
+    });
+
+    document.querySelectorAll(".bet-row").forEach(row => {
+      row.addEventListener("change", recompute);
+      row.addEventListener("input", recompute);
+    });
+
+    recompute();
+  });
+})();
+
 </script>
 
 </body>
