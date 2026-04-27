@@ -1,7 +1,7 @@
 {
   "date": "2026-04-27",
   "stats_through": "2026-04-26",
-  "generated": "2026-04-27T16:51:56.150941",
+  "generated": "2026-04-27T17:26:40.690706",
   "games": [
     {
       "game_pk": 823311,
@@ -4782,22 +4782,16 @@
       },
       "weather": {
         "indoor": false,
-        "temp_f": 53.6,
-        "wind_mph": 4.0,
-        "precip_chance": 0,
-        "wind_dir": 273,
-        "wind_effect": {
-          "component_out": 0,
-          "component_in": 3.2,
-          "label": "blowing in"
-        }
+        "temp_f": null,
+        "wind_mph": null,
+        "precip_chance": null
       },
       "away_pitcher_score": 37.2,
       "home_pitcher_score": 71.5,
       "home_lineup_threat": 47.0,
       "away_lineup_threat": 61.0,
       "nrfi": {
-        "score": 21.1,
+        "score": 19.1,
         "tier": "FADE",
         "pitcher_component": 44.1,
         "lineup_component": 41.8,
@@ -4806,7 +4800,7 @@
         "platoon_adj": -8.0,
         "streak_adj": 4.0,
         "park_adj": 0.6,
-        "weather_adj": 2.0,
+        "weather_adj": 0.0,
         "team_tendency_adj": -2.1,
         "rest_adj": 1.0,
         "bullpen_adj": 0.0
@@ -4860,36 +4854,36 @@
           "confidence": "STRONG"
         },
         "total": {
-          "projected_total": 4.5,
+          "projected_total": 4.7,
           "home_runs_proj": 2.7,
           "away_runs_proj": 2.0,
-          "env_adj": -0.21,
+          "env_adj": -0.05,
           "primary_line": 4.5,
-          "lean": "PUSH",
-          "confidence": "TOSS-UP",
+          "lean": "OVER",
+          "confidence": "SLIGHT",
           "line_calls": {
             "4.0": {
               "lean": "OVER",
-              "confidence": "SLIGHT",
-              "diff": 0.5
+              "confidence": "LEAN",
+              "diff": 0.7
             },
             "4.5": {
-              "lean": "PUSH",
-              "confidence": "TOSS-UP",
-              "diff": 0.0
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.2
             },
             "5.0": {
               "lean": "UNDER",
               "confidence": "SLIGHT",
-              "diff": -0.5
+              "diff": -0.3
             },
             "5.5": {
               "lean": "UNDER",
               "confidence": "LEAN",
-              "diff": -1.0
+              "diff": -0.8
             }
           },
-          "units": 0.0
+          "units": 0.5
         }
       },
       "odds": {
