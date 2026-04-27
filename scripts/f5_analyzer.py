@@ -244,61 +244,31 @@ def compute_f5_moneyline(game: dict) -> dict:
 
 def compute_f5_spread(game: dict, f5_ml: dict) -> dict:
     """
-    F5 Spread: can the favored side cover -0.5 (or -1.5)?
+    F5 Spread is DISABLED as of 2026-04-24.
 
-    The standard F5 spread is -0.5 / +0.5 (which is really just ML with
-    different juice). The -1.5 line is where real value lives — it requires
-    predicting a multi-run edge.
+    Reason: backtest against n=48 STRONG-tier picks showed only 54.2% hit rate,
+    indistinguishable from -110 break-even. Confidence ordering was non-monotonic
+    (STRONG 54.2%, LEAN 37.5%, SLIGHT 43.2%, TOSS-UP 37.5%). The module was
+    deriving spread-coverage probability directly from F5 ML edge, but ML edge
+    is a directional signal that doesn't translate cleanly to margin of victory
+    over 5 innings — too much variance in run distribution.
 
-    We use the ML differential to project spread coverage probability.
+    To revive this module: rebuild from `_estimate_f5_runs()` directly to project
+    actual run-margin distribution, not just sign of margin.
+
+    The function is preserved as a stub so downstream consumers (dashboard,
+    predictions log, hit rate tracker) keep working without code changes; they
+    will see confidence == "DISABLED" and can suppress display.
     """
-    edge = f5_ml["edge"]
-    pick = f5_ml["pick"]
-
-    # Determine if the favorite can cover common spread lines
-    abs_edge = abs(edge)
-
-    # -0.5 spread (equivalent to ML): favored side needs to lead by 1+
-    cover_half = abs_edge >= 3.0
-    # -1.5 spread: favored side needs to lead by 2+
-    cover_1_5 = abs_edge >= 10.0  # need a very strong edge for -1.5
-
-    # Confidence in spread coverage
-    if abs_edge >= 14:
-        spread_confidence = "STRONG"
-    elif abs_edge >= 10:
-        spread_confidence = "LEAN"
-    elif abs_edge >= 5:
-        spread_confidence = "SLIGHT"
-    else:
-        spread_confidence = "TOSS-UP"
-
-    # Cap spread confidence for bullpen games — variance makes spread
-    # coverage unreliable even with a large edge.
-    has_bullpen_game = f5_ml.get("has_bullpen_game", False)
-    if has_bullpen_game and spread_confidence in ("STRONG", "LEAN"):
-        spread_confidence = "SLIGHT"
-
-    # Which line to recommend
-    if cover_1_5:
-        rec_line = -1.5
-        rec_label = f"{pick} -1.5"
-    elif cover_half:
-        rec_line = -0.5
-        rec_label = f"{pick} -0.5"
-    else:
-        rec_line = 0
-        rec_label = "No spread play"
-
     return {
-        "edge": round(edge, 1),
-        "abs_edge": round(abs_edge, 1),
-        "pick": pick,
-        "covers_half": cover_half,
-        "covers_1_5": cover_1_5,
-        "recommended_line": rec_line,
-        "recommended_label": rec_label,
-        "confidence": spread_confidence,
+        "edge": round(f5_ml.get("edge", 0), 1),
+        "abs_edge": round(abs(f5_ml.get("edge", 0)), 1),
+        "pick": f5_ml.get("pick", ""),
+        "covers_half": False,
+        "covers_1_5": False,
+        "recommended_line": 0,
+        "recommended_label": "Disabled",
+        "confidence": "DISABLED",
     }
 
 
@@ -419,22 +389,30 @@ def compute_f5_total(game: dict) -> dict:
     projected_total += bullpen_run_bump
     projected_total = max(1.0, round(projected_total, 1))
 
-    # Compare against common lines
+    # Compare against common lines.
+    #
+    # Confidence boundaries calibrated against logged outcomes (n=154 directional
+    # picks, Apr 10–23 2026):
+    #   |diff| ≥ 1.6   → STRONG  (82% hit, n=17)
+    #   0.15 ≤ |diff| < 1.6 → SLIGHT (58% hit, n=137)  — tracked but not action-tier
+    #   |diff| < 0.15  → TOSS-UP / PUSH
+    #
+    # Background: the previous boundaries (STRONG ≥1.2, LEAN ≥0.5) produced a
+    # non-monotonic confidence ordering — LEAN OVER specifically hit only ~49%
+    # on n=41 because the model under-projects by ~0.35 runs on average and the
+    # market line at 4.5 is sharper than the model in the moderate-diff range.
+    # Only at |diff| ≥ 1.6 does the model cleanly outperform the market line.
+    # We keep the SLIGHT label so the moderate-diff calls are still logged for
+    # ongoing calibration tracking, but it should not be treated as action-grade.
     common_lines = [4.0, 4.5, 5.0, 5.5]
     line_calls = {}
     for line in common_lines:
         diff = projected_total - line
-        if diff > 0.5:
-            lean = "OVER"
-            conf = "STRONG" if diff > 1.2 else "LEAN"
-        elif diff > 0.15:
-            lean = "OVER"
-            conf = "SLIGHT"
-        elif diff < -0.5:
-            lean = "UNDER"
-            conf = "STRONG" if diff < -1.2 else "LEAN"
-        elif diff < -0.15:
-            lean = "UNDER"
+        if abs(diff) >= 1.6:
+            lean = "OVER" if diff > 0 else "UNDER"
+            conf = "STRONG"
+        elif abs(diff) >= 0.15:
+            lean = "OVER" if diff > 0 else "UNDER"
             conf = "SLIGHT"
         else:
             lean = "PUSH"
@@ -442,8 +420,8 @@ def compute_f5_total(game: dict) -> dict:
 
         # Cap total confidence for bullpen games — the projection bump is
         # directionally correct but imprecise.
-        if has_bullpen_game and conf in ("STRONG",):
-            conf = "LEAN"
+        if has_bullpen_game and conf == "STRONG":
+            conf = "SLIGHT"
 
         line_calls[str(line)] = {"lean": lean, "confidence": conf, "diff": round(diff, 1)}
 

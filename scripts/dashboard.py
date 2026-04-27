@@ -17,12 +17,12 @@ from datetime import datetime, timezone, timedelta
 # Mirror of analyzer constant — used for tendency display only.
 LEAGUE_FI_SCORE_RATE = 0.27
 
-# YRFI thresholds — calibrated against logged outcomes (Apr 2026):
-#   score <25  → 78% YRFI hit rate (n=27) — STRONG
-#   score 25-29 → 100% YRFI hit rate (n=5, small) — LEAN
-#   score 30+  → ~33-54% (no edge over league baseline) — no flag
-# League YRFI baseline ≈ 46%. Re-calibrate as the log grows.
-YRFI_STRONG_MAX = 25   # score < 25 → high-confidence YRFI
+# YRFI thresholds — calibrated against logged outcomes (n=174, Apr 10–23 2026):
+#   score <20    → 75.0% YRFI (n=40) — STRONG
+#   score 20-29  → 63.9% YRFI (n=36) — LEAN
+#   score 30-44  → 50.7% YRFI (n=67) — true toss-up, no flag
+# League YRFI base rate in this sample = 56.3%. Re-calibrate as the log grows.
+YRFI_STRONG_MAX = 20   # score < 20 → high-confidence YRFI
 YRFI_LEAN_MAX = 30     # score < 30 → lean YRFI
 
 
@@ -444,10 +444,8 @@ def generate_dashboard(data: dict, output_path: str):
         if away_rating is not None and home_rating is not None:
             rating_sub = f"<div class=\"f5-cell-extra\">Rating: A {away_rating:.1f} vs H {home_rating:.1f}</div>"
 
-        # Spread
-        sp_label = spread.get("recommended_label", "—")
-        sp_conf = spread.get("confidence", "TOSS-UP")
-        sp_color = conf_color(sp_conf)
+        # F5 Spread is disabled — see compute_f5_spread() in f5_analyzer.py.
+        # Cell is omitted from the grid below; the grid layout drops to 2 columns.
 
         # Total
         t_proj = total.get("projected_total", "—")
@@ -484,11 +482,6 @@ def generate_dashboard(data: dict, output_path: str):
               <div class="f5-cell-sub">Edge {ml_edge_str} · <strong>{ml_conf}</strong> {ml_units_badge}</div>
               {rating_sub}
               {eff_sub}
-            </div>
-            <div class="f5-cell f5-cell-spread">
-              <div class="f5-cell-label">F5 SPREAD</div>
-              <div class="f5-cell-val" style="color:{sp_color}">{sp_label}</div>
-              <div class="f5-cell-sub"><strong>{sp_conf}</strong></div>
             </div>
             <div class="f5-cell f5-cell-total">
               <div class="f5-cell-label">F5 TOTAL · proj {t_proj}</div>
@@ -1311,7 +1304,7 @@ def generate_dashboard(data: dict, output_path: str):
   }}
   .f5-headline-grid {{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;  /* F5 Spread cell removed 2026-04-24 */
     gap: 10px;
   }}
   .f5-cell {{
@@ -1684,13 +1677,13 @@ def generate_dashboard(data: dict, output_path: str):
   <p style="margin-top:4px"><strong>F5 Total:</strong> Per-side run projection × pitcher quality vs lineup, summed with park/weather adjustments. Compared to lines 4.0 / 4.5 / 5.0 / 5.5. ★ = STRONG, • = LEAN.</p>
 
   <h3 style="margin-top:18px">⚡ YRFI Watch</h3>
-  <p>Calibrated against logged outcomes: when the NRFI score is below {YRFI_STRONG_MAX} the historical YRFI hit rate is ~78% (n=27); scores from {YRFI_STRONG_MAX} to {YRFI_LEAN_MAX-1} hit ~100% in a small sample (n=5). Above {YRFI_LEAN_MAX}, the edge over the ~46% league YRFI baseline disappears, so no flag is shown. STRONG = play with confidence; LEAN = treat as a soft tip and re-check after lineups post. These map naturally to 1st-inning over 0.5 / YRFI prop bets. Re-calibrate thresholds as the log grows.</p>
+  <p>Calibrated against logged outcomes (n=174, Apr 2026): scores below {YRFI_STRONG_MAX} hit YRFI 75% (n=40); scores from {YRFI_STRONG_MAX} to {YRFI_LEAN_MAX-1} hit YRFI 64% (n=36); scores 30–44 are true coin-flips (~51% YRFI) so no flag is shown. League YRFI base rate in the sample was 56%. STRONG = play with confidence; LEAN = treat as a soft tip and re-check after lineups post. These map naturally to 1st-inning over 0.5 / YRFI prop bets. Re-calibrate thresholds as the log grows.</p>
 
   <h3 style="margin-top:18px">⚠ Bullpen Games</h3>
   <p>When a listed "starter" is actually a reliever (0-2 GS with 5+ relief appearances this season), the game is flagged as a bullpen game. NRFI scores receive a -6 penalty per bullpen side. F5 predictions are penalized harder: the bullpen side's power rating drops by 10 points, run projections bump +0.5 per bullpen side, and all F5 confidence tiers are capped (never STRONG/MODERATE). These games have elevated variance — treat with extra caution.</p>
 
   <h3 style="margin-top:18px">NRFI (Secondary) — Scoring Inputs</h3>
-  <p>NRFI score (0-100) = composite of pitching (45%, weakest-link weighted), lineup threat (25%, most-dangerous weighted), and adjustments. Higher = more likely no run scores in the 1st. Tiers: STRONG ≥72, LEAN 62-71.9, TOSS-UP 50-61.9, FADE &lt;50.</p>
+  <p>NRFI score (0-100) = composite of pitching (45%, weakest-link weighted), lineup threat (25%, most-dangerous weighted), and adjustments. Higher = more likely no run scores in the 1st. Tiers (re-calibrated from n=174 logged outcomes): STRONG ≥50 (NRFI hits 69%), LEAN 45-49.9 (60%), TOSS-UP 30-44.9 (49% — true toss-up), FADE &lt;30 (YRFI hits 70%, see YRFI Watch above).</p>
   <p style="margin-top:4px"><strong>Adjustments:</strong> First-inning ERA & clean%, batter vs pitcher, L/R platoon, recent form, park factor, weather, team 1st-inning tendency, pitcher rest.</p>
 
   <p style="margin-top:14px;color:#ef4444"><strong>Disclaimer:</strong> This is an analytical tool, not financial advice. All sports betting carries risk. Sample sizes are still modest — use as one input, not as the whole story.</p>

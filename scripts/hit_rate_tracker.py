@@ -498,15 +498,20 @@ MARKET_CONFIG = [
     },
     {
         "key": "f5_spread",
-        "title": "F5 Spread Hit Rate",
-        "subtitle": "First 5 innings spread — by confidence (pushes = loss)",
+        "title": "F5 Spread Hit Rate (DISABLED 2026-04-24)",
+        "subtitle": "Module disabled: STRONG tier hit only 54.2% on n=48. Historical data shown for reference.",
         "tier_order": ["STRONG", "LEAN", "SLIGHT"],
     },
     {
         "key": "f5_total",
         "title": "F5 Total Hit Rate",
         "subtitle": "First 5 innings total — by lean & confidence (pushes = loss)",
-        "tier_order": ["STRONG OVER", "LEAN OVER", "STRONG UNDER", "LEAN UNDER"],
+        # As of 2026-04-24 the action tiers are STRONG OVER / STRONG UNDER only
+        # (calibrated against n=154 directional picks). LEAN OVER/UNDER is
+        # historical — current model emits SLIGHT for moderate-diff calls,
+        # which are tracked but not action-grade. Keep all tiers in the order
+        # so the tracker shows continuity across the boundary change.
+        "tier_order": ["STRONG OVER", "STRONG UNDER", "SLIGHT OVER", "SLIGHT UNDER", "LEAN OVER", "LEAN UNDER"],
     },
 ]
 

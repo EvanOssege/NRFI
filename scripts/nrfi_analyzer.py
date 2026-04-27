@@ -2215,12 +2215,18 @@ def compute_nrfi_score(
     # Clamp
     final = max(0, min(100, raw))
 
-    # Confidence tier
-    if final >= 72:
+    # Confidence tier — calibrated against logged outcomes (n=174, Apr 10–23 2026).
+    # League NRFI base rate in the sample was 43.7%, so a score of ~44 is neutral, not 50.
+    # Empirical hit rates per bucket:
+    #   ≥50      → NRFI 68.8% (n=16)   — STRONG
+    #   45-49.9  → NRFI 60.0% (n=15)   — LEAN
+    #   30-44.9  → NRFI 49.3% (n=67)   — TOSS-UP (true coin flip)
+    #   <30      → YRFI 69.7% (n=76)   — FADE (genuine YRFI signal)
+    if final >= 50:
         tier = "STRONG"
-    elif final >= 62:
+    elif final >= 45:
         tier = "LEAN"
-    elif final >= 50:
+    elif final >= 30:
         tier = "TOSS-UP"
     else:
         tier = "FADE"
@@ -2520,15 +2526,12 @@ def analyze_date(game_date: str) -> list[dict]:
         tier_emoji = {"STRONG": "🟢", "LEAN": "🟡", "TOSS-UP": "🟠", "FADE": "🔴"}.get(nrfi["tier"], "⚪")
         print(f"  → NRFI: {nrfi['score']} ({nrfi['tier']}) {tier_emoji}")
 
-        # Print F5 summary
+        # Print F5 summary (Spread disabled 2026-04-24 — see compute_f5_spread)
         f5_ml = f5["ml"]
         f5_total = f5["total"]
-        f5_spread = f5["spread"]
         ml_arrow = "→" if f5_ml["confidence"] in ("TOSS-UP",) else "►"
         print(f"  → F5 ML: {f5_ml['pick']} ({f5_ml['confidence']}, edge {f5_ml['edge']:+.1f})")
         print(f"  → F5 Total: {f5_total['projected_total']} proj ({f5_total['lean']} {f5_total['primary_line']}, {f5_total['confidence']})")
-        if f5_spread["recommended_line"] != 0:
-            print(f"  → F5 Spread: {f5_spread['recommended_label']} ({f5_spread['confidence']})")
         print()
 
     # Sort by NRFI score descending

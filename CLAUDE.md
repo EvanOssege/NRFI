@@ -105,13 +105,13 @@ Per-side power rating: `0.70 * pitcher_score + 0.30 * (100 - lineup_threat) + ad
 
 Key difference from NRFI: pitcher quality is weighted at 70% (vs 45% in NRFI) because over 5 innings the starting pitcher's dominance is the single strongest predictor.
 
-### F5 Spread
+### F5 Spread — DISABLED (2026-04-24)
 
-Derived from the ML edge. Edge ≥1 supports -0.5 (essentially ML). Edge ≥5 supports -1.5 coverage (multi-run lead). Confidence: STRONG / LEAN / SLIGHT / TOSS-UP.
+Disabled after backtest against n=48 STRONG-tier picks showed only 54.2% hit rate (no edge over -110 break-even) and a non-monotonic confidence ordering. Root cause: the module derived spread coverage from F5 ML edge, but ML edge is a directional signal that doesn't translate to margin of victory over 5 innings. To revive, rebuild from `_estimate_f5_runs()` directly to project actual run-margin distribution. The function `compute_f5_spread()` is now a stub returning `confidence: "DISABLED"` so downstream consumers don't crash; UI hides the cell.
 
 ### F5 Total
 
-Projects runs per side via `_estimate_f5_runs()` using pitcher quality vs opposing lineup, then sums with park/weather/tendency adjustments. Baseline: 2.25 runs per side (4.5 total). Compared against common lines (4.0, 4.5, 5.0, 5.5). Each line gets an OVER/UNDER/PUSH call with confidence.
+Projects runs per side via `_estimate_f5_runs()` using pitcher quality vs opposing lineup, then sums with park/weather/tendency adjustments. Baseline: 2.25 runs per side (4.5 total). Compared against common lines (4.0, 4.5, 5.0, 5.5). Each line gets an OVER/UNDER/PUSH call with confidence. Tier boundaries calibrated 2026-04-24 against n=154 logged outcomes: STRONG requires `|diff| ≥ 1.6` (was 1.2), SLIGHT covers 0.15–1.6 (tracked but not action-tier). The previous LEAN tier was retired because moderate-diff OVER picks hit only 49% — model under-projects by ~0.35 runs and the market line is sharper than the model in the moderate-diff range.
 
 ### Key Functions (f5_analyzer.py)
 

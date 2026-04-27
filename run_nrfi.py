@@ -194,18 +194,7 @@ def main():
     else:
         print("  No strong F5 total picks today.")
 
-    # --- F5 Spread Picks ---
-    f5_spread_picks = [g for g in results
-                       if g.get("f5", {}).get("spread", {}).get("confidence") in ("STRONG", "LEAN")]
-    print(f"\n  F5 SPREAD")
-    print(f"  {'─'*40}")
-    if f5_spread_picks:
-        for g in f5_spread_picks:
-            s = g["f5"]["spread"]
-            print(f"  ► {g['matchup']:12s}  {s['recommended_label']} ({s['confidence']})")
-            print(f"     {g['away_pitcher']} vs {g['home_pitcher']}")
-    else:
-        print("  No strong F5 spread picks today.")
+    # F5 Spread: disabled 2026-04-24 (see compute_f5_spread() in f5_analyzer.py).
 
     hub_path = os.path.join(output_dir, "index.html")
     print(f"\n{'─'*60}")
