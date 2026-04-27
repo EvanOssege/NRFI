@@ -41,7 +41,7 @@ def f5_conviction(g):
     Score how confident the F5 model is on this game (0-6).
     Each of ML, Spread, Total contributes: STRONG=2, LEAN/MODERATE=1, else 0.
     Total OVER/UNDER calls only count if not PUSH.
-    Used for sorting and top-line headline.
+    Used for the top-line headline/filter tiers.
     """
     f5 = g.get("f5") or {}
     score = 0
@@ -92,6 +92,127 @@ def yrfi_status(nrfi_score):
     return None
 
 
+CONFIDENCE_SORT_RANK = {
+    "STRONG": 5,
+    "MODERATE": 4,
+    "LEAN": 3,
+    "SLIGHT": 2,
+    "TOSS-UP": 1,
+    "PASS": 0,
+    "FADE": 0,
+    "DISABLED": 0,
+}
+
+MARKET_SORT_PRIORITY = {
+    "F5_ML": 0,
+    "F5_TOTAL": 1,
+    "NRFI": 2,
+    "YRFI": 3,
+}
+
+
+def _num(v, default=0.0):
+    """Best-effort float conversion used for sorting math."""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return default
+
+
+def _best_bet_candidate(g):
+    """
+    Return the strongest actionable candidate bet in a game.
+
+    Ranking: confidence tier first, then units, then signal magnitude.
+    """
+    candidates = []
+    f5 = g.get("f5") or {}
+
+    ml = f5.get("ml", {})
+    ml_pick = ml.get("pick")
+    ml_conf = str(ml.get("confidence", "")).upper()
+    if ml_pick and ml_pick not in ("—", "", "PICK") and ml_conf:
+        candidates.append({
+            "market": "F5_ML",
+            "confidence": ml_conf,
+            "units": _num(ml.get("units"), 0.0),
+            "magnitude": abs(_num(ml.get("edge"), 0.0)),
+        })
+
+    total = f5.get("total", {})
+    t_lean = total.get("lean")
+    t_conf = str(total.get("confidence", "")).upper()
+    if t_lean in ("OVER", "UNDER") and t_conf:
+        projected = _num(total.get("projected_total"), 0.0)
+        primary_line = _num(total.get("primary_line"), 4.5)
+        candidates.append({
+            "market": "F5_TOTAL",
+            "confidence": t_conf,
+            "units": _num(total.get("units"), 0.0),
+            "magnitude": abs(projected - primary_line),
+        })
+
+    nrfi = g.get("nrfi") or {}
+    nrfi_score_raw = nrfi.get("score")
+    nrfi_score = _num(nrfi_score_raw, 0.0)
+    nrfi_tier = str(nrfi.get("tier", "")).upper()
+    if nrfi_tier in ("STRONG", "LEAN"):
+        candidates.append({
+            "market": "NRFI",
+            "confidence": nrfi_tier,
+            "units": 2.0 if nrfi_tier == "STRONG" else 1.0,
+            "magnitude": nrfi_score,
+        })
+
+    if nrfi_score_raw is not None:
+        yrfi = yrfi_status(nrfi_score)
+        if yrfi:
+            _, _, yrfi_tier = yrfi
+            candidates.append({
+                "market": "YRFI",
+                "confidence": yrfi_tier,
+                "units": 2.0 if yrfi_tier == "STRONG" else 1.0,
+                "magnitude": max(0.0, 100.0 - nrfi_score),
+            })
+
+    if not candidates:
+        return None
+
+    def cand_key(c):
+        return (
+            CONFIDENCE_SORT_RANK.get(c["confidence"], 0),
+            c["units"],
+            c["magnitude"],
+            -MARKET_SORT_PRIORITY.get(c["market"], 99),
+        )
+
+    return max(candidates, key=cand_key)
+
+
+def strongest_bet_sort_key(g):
+    """Sort key for dashboard cards: strongest single bet first."""
+    best = _best_bet_candidate(g)
+    if best:
+        conf_rank = CONFIDENCE_SORT_RANK.get(best["confidence"], 0)
+        units = best["units"]
+        magnitude = best["magnitude"]
+        market_priority = MARKET_SORT_PRIORITY.get(best["market"], 99)
+    else:
+        conf_rank = -1
+        units = 0.0
+        magnitude = 0.0
+        market_priority = 99
+
+    return (
+        -conf_rank,
+        -units,
+        -magnitude,
+        market_priority,
+        g.get("game_time", ""),
+        g.get("matchup", ""),
+    )
+
+
 def generate_dashboard(data: dict, output_path: str):
     games = list(data.get("games", []))
     analysis_date = data.get("date", "Unknown")
@@ -103,15 +224,8 @@ def generate_dashboard(data: dict, output_path: str):
         except Exception:
             stats_through = "Unknown"
 
-    # --- Sort: F5 conviction first, NRFI strength second, game time third ---
-    nrfi_tier_rank = {"STRONG": 0, "LEAN": 1, "TOSS-UP": 2, "FADE": 3}
-    def sort_key(g):
-        return (
-            -f5_conviction(g),
-            nrfi_tier_rank.get(g["nrfi"]["tier"], 4),
-            g.get("game_time", "")
-        )
-    games.sort(key=sort_key)
+    # --- Sort: strongest single actionable bet, then deterministic fallbacks ---
+    games.sort(key=strongest_bet_sort_key)
 
     # --- Counts for summary bar ---
     f5_lock_count = sum(1 for g in games if f5_conviction(g) >= 5)
