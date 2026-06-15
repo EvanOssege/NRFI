@@ -1,0 +1,6869 @@
+{
+  "date": "2026-06-15",
+  "stats_through": "2026-06-14",
+  "generated": "2026-06-15T19:51:16.778143",
+  "games": [
+    {
+      "game_pk": 824505,
+      "matchup": "NYM @ CIN",
+      "game_time": "2026-06-15T23:10:00Z",
+      "venue": "Great American Ball Park",
+      "is_indoor": false,
+      "away_team": "New York Mets",
+      "home_team": "Cincinnati Reds",
+      "away_abbr": "NYM",
+      "home_abbr": "CIN",
+      "away_pitcher": "Tobias Myers",
+      "home_pitcher": "Chase Burns",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 4.05,
+        "whip": 1.08,
+        "k9": 7.02,
+        "bb9": 1.89,
+        "hr9": 1.62,
+        "ip": 33.1,
+        "hits": 29.0,
+        "walks": 7.0,
+        "strikeouts": 26.0,
+        "games_started": 2.0,
+        "games_played": 20.0,
+        "runs": 17.0,
+        "earned_runs": 15.0
+      },
+      "home_pitcher_stats": {
+        "era": 2.14,
+        "whip": 0.99,
+        "k9": 10.47,
+        "bb9": 2.74,
+        "hr9": 1.07,
+        "ip": 75.2,
+        "hits": 52.0,
+        "walks": 23.0,
+        "strikeouts": 88.0,
+        "games_started": 13.0,
+        "games_played": 13.0,
+        "runs": 18.0,
+        "earned_runs": 18.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 1.8,
+        "fi_runs": 2,
+        "fi_hits": 5,
+        "fi_hits_per_fi": 0.5,
+        "fi_starts": 8,
+        "fi_clean": 6,
+        "fi_clean_pct": 0.8
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 1.38,
+        "fi_runs": 2,
+        "fi_hits": 5,
+        "fi_hits_per_fi": 0.385,
+        "fi_starts": 13,
+        "fi_clean": 12,
+        "fi_clean_pct": 0.923
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 29,
+        "home_games": 14,
+        "away_games": 15,
+        "home_scored": 4,
+        "away_scored": 2,
+        "home_score_rate": 0.286,
+        "away_score_rate": 0.133,
+        "overall_score_rate": 0.207
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 17,
+        "away_games": 13,
+        "home_scored": 6,
+        "away_scored": 4,
+        "home_score_rate": 0.353,
+        "away_score_rate": 0.308,
+        "overall_score_rate": 0.333
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.256,
+        "away_team_away_rate_shrunk": 0.31,
+        "blended_rate": 0.283,
+        "adj": -0.4
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 24,
+        "last_pitches": 20,
+        "last_start_date": "2026-05-22"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 105,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 2,
+        "starts_lookback": 2,
+        "avg_pitches_per_inning": 14.5,
+        "median_pitches_per_inning": 14.5,
+        "high_inefficiency_starts": 0,
+        "high_inefficiency_rate": 0.0
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 15.89,
+        "median_pitches_per_inning": 16.0,
+        "high_inefficiency_starts": 1,
+        "high_inefficiency_rate": 0.125
+      },
+      "home_top_order": {
+        "avg_obp": 0.33925,
+        "avg_slg": 0.45625,
+        "avg_ops": 0.7955,
+        "batters": [
+          {
+            "id": 694362,
+            "name": "Blake Dunn",
+            "position": "CF",
+            "pa": 116,
+            "avg": ".269",
+            "obp": ".319",
+            "slg": ".380",
+            "ops": ".699",
+            "hr": 2,
+            "so": 26,
+            "bb": 7,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 78,
+              "avg": ".269",
+              "obp": ".313",
+              "ops": ".710",
+              "hr": 2,
+              "so": 17,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 32,
+              "hits": 8,
+              "hr": 0,
+              "so": 7,
+              "bb": 2,
+              "avg": ".250",
+              "obp": ".294",
+              "ops": ".575",
+              "streak_status": "cool",
+              "ops_delta": -0.124
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".500",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 668709,
+            "name": "JJ Bleday",
+            "position": "LF",
+            "pa": 183,
+            "avg": ".266",
+            "obp": ".361",
+            "slg": ".570",
+            "ops": ".931",
+            "hr": 12,
+            "so": 33,
+            "bb": 23,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 115,
+              "avg": ".278",
+              "obp": ".381",
+              "ops": "1.016",
+              "hr": 10,
+              "so": 24,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 5,
+              "hr": 2,
+              "so": 3,
+              "bb": 4,
+              "avg": ".185",
+              "obp": ".312",
+              "ops": ".794",
+              "streak_status": "cool",
+              "ops_delta": -0.137
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 701398,
+            "name": "Sal Stewart",
+            "position": "DH",
+            "pa": 305,
+            "avg": ".247",
+            "obp": ".344",
+            "slg": ".445",
+            "ops": ".789",
+            "hr": 13,
+            "so": 63,
+            "bb": 39,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 205,
+              "avg": ".249",
+              "obp": ".330",
+              "ops": ".750",
+              "hr": 8,
+              "so": 47,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 4,
+              "hr": 1,
+              "so": 6,
+              "bb": 5,
+              "avg": ".154",
+              "obp": ".290",
+              "ops": ".560",
+              "streak_status": "cold",
+              "ops_delta": -0.229
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 668715,
+            "name": "Spencer Steer",
+            "position": "1B",
+            "pa": 267,
+            "avg": ".251",
+            "obp": ".333",
+            "slg": ".430",
+            "ops": ".763",
+            "hr": 10,
+            "so": 56,
+            "bb": 27,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 178,
+              "avg": ".230",
+              "obp": ".307",
+              "ops": ".661",
+              "hr": 5,
+              "so": 47,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 21,
+              "hits": 1,
+              "hr": 1,
+              "so": 8,
+              "bb": 2,
+              "avg": ".048",
+              "obp": ".130",
+              "ops": ".321",
+              "streak_status": "cold",
+              "ops_delta": -0.442
+            },
+            "bvp": {
+              "ab": 6,
+              "hits": 1,
+              "hr": 0,
+              "so": 3,
+              "bb": 0,
+              "avg": ".167",
+              "ops": ".334",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.3305,
+        "avg_slg": 0.446,
+        "avg_ops": 0.7765,
+        "batters": [
+          {
+            "id": 701807,
+            "name": "Carson Benge",
+            "position": "RF",
+            "pa": 268,
+            "avg": ".257",
+            "obp": ".321",
+            "slg": ".388",
+            "ops": ".709",
+            "hr": 7,
+            "so": 59,
+            "bb": 19,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 202,
+              "avg": ".243",
+              "obp": ".298",
+              "ops": ".664",
+              "hr": 5,
+              "so": 47,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 9,
+              "hr": 1,
+              "so": 7,
+              "bb": 2,
+              "avg": ".333",
+              "obp": ".400",
+              "ops": ".919",
+              "streak_status": "hot",
+              "ops_delta": 0.21
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 666182,
+            "name": "Bo Bichette",
+            "position": "SS",
+            "pa": 309,
+            "avg": ".239",
+            "obp": ".285",
+            "slg": ".361",
+            "ops": ".646",
+            "hr": 8,
+            "so": 54,
+            "bb": 19,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 214,
+              "avg": ".234",
+              "obp": ".273",
+              "ops": ".595",
+              "hr": 4,
+              "so": 44,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 9,
+              "hr": 3,
+              "so": 7,
+              "bb": 0,
+              "avg": ".310",
+              "obp": ".300",
+              "ops": ".990",
+              "streak_status": "hot",
+              "ops_delta": 0.344
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".333",
+              "ops": ".666",
+              "has_data": true
+            }
+          },
+          {
+            "id": 665742,
+            "name": "Juan Soto",
+            "position": "DH",
+            "pa": 231,
+            "avg": ".293",
+            "obp": ".387",
+            "slg": ".561",
+            "ops": ".948",
+            "hr": 15,
+            "so": 30,
+            "bb": 31,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 127,
+              "avg": ".307",
+              "obp": ".418",
+              "ops": "1.016",
+              "hr": 11,
+              "so": 18,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 23,
+              "hits": 9,
+              "hr": 2,
+              "so": 0,
+              "bb": 7,
+              "avg": ".391",
+              "obp": ".533",
+              "ops": "1.272",
+              "streak_status": "hot",
+              "ops_delta": 0.324
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 1,
+              "so": 1,
+              "bb": 0,
+              "avg": ".333",
+              "ops": "1.666",
+              "has_data": true
+            }
+          },
+          {
+            "id": 676724,
+            "name": "Jared Young",
+            "position": "1B",
+            "pa": 85,
+            "avg": ".263",
+            "obp": ".329",
+            "slg": ".474",
+            "ops": ".803",
+            "hr": 4,
+            "so": 18,
+            "bb": 7,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 68,
+              "avg": ".279",
+              "obp": ".342",
+              "ops": ".857",
+              "hr": 4,
+              "so": 15,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 24,
+              "hits": 5,
+              "hr": 1,
+              "so": 3,
+              "bb": 1,
+              "avg": ".208",
+              "obp": ".269",
+              "ops": ".644",
+              "streak_status": "cold",
+              "ops_delta": -0.159
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".500",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": true,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 9,
+        "total_hits": 2,
+        "total_hr": 0,
+        "total_so": 4,
+        "weighted_avg": 0.222,
+        "weighted_ops": 0.445,
+        "batters_with_history": 3,
+        "has_meaningful_data": true
+      },
+      "away_bvp": {
+        "total_ab": 10,
+        "total_hits": 2,
+        "total_hr": 1,
+        "total_so": 4,
+        "weighted_avg": 0.2,
+        "weighted_ops": 0.75,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 576,
+        "weighted_ops": 0.77,
+        "advantage_count": 1,
+        "disadvantage_count": 3,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 611,
+        "weighted_ops": 0.734,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.562,
+        "avg_ops_delta": -0.233,
+        "hot_count": 0,
+        "cold_count": 4,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.956,
+        "avg_ops_delta": 0.18,
+        "hot_count": 3,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 107,
+        "label": "Hitter-friendly",
+        "tier": "hitter"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 64.2,
+        "wind_mph": 3.4,
+        "precip_chance": 0,
+        "wind_dir": 94,
+        "wind_effect": {
+          "component_out": 1.2,
+          "component_in": 0,
+          "label": "blowing out"
+        }
+      },
+      "away_pitcher_score": 51.4,
+      "home_pitcher_score": 86.0,
+      "home_lineup_threat": 64.0,
+      "away_lineup_threat": 56.0,
+      "nrfi": {
+        "score": 47.1,
+        "tier": "LEAN",
+        "pitcher_component": 58.3,
+        "lineup_component": 37.6,
+        "fi_adj": 15.6,
+        "bvp_adj": 4.0,
+        "platoon_adj": -2.0,
+        "streak_adj": 2.0,
+        "park_adj": -4.2,
+        "weather_adj": 2.0,
+        "team_tendency_adj": -0.4,
+        "rest_adj": 0.5,
+        "bullpen_adj": -6.0
+      },
+      "away_fi_adj": 4.3,
+      "home_fi_adj": 11.3,
+      "home_bvp_adj": 3.3,
+      "away_bvp_adj": 0.7,
+      "home_platoon_adj": 0.0,
+      "away_platoon_adj": -2.0,
+      "home_streak_adj": 6,
+      "away_streak_adj": -4.0,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": true,
+        "reason": "primary reliever (2 GS, 18 relief apps)",
+        "games_started": 2,
+        "games_played": 20,
+        "relief_appearances": 18
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 13,
+        "games_played": 13,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": true,
+      "f5": {
+        "ml": {
+          "away_rating": 44.910000000000004,
+          "home_rating": 71.63,
+          "edge": -26.7,
+          "pick": "CIN",
+          "pick_full": "Cincinnati Reds",
+          "confidence": "LEAN",
+          "has_bullpen_game": true,
+          "away_pitch_eff_adj": 0.0,
+          "home_pitch_eff_adj": 0.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": -26.7,
+          "abs_edge": 26.7,
+          "pick": "CIN",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 4.0,
+          "home_runs_proj": 2.0,
+          "away_runs_proj": 1.2,
+          "env_adj": 0.18,
+          "primary_line": 4.5,
+          "lean": "UNDER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": 0.0
+            },
+            "4.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.5
+            },
+            "5.0": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -1.0
+            },
+            "5.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -1.5
+            }
+          },
+          "units": 1.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 825071,
+      "matchup": "LAA @ AZ",
+      "game_time": "2026-06-16T01:40:00Z",
+      "venue": "Chase Field",
+      "is_indoor": true,
+      "away_team": "Los Angeles Angels",
+      "home_team": "Arizona Diamondbacks",
+      "away_abbr": "LAA",
+      "home_abbr": "AZ",
+      "away_pitcher": "Walbert Ure\u00f1a",
+      "home_pitcher": "Ryne Nelson",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 2.44,
+        "whip": 1.36,
+        "k9": 8.95,
+        "bb9": 5.37,
+        "hr9": 0.65,
+        "ip": 55.1,
+        "hits": 42.0,
+        "walks": 33.0,
+        "strikeouts": 55.0,
+        "games_started": 10.0,
+        "games_played": 12.0,
+        "runs": 21.0,
+        "earned_runs": 15.0
+      },
+      "home_pitcher_stats": {
+        "era": 5.19,
+        "whip": 1.23,
+        "k9": 6.72,
+        "bb9": 2.59,
+        "hr9": 2.0,
+        "ip": 76.1,
+        "hits": 72.0,
+        "walks": 22.0,
+        "strikeouts": 57.0,
+        "games_started": 14.0,
+        "games_played": 14.0,
+        "runs": 51.0,
+        "earned_runs": 44.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 0.9,
+        "fi_runs": 1,
+        "fi_hits": 3,
+        "fi_hits_per_fi": 0.3,
+        "fi_starts": 10,
+        "fi_clean": 9,
+        "fi_clean_pct": 0.9
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 5.79,
+        "fi_runs": 9,
+        "fi_hits": 12,
+        "fi_hits_per_fi": 0.857,
+        "fi_starts": 14,
+        "fi_clean": 12,
+        "fi_clean_pct": 0.857
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 14,
+        "away_games": 16,
+        "home_scored": 5,
+        "away_scored": 3,
+        "home_score_rate": 0.357,
+        "away_score_rate": 0.188,
+        "overall_score_rate": 0.267
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 19,
+        "away_games": 11,
+        "home_scored": 7,
+        "away_scored": 2,
+        "home_score_rate": 0.368,
+        "away_score_rate": 0.182,
+        "overall_score_rate": 0.3
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.311,
+        "away_team_away_rate_shrunk": 0.244,
+        "blended_rate": 0.278,
+        "adj": -0.2
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 107,
+        "last_start_date": "2026-06-09"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 82,
+        "last_start_date": "2026-06-10"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 16.75,
+        "median_pitches_per_inning": 15.92,
+        "high_inefficiency_starts": 3,
+        "high_inefficiency_rate": 0.375
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 14.95,
+        "median_pitches_per_inning": 13.84,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 0.25
+      },
+      "home_top_order": {
+        "avg_obp": 0.33725,
+        "avg_slg": 0.45975000000000005,
+        "avg_ops": 0.797,
+        "batters": [
+          {
+            "id": 606466,
+            "name": "Ketel Marte",
+            "position": "2B",
+            "pa": 296,
+            "avg": ".255",
+            "obp": ".307",
+            "slg": ".443",
+            "ops": ".750",
+            "hr": 11,
+            "so": 45,
+            "bb": 22,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 193,
+              "avg": ".244",
+              "obp": ".303",
+              "ops": ".712",
+              "hr": 7,
+              "so": 32,
+              "bat_side": "S"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 9,
+              "hr": 0,
+              "so": 4,
+              "bb": 2,
+              "avg": ".290",
+              "obp": ".333",
+              "ops": ".720",
+              "streak_status": "neutral",
+              "ops_delta": -0.03
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 682998,
+            "name": "Corbin Carroll",
+            "position": "RF",
+            "pa": 292,
+            "avg": ".278",
+            "obp": ".370",
+            "slg": ".544",
+            "ops": ".914",
+            "hr": 12,
+            "so": 63,
+            "bb": 34,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 167,
+              "avg": ".216",
+              "obp": ".327",
+              "ops": ".812",
+              "hr": 10,
+              "so": 47,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 6,
+              "hr": 3,
+              "so": 6,
+              "bb": 3,
+              "avg": ".222",
+              "obp": ".344",
+              "ops": ".899",
+              "streak_status": "neutral",
+              "ops_delta": -0.015
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 672515,
+            "name": "Gabriel Moreno",
+            "position": "DH",
+            "pa": 184,
+            "avg": ".264",
+            "obp": ".348",
+            "slg": ".447",
+            "ops": ".795",
+            "hr": 6,
+            "so": 34,
+            "bb": 19,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 118,
+              "avg": ".280",
+              "obp": ".381",
+              "ops": ".847",
+              "hr": 4,
+              "so": 25,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 9,
+              "hr": 3,
+              "so": 4,
+              "bb": 5,
+              "avg": ".346",
+              "obp": ".469",
+              "ops": "1.238",
+              "streak_status": "hot",
+              "ops_delta": 0.443
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 571448,
+            "name": "Nolan Arenado",
+            "position": "3B",
+            "pa": 253,
+            "avg": ".243",
+            "obp": ".324",
+            "slg": ".405",
+            "ops": ".729",
+            "hr": 8,
+            "so": 53,
+            "bb": 22,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 164,
+              "avg": ".250",
+              "obp": ".328",
+              "ops": ".743",
+              "hr": 6,
+              "so": 43,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 4,
+              "hr": 0,
+              "so": 9,
+              "bb": 3,
+              "avg": ".154",
+              "obp": ".258",
+              "ops": ".412",
+              "streak_status": "cold",
+              "ops_delta": -0.317
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.35475,
+        "avg_slg": 0.46324999999999994,
+        "avg_ops": 0.818,
+        "batters": [
+          {
+            "id": 687263,
+            "name": "Zach Neto",
+            "position": "SS",
+            "pa": 317,
+            "avg": ".223",
+            "obp": ".328",
+            "slg": ".425",
+            "ops": ".753",
+            "hr": 13,
+            "so": 100,
+            "bb": 36,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 206,
+              "avg": ".223",
+              "obp": ".318",
+              "ops": ".745",
+              "hr": 10,
+              "so": 76,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 32,
+              "hits": 5,
+              "hr": 2,
+              "so": 17,
+              "bb": 2,
+              "avg": ".156",
+              "obp": ".229",
+              "ops": ".572",
+              "streak_status": "cold",
+              "ops_delta": -0.181
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 2,
+              "hr": 1,
+              "so": 1,
+              "bb": 0,
+              "avg": ".667",
+              "ops": "2.334",
+              "has_data": true
+            }
+          },
+          {
+            "id": 545361,
+            "name": "Mike Trout",
+            "position": "CF",
+            "pa": 322,
+            "avg": ".224",
+            "obp": ".388",
+            "slg": ".445",
+            "ops": ".833",
+            "hr": 15,
+            "so": 80,
+            "bb": 65,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 192,
+              "avg": ".224",
+              "obp": ".387",
+              "ops": ".840",
+              "hr": 12,
+              "so": 59,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 30,
+              "hits": 5,
+              "hr": 1,
+              "so": 11,
+              "bb": 5,
+              "avg": ".167",
+              "obp": ".286",
+              "ops": ".586",
+              "streak_status": "cold",
+              "ops_delta": -0.247
+            },
+            "bvp": {
+              "ab": 4,
+              "hits": 1,
+              "hr": 0,
+              "so": 2,
+              "bb": 2,
+              "avg": ".250",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 642350,
+            "name": "Jose Siri",
+            "position": "LF",
+            "pa": 54,
+            "avg": ".326",
+            "obp": ".404",
+            "slg": ".587",
+            "ops": ".991",
+            "hr": 3,
+            "so": 14,
+            "bb": 5,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 29,
+              "avg": ".310",
+              "obp": ".375",
+              "ops": ".858",
+              "hr": 1,
+              "so": 8,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 18,
+              "hits": 7,
+              "hr": 1,
+              "so": 4,
+              "bb": 4,
+              "avg": ".389",
+              "obp": ".522",
+              "ops": "1.077",
+              "streak_status": "warm",
+              "ops_delta": 0.086
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 666176,
+            "name": "Jo Adell",
+            "position": "RF",
+            "pa": 301,
+            "avg": ".254",
+            "obp": ".299",
+            "slg": ".396",
+            "ops": ".695",
+            "hr": 10,
+            "so": 69,
+            "bb": 9,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 203,
+              "avg": ".227",
+              "obp": ".273",
+              "ops": ".598",
+              "hr": 4,
+              "so": 52,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 30,
+              "hits": 13,
+              "hr": 1,
+              "so": 6,
+              "bb": 2,
+              "avg": ".433",
+              "obp": ".500",
+              "ops": "1.100",
+              "streak_status": "hot",
+              "ops_delta": 0.405
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 9,
+        "total_hits": 3,
+        "total_hr": 1,
+        "total_so": 3,
+        "weighted_avg": 0.333,
+        "weighted_ops": 1.222,
+        "batters_with_history": 3,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 642,
+        "weighted_ops": 0.771,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 630,
+        "weighted_ops": 0.732,
+        "advantage_count": 0,
+        "disadvantage_count": 4,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.817,
+        "avg_ops_delta": 0.02,
+        "hot_count": 1,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.834,
+        "avg_ops_delta": 0.016,
+        "hot_count": 2,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 99,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": true,
+        "temp_f": 72,
+        "wind_mph": 0,
+        "precip_chance": 0,
+        "wind_dir": null,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 0,
+          "label": "indoor"
+        }
+      },
+      "away_pitcher_score": 62.0,
+      "home_pitcher_score": 22.0,
+      "home_lineup_threat": 64.0,
+      "away_lineup_threat": 69.0,
+      "nrfi": {
+        "score": 37.6,
+        "tier": "TOSS-UP",
+        "pitcher_component": 30.0,
+        "lineup_component": 32.0,
+        "fi_adj": 14.3,
+        "bvp_adj": -2.1,
+        "platoon_adj": 0.0,
+        "streak_adj": 0.0,
+        "park_adj": 0.6,
+        "weather_adj": 3,
+        "team_tendency_adj": -0.2,
+        "rest_adj": 0.5,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": 8.7,
+      "home_fi_adj": 5.6,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": -2.1,
+      "home_platoon_adj": -2.0,
+      "away_platoon_adj": 2.0,
+      "home_streak_adj": 0.0,
+      "away_streak_adj": 0.0,
+      "away_rest_adj": 0.5,
+      "home_rest_adj": 0.0,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 10,
+        "games_played": 12,
+        "relief_appearances": 2
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 14,
+        "games_played": 14,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 54.19,
+          "home_rating": 26.46,
+          "edge": 27.7,
+          "pick": "LAA",
+          "pick_full": "Los Angeles Angels",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": -1.0,
+          "home_pitch_eff_adj": 0.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": 27.7,
+          "abs_edge": 27.7,
+          "pick": "LAA",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 5.0,
+          "home_runs_proj": 2.0,
+          "away_runs_proj": 3.3,
+          "env_adj": -0.29,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.0
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.5
+            },
+            "5.0": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": 0.0
+            },
+            "5.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.5
+            }
+          },
+          "units": 1.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 823938,
+      "matchup": "TB @ LAD",
+      "game_time": "2026-06-16T02:10:00Z",
+      "venue": "UNIQLO Field at Dodger Stadium",
+      "is_indoor": false,
+      "away_team": "Tampa Bay Rays",
+      "home_team": "Los Angeles Dodgers",
+      "away_abbr": "TB",
+      "home_abbr": "LAD",
+      "away_pitcher": "Nick Martinez",
+      "home_pitcher": "Eric Lauer",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "L",
+      "away_pitcher_stats": {
+        "era": 2.43,
+        "whip": 1.16,
+        "k9": 5.1,
+        "bb9": 1.51,
+        "hr9": 0.7,
+        "ip": 77.2,
+        "hits": 77.0,
+        "walks": 13.0,
+        "strikeouts": 44.0,
+        "games_started": 13.0,
+        "games_played": 13.0,
+        "runs": 21.0,
+        "earned_runs": 21.0
+      },
+      "home_pitcher_stats": {
+        "era": 6.69,
+        "whip": 1.49,
+        "k9": 6.44,
+        "bb9": 3.96,
+        "hr9": 2.72,
+        "ip": 36.1,
+        "hits": 38.0,
+        "walks": 16.0,
+        "strikeouts": 26.0,
+        "games_started": 6.0,
+        "games_played": 8.0,
+        "runs": 27.0,
+        "earned_runs": 27.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 0.69,
+        "fi_runs": 1,
+        "fi_hits": 10,
+        "fi_hits_per_fi": 0.769,
+        "fi_starts": 13,
+        "fi_clean": 12,
+        "fi_clean_pct": 0.923
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 7.0,
+        "fi_runs": 7,
+        "fi_hits": 10,
+        "fi_hits_per_fi": 1.111,
+        "fi_starts": 9,
+        "fi_clean": 5,
+        "fi_clean_pct": 0.556
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 11,
+        "away_games": 19,
+        "home_scored": 5,
+        "away_scored": 6,
+        "home_score_rate": 0.455,
+        "away_score_rate": 0.316,
+        "overall_score_rate": 0.367
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 28,
+        "home_games": 15,
+        "away_games": 13,
+        "home_scored": 9,
+        "away_scored": 3,
+        "home_score_rate": 0.6,
+        "away_score_rate": 0.231,
+        "overall_score_rate": 0.429
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.386,
+        "away_team_away_rate_shrunk": 0.309,
+        "blended_rate": 0.347,
+        "adj": -2.3
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 73,
+        "last_start_date": "2026-06-09"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 89,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 13.18,
+        "median_pitches_per_inning": 13.48,
+        "high_inefficiency_starts": 0,
+        "high_inefficiency_rate": 0.0
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 16.82,
+        "median_pitches_per_inning": 15.75,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 0.25
+      },
+      "home_top_order": {
+        "avg_obp": 0.344,
+        "avg_slg": 0.47325000000000006,
+        "avg_ops": 0.8172499999999999,
+        "batters": [
+          {
+            "id": 660271,
+            "name": "Shohei Ohtani",
+            "position": "DH",
+            "pa": 309,
+            "avg": ".302",
+            "obp": ".427",
+            "slg": ".548",
+            "ops": ".975",
+            "hr": 14,
+            "so": 69,
+            "bb": 51,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 173,
+              "avg": ".301",
+              "obp": ".443",
+              "ops": ".986",
+              "hr": 9,
+              "so": 51,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 9,
+              "hr": 4,
+              "so": 7,
+              "bb": 9,
+              "avg": ".360",
+              "obp": ".529",
+              "ops": "1.409",
+              "streak_status": "hot",
+              "ops_delta": 0.434
+            },
+            "bvp": {
+              "ab": 9,
+              "hits": 0,
+              "hr": 0,
+              "so": 3,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".100",
+              "has_data": true
+            }
+          },
+          {
+            "id": 681624,
+            "name": "Andy Pages",
+            "position": "CF",
+            "pa": 301,
+            "avg": ".273",
+            "obp": ".319",
+            "slg": ".498",
+            "ops": ".817",
+            "hr": 15,
+            "so": 60,
+            "bb": 19,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 206,
+              "avg": ".282",
+              "obp": ".327",
+              "ops": ".832",
+              "hr": 12,
+              "so": 44,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 33,
+              "hits": 6,
+              "hr": 2,
+              "so": 10,
+              "bb": 2,
+              "avg": ".182",
+              "obp": ".222",
+              "ops": ".586",
+              "streak_status": "cold",
+              "ops_delta": -0.231
+            },
+            "bvp": {
+              "ab": 7,
+              "hits": 3,
+              "hr": 0,
+              "so": 2,
+              "bb": 0,
+              "avg": ".429",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 518692,
+            "name": "Freddie Freeman",
+            "position": "1B",
+            "pa": 303,
+            "avg": ".275",
+            "obp": ".363",
+            "slg": ".473",
+            "ops": ".836",
+            "hr": 11,
+            "so": 51,
+            "bb": 35,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 184,
+              "avg": ".299",
+              "obp": ".382",
+              "ops": ".898",
+              "hr": 8,
+              "so": 31,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 28,
+              "hits": 7,
+              "hr": 1,
+              "so": 6,
+              "bb": 4,
+              "avg": ".250",
+              "obp": ".382",
+              "ops": ".811",
+              "streak_status": "neutral",
+              "ops_delta": -0.025
+            },
+            "bvp": {
+              "ab": 14,
+              "hits": 3,
+              "hr": 1,
+              "so": 1,
+              "bb": 3,
+              "avg": ".214",
+              "ops": ".853",
+              "has_data": true
+            }
+          },
+          {
+            "id": 605141,
+            "name": "Mookie Betts",
+            "position": "SS",
+            "pa": 161,
+            "avg": ".204",
+            "obp": ".267",
+            "slg": ".374",
+            "ops": ".641",
+            "hr": 7,
+            "so": 20,
+            "bb": 12,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 106,
+              "avg": ".208",
+              "obp": ".270",
+              "ops": ".638",
+              "hr": 5,
+              "so": 14,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 30,
+              "hits": 9,
+              "hr": 1,
+              "so": 4,
+              "bb": 2,
+              "avg": ".300",
+              "obp": ".344",
+              "ops": ".777",
+              "streak_status": "warm",
+              "ops_delta": 0.136
+            },
+            "bvp": {
+              "ab": 29,
+              "hits": 6,
+              "hr": 1,
+              "so": 2,
+              "bb": 2,
+              "avg": ".207",
+              "ops": ".568",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.3385,
+        "avg_slg": 0.40149999999999997,
+        "avg_ops": 0.74,
+        "batters": [
+          {
+            "id": 683748,
+            "name": "Victor Mesa Jr.",
+            "position": "PR",
+            "pa": 48,
+            "avg": ".200",
+            "obp": ".319",
+            "slg": ".350",
+            "ops": ".669",
+            "hr": 2,
+            "so": 12,
+            "bb": 7,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 7,
+              "avg": ".143",
+              "obp": ".250",
+              "ops": ".393",
+              "hr": 0,
+              "so": 2,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 15,
+              "hits": 4,
+              "hr": 1,
+              "so": 4,
+              "bb": 4,
+              "avg": ".267",
+              "obp": ".421",
+              "ops": ".888",
+              "streak_status": "hot",
+              "ops_delta": 0.219
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 666018,
+            "name": "Jonathan Aranda",
+            "position": "1B",
+            "pa": 293,
+            "avg": ".272",
+            "obp": ".375",
+            "slg": ".449",
+            "ops": ".824",
+            "hr": 11,
+            "so": 70,
+            "bb": 41,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 73,
+              "avg": ".260",
+              "obp": ".371",
+              "ops": ".686",
+              "hr": 1,
+              "so": 24,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 7,
+              "hr": 0,
+              "so": 8,
+              "bb": 2,
+              "avg": ".241",
+              "obp": ".290",
+              "ops": ".566",
+              "streak_status": "cold",
+              "ops_delta": -0.258
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".333",
+              "ops": ".666",
+              "has_data": true
+            }
+          },
+          {
+            "id": 691406,
+            "name": "Junior Caminero",
+            "position": "3B",
+            "pa": 300,
+            "avg": ".271",
+            "obp": ".370",
+            "slg": ".488",
+            "ops": ".858",
+            "hr": 15,
+            "so": 51,
+            "bb": 41,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 70,
+              "avg": ".271",
+              "obp": ".414",
+              "ops": ".871",
+              "hr": 3,
+              "so": 11,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 5,
+              "hr": 1,
+              "so": 9,
+              "bb": 3,
+              "avg": ".185",
+              "obp": ".267",
+              "ops": ".600",
+              "streak_status": "cold",
+              "ops_delta": -0.258
+            },
+            "bvp": {
+              "ab": 4,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 2,
+              "avg": ".250",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 656775,
+            "name": "Cedric Mullins",
+            "position": "PH",
+            "pa": 237,
+            "avg": ".201",
+            "obp": ".290",
+            "slg": ".319",
+            "ops": ".609",
+            "hr": 6,
+            "so": 43,
+            "bb": 21,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 54,
+              "avg": ".259",
+              "obp": ".355",
+              "ops": ".633",
+              "hr": 0,
+              "so": 8,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 20,
+              "hits": 7,
+              "hr": 1,
+              "so": 7,
+              "bb": 4,
+              "avg": ".350",
+              "obp": ".480",
+              "ops": ".980",
+              "streak_status": "hot",
+              "ops_delta": 0.371
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 1,
+              "so": 0,
+              "bb": 0,
+              "avg": ".333",
+              "ops": "1.666",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 59,
+        "total_hits": 12,
+        "total_hr": 2,
+        "total_so": 8,
+        "weighted_avg": 0.203,
+        "weighted_ops": 0.615,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "away_bvp": {
+        "total_ab": 10,
+        "total_hits": 3,
+        "total_hr": 1,
+        "total_so": 1,
+        "weighted_avg": 0.3,
+        "weighted_ops": 1.1,
+        "batters_with_history": 3,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 669,
+        "weighted_ops": 0.859,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "L",
+        "total_ab": 204,
+        "weighted_ops": 0.725,
+        "advantage_count": 1,
+        "disadvantage_count": 3,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.896,
+        "avg_ops_delta": 0.079,
+        "hot_count": 2,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.758,
+        "avg_ops_delta": 0.018,
+        "hot_count": 2,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 99,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 61.3,
+        "wind_mph": 3.4,
+        "precip_chance": 0,
+        "wind_dir": 217,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 3.2,
+          "label": "blowing in"
+        }
+      },
+      "away_pitcher_score": 80.0,
+      "home_pitcher_score": 18.8,
+      "home_lineup_threat": 69.0,
+      "away_lineup_threat": 56.0,
+      "nrfi": {
+        "score": 28.0,
+        "tier": "FADE",
+        "pitcher_component": 31.0,
+        "lineup_component": 33.6,
+        "fi_adj": 8.0,
+        "bvp_adj": -0.7,
+        "platoon_adj": -2.0,
+        "streak_adj": -1.0,
+        "park_adj": 0.6,
+        "weather_adj": 2.0,
+        "team_tendency_adj": -2.3,
+        "rest_adj": 1.0,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": 10.4,
+      "home_fi_adj": -2.4,
+      "home_bvp_adj": 2.0,
+      "away_bvp_adj": -2.7,
+      "home_platoon_adj": -4.0,
+      "away_platoon_adj": 2.0,
+      "home_streak_adj": -1.0,
+      "away_streak_adj": 0.0,
+      "away_rest_adj": 0.5,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 13,
+        "games_played": 13,
+        "relief_appearances": 0
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 6,
+        "games_played": 8,
+        "relief_appearances": 2
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 67.52000000000001,
+          "home_rating": 24.32,
+          "edge": 43.2,
+          "pick": "TB",
+          "pick_full": "Tampa Bay Rays",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": 0.8,
+          "home_pitch_eff_adj": -1.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": 43.2,
+          "abs_edge": 43.2,
+          "pick": "TB",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 4.7,
+          "home_runs_proj": 1.5,
+          "away_runs_proj": 3.3,
+          "env_adj": -0.21,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.7
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.2
+            },
+            "5.0": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.3
+            },
+            "5.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.8
+            }
+          },
+          "units": 0.5
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 824993,
+      "matchup": "PIT @ ATH",
+      "game_time": "2026-06-16T01:40:00Z",
+      "venue": "Sutter Health Park",
+      "is_indoor": false,
+      "away_team": "Pittsburgh Pirates",
+      "home_team": "Athletics",
+      "away_abbr": "PIT",
+      "home_abbr": "ATH",
+      "away_pitcher": "Jared Jones",
+      "home_pitcher": "J.T. Ginn",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 4.73,
+        "whip": 1.43,
+        "k9": 9.45,
+        "bb9": 3.38,
+        "hr9": 1.35,
+        "ip": 13.1,
+        "hits": 14.0,
+        "walks": 5.0,
+        "strikeouts": 14.0,
+        "games_started": 3.0,
+        "games_played": 3.0,
+        "runs": 7.0,
+        "earned_runs": 7.0
+      },
+      "home_pitcher_stats": {
+        "era": 3.15,
+        "whip": 1.15,
+        "k9": 8.2,
+        "bb9": 3.79,
+        "hr9": 1.01,
+        "ip": 71.1,
+        "hits": 52.0,
+        "walks": 30.0,
+        "strikeouts": 65.0,
+        "games_started": 12.0,
+        "games_played": 15.0,
+        "runs": 27.0,
+        "earned_runs": 25.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 3.0,
+        "fi_runs": 1,
+        "fi_hits": 2,
+        "fi_hits_per_fi": 0.667,
+        "fi_starts": 3,
+        "fi_clean": 2,
+        "fi_clean_pct": 0.667
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 3.0,
+        "fi_runs": 4,
+        "fi_hits": 12,
+        "fi_hits_per_fi": 1.0,
+        "fi_starts": 12,
+        "fi_clean": 10,
+        "fi_clean_pct": 0.833
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 17,
+        "away_games": 13,
+        "home_scored": 8,
+        "away_scored": 4,
+        "home_score_rate": 0.471,
+        "away_score_rate": 0.308,
+        "overall_score_rate": 0.4
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 18,
+        "away_games": 12,
+        "home_scored": 6,
+        "away_scored": 5,
+        "home_score_rate": 0.333,
+        "away_score_rate": 0.417,
+        "overall_score_rate": 0.367
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.417,
+        "away_team_away_rate_shrunk": 0.371,
+        "blended_rate": 0.394,
+        "adj": -3.0
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 75,
+        "last_start_date": "2026-06-10"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 97,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 3,
+        "starts_lookback": 3,
+        "avg_pitches_per_inning": 17.11,
+        "median_pitches_per_inning": 17.77,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 0.667
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 17.21,
+        "median_pitches_per_inning": 15.25,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 0.25
+      },
+      "home_top_order": {
+        "avg_obp": 0.3365,
+        "avg_slg": 0.38375000000000004,
+        "avg_ops": 0.72025,
+        "batters": [
+          {
+            "id": 671732,
+            "name": "Lawrence Butler",
+            "position": "RF",
+            "pa": 192,
+            "avg": ".186",
+            "obp": ".271",
+            "slg": ".279",
+            "ops": ".550",
+            "hr": 4,
+            "so": 50,
+            "bb": 20,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 141,
+              "avg": ".191",
+              "obp": ".274",
+              "ops": ".572",
+              "hr": 4,
+              "so": 41,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 20,
+              "hits": 8,
+              "hr": 1,
+              "so": 5,
+              "bb": 1,
+              "avg": ".400",
+              "obp": ".429",
+              "ops": "1.029",
+              "streak_status": "hot",
+              "ops_delta": 0.479
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 687515,
+            "name": "Colby Thomas",
+            "position": "LF",
+            "pa": 63,
+            "avg": ".241",
+            "obp": ".290",
+            "slg": ".379",
+            "ops": ".669",
+            "hr": 2,
+            "so": 17,
+            "bb": 4,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 8,
+              "avg": ".125",
+              "obp": ".125",
+              "ops": ".250",
+              "hr": 0,
+              "so": 2,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 12,
+              "hits": 2,
+              "hr": 0,
+              "so": 5,
+              "bb": 1,
+              "avg": ".167",
+              "obp": ".231",
+              "ops": ".397",
+              "streak_status": "cold",
+              "ops_delta": -0.272
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 703607,
+            "name": "Henry Bolte",
+            "position": "CF",
+            "pa": 101,
+            "avg": ".318",
+            "obp": ".396",
+            "slg": ".398",
+            "ops": ".794",
+            "hr": 1,
+            "so": 29,
+            "bb": 7,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 60,
+              "avg": ".283",
+              "obp": ".362",
+              "ops": ".679",
+              "hr": 0,
+              "so": 16,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 22,
+              "hits": 7,
+              "hr": 1,
+              "so": 8,
+              "bb": 0,
+              "avg": ".318",
+              "obp": ".375",
+              "ops": ".830",
+              "streak_status": "neutral",
+              "ops_delta": 0.036
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 666126,
+            "name": "Carlos Cortes",
+            "position": "P",
+            "pa": 190,
+            "avg": ".303",
+            "obp": ".389",
+            "slg": ".479",
+            "ops": ".868",
+            "hr": 6,
+            "so": 17,
+            "bb": 21,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 155,
+              "avg": ".290",
+              "obp": ".380",
+              "ops": ".845",
+              "hr": 6,
+              "so": 14,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 19,
+              "hits": 4,
+              "hr": 1,
+              "so": 1,
+              "bb": 1,
+              "avg": ".211",
+              "obp": ".286",
+              "ops": ".654",
+              "streak_status": "cold",
+              "ops_delta": -0.214
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.36025000000000007,
+        "avg_slg": 0.4635,
+        "avg_ops": 0.8237499999999999,
+        "batters": [
+          {
+            "id": 687462,
+            "name": "Spencer Horwitz",
+            "position": "DH",
+            "pa": 259,
+            "avg": ".281",
+            "obp": ".382",
+            "slg": ".452",
+            "ops": ".834",
+            "hr": 9,
+            "so": 37,
+            "bb": 34,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 180,
+              "avg": ".283",
+              "obp": ".383",
+              "ops": ".855",
+              "hr": 8,
+              "so": 29,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 8,
+              "hr": 2,
+              "so": 9,
+              "bb": 2,
+              "avg": ".276",
+              "obp": ".364",
+              "ops": ".846",
+              "streak_status": "neutral",
+              "ops_delta": 0.012
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 664040,
+            "name": "Brandon Lowe",
+            "position": "2B",
+            "pa": 289,
+            "avg": ".240",
+            "obp": ".325",
+            "slg": ".512",
+            "ops": ".837",
+            "hr": 17,
+            "so": 73,
+            "bb": 31,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 178,
+              "avg": ".264",
+              "obp": ".356",
+              "ops": ".940",
+              "hr": 13,
+              "so": 47,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 4,
+              "hr": 2,
+              "so": 7,
+              "bb": 3,
+              "avg": ".160",
+              "obp": ".250",
+              "ops": ".730",
+              "streak_status": "cool",
+              "ops_delta": -0.107
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 1,
+              "hr": 1,
+              "so": 0,
+              "bb": 0,
+              "avg": ".500",
+              "ops": "2.500",
+              "has_data": true
+            }
+          },
+          {
+            "id": 668804,
+            "name": "Bryan Reynolds",
+            "position": "LF",
+            "pa": 311,
+            "avg": ".270",
+            "obp": ".392",
+            "slg": ".441",
+            "ops": ".833",
+            "hr": 8,
+            "so": 66,
+            "bb": 48,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 169,
+              "avg": ".243",
+              "obp": ".378",
+              "ops": ".763",
+              "hr": 4,
+              "so": 46,
+              "bat_side": "S"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 8,
+              "hr": 2,
+              "so": 7,
+              "bb": 3,
+              "avg": ".296",
+              "obp": ".387",
+              "ops": "1.017",
+              "streak_status": "hot",
+              "ops_delta": 0.184
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 656811,
+            "name": "Ryan O'Hearn",
+            "position": "1B",
+            "pa": 231,
+            "avg": ".275",
+            "obp": ".342",
+            "slg": ".449",
+            "ops": ".791",
+            "hr": 10,
+            "so": 52,
+            "bb": 20,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 147,
+              "avg": ".286",
+              "obp": ".369",
+              "ops": ".845",
+              "hr": 8,
+              "so": 35,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 5,
+              "hr": 1,
+              "so": 12,
+              "bb": 0,
+              "avg": ".172",
+              "obp": ".172",
+              "ops": ".448",
+              "streak_status": "cold",
+              "ops_delta": -0.343
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 2,
+        "total_hits": 1,
+        "total_hr": 1,
+        "total_so": 0,
+        "weighted_avg": 0.5,
+        "weighted_ops": 2.5,
+        "batters_with_history": 1,
+        "has_meaningful_data": false
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 364,
+        "weighted_ops": 0.699,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 674,
+        "weighted_ops": 0.852,
+        "advantage_count": 4,
+        "disadvantage_count": 0,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.727,
+        "avg_ops_delta": 0.007,
+        "hot_count": 1,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.76,
+        "avg_ops_delta": -0.064,
+        "hot_count": 1,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 100,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": null,
+        "wind_mph": null,
+        "precip_chance": null,
+        "wind_dir": null,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 0,
+          "label": "unknown"
+        }
+      },
+      "away_pitcher_score": 41.3,
+      "home_pitcher_score": 52.0,
+      "home_lineup_threat": 56.0,
+      "away_lineup_threat": 69.0,
+      "nrfi": {
+        "score": 26.0,
+        "tier": "FADE",
+        "pitcher_component": 43.4,
+        "lineup_component": 33.6,
+        "fi_adj": 5.6,
+        "bvp_adj": 0.0,
+        "platoon_adj": -6.0,
+        "streak_adj": 1.0,
+        "park_adj": 0.0,
+        "weather_adj": 0.0,
+        "team_tendency_adj": -3.0,
+        "rest_adj": 0.5,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": 0.8,
+      "home_fi_adj": 4.8,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": 0.0,
+      "home_platoon_adj": 0.0,
+      "away_platoon_adj": -6,
+      "home_streak_adj": 0.0,
+      "away_streak_adj": 1.0,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 3,
+        "games_played": 3,
+        "relief_appearances": 0
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 12,
+        "games_played": 15,
+        "relief_appearances": 3
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 40.25,
+          "home_rating": 39.74,
+          "edge": 0.5,
+          "pick": "PIT",
+          "pick_full": "Pittsburgh Pirates",
+          "confidence": "TOSS-UP",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": -1.5,
+          "home_pitch_eff_adj": -2.0,
+          "units": 0.0
+        },
+        "spread": {
+          "edge": 0.5,
+          "abs_edge": 0.5,
+          "pick": "PIT",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 5.4,
+          "home_runs_proj": 2.6,
+          "away_runs_proj": 2.6,
+          "env_adj": -0.0,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.4
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.9
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.4
+            },
+            "5.5": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": -0.1
+            }
+          },
+          "units": 2.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 823452,
+      "matchup": "MIA @ PHI",
+      "game_time": "2026-06-15T22:40:00Z",
+      "venue": "Citizens Bank Park",
+      "is_indoor": false,
+      "away_team": "Miami Marlins",
+      "home_team": "Philadelphia Phillies",
+      "away_abbr": "MIA",
+      "home_abbr": "PHI",
+      "away_pitcher": "Ryan Gusto",
+      "home_pitcher": "Zack Wheeler",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 6.0,
+        "whip": 1.44,
+        "k9": 9.0,
+        "bb9": 2.0,
+        "hr9": 0.0,
+        "ip": 9.0,
+        "hits": 11.0,
+        "walks": 2.0,
+        "strikeouts": 9.0,
+        "games_started": 2.0,
+        "games_played": 4.0,
+        "runs": 6.0,
+        "earned_runs": 6.0
+      },
+      "home_pitcher_stats": {
+        "era": 2.22,
+        "whip": 0.85,
+        "k9": 8.42,
+        "bb9": 1.91,
+        "hr9": 1.11,
+        "ip": 56.2,
+        "hits": 36.0,
+        "walks": 12.0,
+        "strikeouts": 53.0,
+        "games_started": 9.0,
+        "games_played": 9.0,
+        "runs": 14.0,
+        "earned_runs": 14.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 7.29,
+        "fi_runs": 14,
+        "fi_hits": 21,
+        "fi_hits_per_fi": 1.238,
+        "fi_starts": 19,
+        "fi_clean": 12,
+        "fi_clean_pct": 0.619
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 2.0,
+        "fi_runs": 2,
+        "fi_hits": 4,
+        "fi_hits_per_fi": 0.444,
+        "fi_starts": 9,
+        "fi_clean": 7,
+        "fi_clean_pct": 0.778
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 12,
+        "away_games": 18,
+        "home_scored": 3,
+        "away_scored": 6,
+        "home_score_rate": 0.25,
+        "away_score_rate": 0.333,
+        "overall_score_rate": 0.3
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 13,
+        "away_games": 17,
+        "home_scored": 4,
+        "away_scored": 4,
+        "home_score_rate": 0.308,
+        "away_score_rate": 0.235,
+        "overall_score_rate": 0.267
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.272,
+        "away_team_away_rate_shrunk": 0.25,
+        "blended_rate": 0.261,
+        "adj": 0.3
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 66,
+        "last_start_date": "2026-06-10"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 96,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 2,
+        "starts_lookback": 2,
+        "avg_pitches_per_inning": 16.5,
+        "median_pitches_per_inning": 16.5,
+        "high_inefficiency_starts": 0,
+        "high_inefficiency_rate": 0.0
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 14.92,
+        "median_pitches_per_inning": 15.24,
+        "high_inefficiency_starts": 0,
+        "high_inefficiency_rate": 0.0
+      },
+      "home_top_order": {
+        "avg_obp": 0.33799999999999997,
+        "avg_slg": 0.4715,
+        "avg_ops": 0.8095,
+        "batters": [
+          {
+            "id": 656941,
+            "name": "Kyle Schwarber",
+            "position": "DH",
+            "pa": 306,
+            "avg": ".247",
+            "obp": ".363",
+            "slg": ".568",
+            "ops": ".931",
+            "hr": 24,
+            "so": 104,
+            "bb": 43,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 159,
+              "avg": ".226",
+              "obp": ".349",
+              "ops": ".902",
+              "hr": 16,
+              "so": 70,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 8,
+              "hr": 1,
+              "so": 10,
+              "bb": 5,
+              "avg": ".296",
+              "obp": ".406",
+              "ops": ".814",
+              "streak_status": "cool",
+              "ops_delta": -0.117
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 607208,
+            "name": "Trea Turner",
+            "position": "SS",
+            "pa": 309,
+            "avg": ".219",
+            "obp": ".269",
+            "slg": ".330",
+            "ops": ".599",
+            "hr": 7,
+            "so": 71,
+            "bb": 20,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 196,
+              "avg": ".235",
+              "obp": ".263",
+              "ops": ".630",
+              "hr": 6,
+              "so": 53,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 5,
+              "hr": 0,
+              "so": 11,
+              "bb": 1,
+              "avg": ".161",
+              "obp": ".188",
+              "ops": ".413",
+              "streak_status": "cold",
+              "ops_delta": -0.186
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 547180,
+            "name": "Bryce Harper",
+            "position": "1B",
+            "pa": 294,
+            "avg": ".256",
+            "obp": ".364",
+            "slg": ".496",
+            "ops": ".860",
+            "hr": 15,
+            "so": 56,
+            "bb": 44,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 150,
+              "avg": ".287",
+              "obp": ".397",
+              "ops": ".990",
+              "hr": 12,
+              "so": 30,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 23,
+              "hits": 5,
+              "hr": 1,
+              "so": 6,
+              "bb": 6,
+              "avg": ".217",
+              "obp": ".367",
+              "ops": ".801",
+              "streak_status": "cool",
+              "ops_delta": -0.059
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 669016,
+            "name": "Brandon Marsh",
+            "position": "LF",
+            "pa": 253,
+            "avg": ".322",
+            "obp": ".356",
+            "slg": ".492",
+            "ops": ".848",
+            "hr": 8,
+            "so": 60,
+            "bb": 12,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 177,
+              "avg": ".333",
+              "obp": ".365",
+              "ops": ".879",
+              "hr": 7,
+              "so": 40,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 6,
+              "hr": 1,
+              "so": 9,
+              "bb": 2,
+              "avg": ".222",
+              "obp": ".300",
+              "ops": ".670",
+              "streak_status": "cold",
+              "ops_delta": -0.178
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.354,
+        "avg_slg": 0.44375,
+        "avg_ops": 0.79775,
+        "batters": [
+          {
+            "id": 689414,
+            "name": "Liam Hicks",
+            "position": "1B",
+            "pa": 269,
+            "avg": ".277",
+            "obp": ".361",
+            "slg": ".485",
+            "ops": ".846",
+            "hr": 13,
+            "so": 24,
+            "bb": 28,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 191,
+              "avg": ".298",
+              "obp": ".377",
+              "ops": ".911",
+              "hr": 12,
+              "so": 17,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 28,
+              "hits": 10,
+              "hr": 1,
+              "so": 2,
+              "bb": 4,
+              "avg": ".357",
+              "obp": ".455",
+              "ops": "1.062",
+              "streak_status": "hot",
+              "ops_delta": 0.216
+            },
+            "bvp": {
+              "ab": 4,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".200",
+              "has_data": true
+            }
+          },
+          {
+            "id": 672640,
+            "name": "Otto Lopez",
+            "position": "SS",
+            "pa": 302,
+            "avg": ".343",
+            "obp": ".371",
+            "slg": ".481",
+            "ops": ".852",
+            "hr": 5,
+            "so": 46,
+            "bb": 11,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 216,
+              "avg": ".301",
+              "obp": ".336",
+              "ops": ".762",
+              "hr": 4,
+              "so": 39,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 13,
+              "hr": 0,
+              "so": 2,
+              "bb": 1,
+              "avg": ".419",
+              "obp": ".438",
+              "ops": "1.018",
+              "streak_status": "hot",
+              "ops_delta": 0.166
+            },
+            "bvp": {
+              "ab": 12,
+              "hits": 5,
+              "hr": 0,
+              "so": 2,
+              "bb": 1,
+              "avg": ".417",
+              "ops": "1.045",
+              "has_data": true
+            }
+          },
+          {
+            "id": 669065,
+            "name": "Kyle Stowers",
+            "position": "DH",
+            "pa": 206,
+            "avg": ".215",
+            "obp": ".302",
+            "slg": ".370",
+            "ops": ".672",
+            "hr": 5,
+            "so": 61,
+            "bb": 19,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 142,
+              "avg": ".225",
+              "obp": ".321",
+              "ops": ".722",
+              "hr": 5,
+              "so": 49,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 24,
+              "hits": 6,
+              "hr": 1,
+              "so": 8,
+              "bb": 4,
+              "avg": ".250",
+              "obp": ".387",
+              "ops": ".804",
+              "streak_status": "warm",
+              "ops_delta": 0.132
+            },
+            "bvp": {
+              "ab": 8,
+              "hits": 1,
+              "hr": 0,
+              "so": 5,
+              "bb": 0,
+              "avg": ".125",
+              "ops": ".250",
+              "has_data": true
+            }
+          },
+          {
+            "id": 669364,
+            "name": "Xavier Edwards",
+            "position": "2B",
+            "pa": 305,
+            "avg": ".299",
+            "obp": ".382",
+            "slg": ".439",
+            "ops": ".821",
+            "hr": 6,
+            "so": 37,
+            "bb": 37,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 205,
+              "avg": ".293",
+              "obp": ".378",
+              "ops": ".788",
+              "hr": 2,
+              "so": 26,
+              "bat_side": "S"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 22,
+              "hits": 5,
+              "hr": 0,
+              "so": 4,
+              "bb": 4,
+              "avg": ".227",
+              "obp": ".310",
+              "ops": ".538",
+              "streak_status": "cold",
+              "ops_delta": -0.283
+            },
+            "bvp": {
+              "ab": 9,
+              "hits": 2,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".222",
+              "ops": ".555",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": true,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 33,
+        "total_hits": 8,
+        "total_hr": 0,
+        "total_so": 8,
+        "weighted_avg": 0.242,
+        "weighted_ops": 0.616,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 682,
+        "weighted_ops": 0.837,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 754,
+        "weighted_ops": 0.799,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.674,
+        "avg_ops_delta": -0.135,
+        "hot_count": 0,
+        "cold_count": 4,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.856,
+        "avg_ops_delta": 0.058,
+        "hot_count": 3,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 104,
+        "label": "Hitter-friendly",
+        "tier": "hitter"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 66.1,
+        "wind_mph": 4.5,
+        "precip_chance": 0,
+        "wind_dir": 276,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 2.5,
+          "label": "blowing in"
+        }
+      },
+      "away_pitcher_score": 46.8,
+      "home_pitcher_score": 84.2,
+      "home_lineup_threat": 64.0,
+      "away_lineup_threat": 69.0,
+      "nrfi": {
+        "score": 25.6,
+        "tier": "FADE",
+        "pitcher_component": 54.3,
+        "lineup_component": 32.0,
+        "fi_adj": -1.2,
+        "bvp_adj": 2.0,
+        "platoon_adj": -8.0,
+        "streak_adj": 2.0,
+        "park_adj": -2.4,
+        "weather_adj": 0.0,
+        "team_tendency_adj": 0.3,
+        "rest_adj": 0.5,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": -6.0,
+      "home_fi_adj": 4.8,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": 2.0,
+      "home_platoon_adj": -4.0,
+      "away_platoon_adj": -4.0,
+      "home_streak_adj": 4.0,
+      "away_streak_adj": -2.0,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 2,
+        "games_played": 4,
+        "relief_appearances": 2
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 9,
+        "games_played": 9,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 39.82,
+          "home_rating": 65.96000000000001,
+          "edge": -26.1,
+          "pick": "PHI",
+          "pick_full": "Philadelphia Phillies",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": -0.3,
+          "home_pitch_eff_adj": 0.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": -26.1,
+          "abs_edge": 26.1,
+          "pick": "PHI",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 4.4,
+          "home_runs_proj": 2.7,
+          "away_runs_proj": 1.5,
+          "env_adj": 0.19,
+          "primary_line": 4.5,
+          "lean": "PUSH",
+          "confidence": "TOSS-UP",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.4
+            },
+            "4.5": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": -0.1
+            },
+            "5.0": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.6
+            },
+            "5.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -1.1
+            }
+          },
+          "units": 0.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 824181,
+      "matchup": "DET @ HOU",
+      "game_time": "2026-06-16T00:10:00Z",
+      "venue": "Daikin Park",
+      "is_indoor": false,
+      "away_team": "Detroit Tigers",
+      "home_team": "Houston Astros",
+      "away_abbr": "DET",
+      "home_abbr": "HOU",
+      "away_pitcher": "Troy Melton",
+      "home_pitcher": "Kai-Wei Teng",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 2.81,
+        "whip": 1.01,
+        "k9": 4.91,
+        "bb9": 2.1,
+        "hr9": 1.75,
+        "ip": 25.2,
+        "hits": 20.0,
+        "walks": 6.0,
+        "strikeouts": 14.0,
+        "games_started": 4.0,
+        "games_played": 4.0,
+        "runs": 8.0,
+        "earned_runs": 8.0
+      },
+      "home_pitcher_stats": {
+        "era": 3.71,
+        "whip": 1.27,
+        "k9": 8.65,
+        "bb9": 4.24,
+        "hr9": 1.06,
+        "ip": 51.0,
+        "hits": 41.0,
+        "walks": 24.0,
+        "strikeouts": 49.0,
+        "games_started": 7.0,
+        "games_played": 20.0,
+        "runs": 24.0,
+        "earned_runs": 21.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 3.75,
+        "fi_runs": 3,
+        "fi_hits": 6,
+        "fi_hits_per_fi": 0.833,
+        "fi_starts": 8,
+        "fi_clean": 5,
+        "fi_clean_pct": 0.583
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 6.43,
+        "fi_runs": 5,
+        "fi_hits": 6,
+        "fi_hits_per_fi": 0.857,
+        "fi_starts": 7,
+        "fi_clean": 4,
+        "fi_clean_pct": 0.571
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 14,
+        "away_games": 16,
+        "home_scored": 4,
+        "away_scored": 5,
+        "home_score_rate": 0.286,
+        "away_score_rate": 0.312,
+        "overall_score_rate": 0.3
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 29,
+        "home_games": 16,
+        "away_games": 13,
+        "home_scored": 4,
+        "away_scored": 9,
+        "home_score_rate": 0.25,
+        "away_score_rate": 0.692,
+        "overall_score_rate": 0.448
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.288,
+        "away_team_away_rate_shrunk": 0.529,
+        "blended_rate": 0.409,
+        "adj": -3.0
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 88,
+        "last_start_date": "2026-06-09"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 93,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 4,
+        "starts_lookback": 4,
+        "avg_pitches_per_inning": 14.0,
+        "median_pitches_per_inning": 13.33,
+        "high_inefficiency_starts": 1,
+        "high_inefficiency_rate": 0.25
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 7,
+        "starts_lookback": 7,
+        "avg_pitches_per_inning": 17.7,
+        "median_pitches_per_inning": 17.4,
+        "high_inefficiency_starts": 3,
+        "high_inefficiency_rate": 0.429
+      },
+      "home_top_order": {
+        "avg_obp": 0.3555,
+        "avg_slg": 0.462,
+        "avg_ops": 0.8175,
+        "batters": [
+          {
+            "id": 665161,
+            "name": "Jeremy Pe\u00f1a",
+            "position": "SS",
+            "pa": 149,
+            "avg": ".271",
+            "obp": ".342",
+            "slg": ".391",
+            "ops": ".733",
+            "hr": 3,
+            "so": 20,
+            "bb": 12,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 110,
+              "avg": ".264",
+              "obp": ".333",
+              "ops": ".697",
+              "hr": 2,
+              "so": 17,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 22,
+              "hits": 2,
+              "hr": 0,
+              "so": 4,
+              "bb": 4,
+              "avg": ".091",
+              "obp": ".231",
+              "ops": ".322",
+              "streak_status": "cold",
+              "ops_delta": -0.411
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 670541,
+            "name": "Yordan Alvarez",
+            "position": "DH",
+            "pa": 314,
+            "avg": ".326",
+            "obp": ".433",
+            "slg": ".651",
+            "ops": "1.084",
+            "hr": 24,
+            "so": 54,
+            "bb": 46,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 183,
+              "avg": ".328",
+              "obp": ".451",
+              "ops": "1.101",
+              "hr": 16,
+              "so": 40,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 11,
+              "hr": 2,
+              "so": 5,
+              "bb": 3,
+              "avg": ".407",
+              "obp": ".467",
+              "ops": "1.096",
+              "streak_status": "neutral",
+              "ops_delta": 0.012
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 572233,
+            "name": "Christian Walker",
+            "position": "1B",
+            "pa": 299,
+            "avg": ".247",
+            "obp": ".314",
+            "slg": ".502",
+            "ops": ".816",
+            "hr": 18,
+            "so": 64,
+            "bb": 23,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 213,
+              "avg": ".263",
+              "obp": ".320",
+              "ops": ".841",
+              "hr": 14,
+              "so": 50,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 6,
+              "hr": 2,
+              "so": 7,
+              "bb": 1,
+              "avg": ".207",
+              "obp": ".233",
+              "ops": ".716",
+              "streak_status": "cool",
+              "ops_delta": -0.1
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 694388,
+            "name": "Joey Loperfido",
+            "position": "LF",
+            "pa": 81,
+            "avg": ".232",
+            "obp": ".333",
+            "slg": ".304",
+            "ops": ".637",
+            "hr": 0,
+            "so": 22,
+            "bb": 10,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 57,
+              "avg": ".263",
+              "obp": ".377",
+              "ops": ".728",
+              "hr": 0,
+              "so": 20,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 17,
+              "hits": 1,
+              "hr": 0,
+              "so": 5,
+              "bb": 4,
+              "avg": ".059",
+              "obp": ".273",
+              "ops": ".332",
+              "streak_status": "cold",
+              "ops_delta": -0.305
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.37425,
+        "avg_slg": 0.44525000000000003,
+        "avg_ops": 0.8195,
+        "batters": [
+          {
+            "id": 805808,
+            "name": "Kevin McGonigle",
+            "position": "3B",
+            "pa": 300,
+            "avg": ".277",
+            "obp": ".383",
+            "slg": ".406",
+            "ops": ".789",
+            "hr": 4,
+            "so": 40,
+            "bb": 42,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 185,
+              "avg": ".281",
+              "obp": ".393",
+              "ops": ".820",
+              "hr": 3,
+              "so": 26,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 5,
+              "hr": 1,
+              "so": 5,
+              "bb": 6,
+              "avg": ".192",
+              "obp": ".344",
+              "ops": ".728",
+              "streak_status": "cool",
+              "ops_delta": -0.061
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 650402,
+            "name": "Gleyber Torres",
+            "position": "2B",
+            "pa": 189,
+            "avg": ".282",
+            "obp": ".397",
+            "slg": ".397",
+            "ops": ".794",
+            "hr": 4,
+            "so": 32,
+            "bb": 29,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 123,
+              "avg": ".325",
+              "obp": ".413",
+              "ops": ".836",
+              "hr": 3,
+              "so": 24,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 7,
+              "hr": 1,
+              "so": 9,
+              "bb": 3,
+              "avg": ".259",
+              "obp": ".355",
+              "ops": ".799",
+              "streak_status": "neutral",
+              "ops_delta": 0.005
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 682985,
+            "name": "Riley Greene",
+            "position": "LF",
+            "pa": 297,
+            "avg": ".297",
+            "obp": ".387",
+            "slg": ".453",
+            "ops": ".840",
+            "hr": 8,
+            "so": 84,
+            "bb": 37,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 184,
+              "avg": ".304",
+              "obp": ".375",
+              "ops": ".837",
+              "hr": 6,
+              "so": 57,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 24,
+              "hits": 3,
+              "hr": 2,
+              "so": 10,
+              "bb": 4,
+              "avg": ".125",
+              "obp": ".233",
+              "ops": ".608",
+              "streak_status": "cold",
+              "ops_delta": -0.232
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 693307,
+            "name": "Dillon Dingler",
+            "position": "C",
+            "pa": 266,
+            "avg": ".254",
+            "obp": ".330",
+            "slg": ".525",
+            "ops": ".855",
+            "hr": 16,
+            "so": 55,
+            "bb": 22,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 163,
+              "avg": ".282",
+              "obp": ".350",
+              "ops": ".921",
+              "hr": 12,
+              "so": 34,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 10,
+              "hr": 2,
+              "so": 9,
+              "bb": 2,
+              "avg": ".345",
+              "obp": ".387",
+              "ops": "1.077",
+              "streak_status": "hot",
+              "ops_delta": 0.222
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 1,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 1,
+        "weighted_avg": 0.0,
+        "weighted_ops": 0.0,
+        "batters_with_history": 1,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 563,
+        "weighted_ops": 0.886,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 655,
+        "weighted_ops": 0.853,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.617,
+        "avg_ops_delta": -0.201,
+        "hot_count": 0,
+        "cold_count": 3,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.803,
+        "avg_ops_delta": -0.017,
+        "hot_count": 1,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 100,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": null,
+        "wind_mph": null,
+        "precip_chance": null,
+        "wind_dir": null,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 0,
+          "label": "unknown"
+        }
+      },
+      "away_pitcher_score": 56.4,
+      "home_pitcher_score": 45.8,
+      "home_lineup_threat": 69.0,
+      "away_lineup_threat": 74.0,
+      "nrfi": {
+        "score": 21.3,
+        "tier": "FADE",
+        "pitcher_component": 47.9,
+        "lineup_component": 27.0,
+        "fi_adj": -3.0,
+        "bvp_adj": 0.0,
+        "platoon_adj": -8.0,
+        "streak_adj": 6.0,
+        "park_adj": 0.0,
+        "weather_adj": 0.0,
+        "team_tendency_adj": -3.0,
+        "rest_adj": 1.0,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": -1.1,
+      "home_fi_adj": -1.9,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": 0.0,
+      "home_platoon_adj": -4.0,
+      "away_platoon_adj": -4.0,
+      "home_streak_adj": 6,
+      "away_streak_adj": 0.0,
+      "away_rest_adj": 0.5,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 4,
+        "games_played": 4,
+        "relief_appearances": 0
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 7,
+        "games_played": 20,
+        "relief_appearances": 13
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 50.55,
+          "home_rating": 33.09,
+          "edge": 17.5,
+          "pick": "DET",
+          "pick_full": "Detroit Tigers",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": 0.5,
+          "home_pitch_eff_adj": -2.0,
+          "units": 4.5
+        },
+        "spread": {
+          "edge": 17.5,
+          "abs_edge": 17.5,
+          "pick": "DET",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 5.5,
+          "home_runs_proj": 2.3,
+          "away_runs_proj": 2.9,
+          "env_adj": -0.0,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.5
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.0
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.5
+            },
+            "5.5": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": 0.0
+            }
+          },
+          "units": 2.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 823046,
+      "matchup": "SD @ STL",
+      "game_time": "2026-06-15T23:45:00Z",
+      "venue": "Busch Stadium",
+      "is_indoor": false,
+      "away_team": "San Diego Padres",
+      "home_team": "St. Louis Cardinals",
+      "away_abbr": "SD",
+      "home_abbr": "STL",
+      "away_pitcher": "Wandy Peralta",
+      "home_pitcher": "Dustin May",
+      "away_pitcher_hand": "L",
+      "home_pitcher_hand": "R",
+      "away_pitcher_stats": {
+        "era": 2.18,
+        "whip": 1.42,
+        "k9": 6.27,
+        "bb9": 4.64,
+        "hr9": 0.82,
+        "ip": 33.0,
+        "hits": 30.0,
+        "walks": 17.0,
+        "strikeouts": 23.0,
+        "games_started": 0.0,
+        "games_played": 28.0,
+        "runs": 8.0,
+        "earned_runs": 8.0
+      },
+      "home_pitcher_stats": {
+        "era": 4.21,
+        "whip": 1.25,
+        "k9": 8.17,
+        "bb9": 2.48,
+        "hr9": 0.62,
+        "ip": 72.2,
+        "hits": 71.0,
+        "walks": 20.0,
+        "strikeouts": 66.0,
+        "games_started": 13.0,
+        "games_played": 13.0,
+        "runs": 37.0,
+        "earned_runs": 34.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 0.0,
+        "fi_runs": 0,
+        "fi_hits": 0,
+        "fi_hits_per_fi": 0.0,
+        "fi_starts": 1,
+        "fi_clean": 1,
+        "fi_clean_pct": 1.0
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 4.85,
+        "fi_runs": 7,
+        "fi_hits": 11,
+        "fi_hits_per_fi": 0.846,
+        "fi_starts": 13,
+        "fi_clean": 8,
+        "fi_clean_pct": 0.615
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 28,
+        "home_games": 15,
+        "away_games": 13,
+        "home_scored": 5,
+        "away_scored": 4,
+        "home_score_rate": 0.333,
+        "away_score_rate": 0.308,
+        "overall_score_rate": 0.321
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 15,
+        "away_games": 15,
+        "home_scored": 4,
+        "away_scored": 4,
+        "home_score_rate": 0.267,
+        "away_score_rate": 0.267,
+        "overall_score_rate": 0.267
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.319,
+        "away_team_away_rate_shrunk": 0.268,
+        "blended_rate": 0.293,
+        "adj": -0.7
+      },
+      "away_rest": {
+        "has_data": false
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 101,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": false
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 15.65,
+        "median_pitches_per_inning": 15.86,
+        "high_inefficiency_starts": 0,
+        "high_inefficiency_rate": 0.0
+      },
+      "home_top_order": {
+        "avg_obp": 0.36424999999999996,
+        "avg_slg": 0.47075,
+        "avg_ops": 0.835,
+        "batters": [
+          {
+            "id": 802139,
+            "name": "JJ Wetherholt",
+            "position": "2B",
+            "pa": 295,
+            "avg": ".255",
+            "obp": ".359",
+            "slg": ".402",
+            "ops": ".761",
+            "hr": 10,
+            "so": 49,
+            "bb": 32,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 77,
+              "avg": ".247",
+              "obp": ".375",
+              "ops": ".726",
+              "hr": 2,
+              "so": 12,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 8,
+              "hr": 1,
+              "so": 4,
+              "bb": 3,
+              "avg": ".308",
+              "obp": ".379",
+              "ops": ".802",
+              "streak_status": "neutral",
+              "ops_delta": 0.041
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".500",
+              "has_data": true
+            }
+          },
+          {
+            "id": 671056,
+            "name": "Iv\u00e1n Herrera",
+            "position": "DH",
+            "pa": 314,
+            "avg": ".267",
+            "obp": ".398",
+            "slg": ".431",
+            "ops": ".829",
+            "hr": 9,
+            "so": 50,
+            "bb": 41,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 69,
+              "avg": ".304",
+              "obp": ".473",
+              "ops": ".995",
+              "hr": 4,
+              "so": 11,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 23,
+              "hits": 8,
+              "hr": 2,
+              "so": 3,
+              "bb": 6,
+              "avg": ".348",
+              "obp": ".545",
+              "ops": "1.198",
+              "streak_status": "hot",
+              "ops_delta": 0.369
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 1,
+              "hr": 1,
+              "so": 0,
+              "bb": 1,
+              "avg": ".500",
+              "ops": "2.500",
+              "has_data": true
+            }
+          },
+          {
+            "id": 676475,
+            "name": "Alec Burleson",
+            "position": "1B",
+            "pa": 298,
+            "avg": ".287",
+            "obp": ".352",
+            "slg": ".496",
+            "ops": ".848",
+            "hr": 13,
+            "so": 47,
+            "bb": 26,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 83,
+              "avg": ".193",
+              "obp": ".227",
+              "ops": ".480",
+              "hr": 1,
+              "so": 9,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 8,
+              "hr": 5,
+              "so": 6,
+              "bb": 2,
+              "avg": ".258",
+              "obp": ".303",
+              "ops": "1.109",
+              "streak_status": "hot",
+              "ops_delta": 0.261
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".333",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 691023,
+            "name": "Jordan Walker",
+            "position": "RF",
+            "pa": 293,
+            "avg": ".294",
+            "obp": ".348",
+            "slg": ".554",
+            "ops": ".902",
+            "hr": 18,
+            "so": 75,
+            "bb": 21,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 65,
+              "avg": ".277",
+              "obp": ".338",
+              "ops": ".938",
+              "hr": 6,
+              "so": 15,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 33,
+              "hits": 8,
+              "hr": 2,
+              "so": 7,
+              "bb": 0,
+              "avg": ".242",
+              "obp": ".242",
+              "ops": ".758",
+              "streak_status": "cool",
+              "ops_delta": -0.144
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.292,
+        "avg_slg": 0.31675,
+        "avg_ops": 0.6087499999999999,
+        "batters": [
+          {
+            "id": 665487,
+            "name": "Fernando Tatis Jr.",
+            "position": "2B",
+            "pa": 301,
+            "avg": ".282",
+            "obp": ".347",
+            "slg": ".350",
+            "ops": ".697",
+            "hr": 2,
+            "so": 63,
+            "bb": 27,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 211,
+              "avg": ".265",
+              "obp": ".331",
+              "ops": ".639",
+              "hr": 1,
+              "so": 47,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 32,
+              "hits": 11,
+              "hr": 1,
+              "so": 5,
+              "bb": 3,
+              "avg": ".344",
+              "obp": ".389",
+              "ops": ".920",
+              "streak_status": "hot",
+              "ops_delta": 0.223
+            },
+            "bvp": {
+              "ab": 25,
+              "hits": 7,
+              "hr": 1,
+              "so": 5,
+              "bb": 2,
+              "avg": ".280",
+              "ops": ".773",
+              "has_data": true
+            }
+          },
+          {
+            "id": 701538,
+            "name": "Jackson Merrill",
+            "position": "CF",
+            "pa": 282,
+            "avg": ".207",
+            "obp": ".275",
+            "slg": ".344",
+            "ops": ".619",
+            "hr": 7,
+            "so": 67,
+            "bb": 23,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 188,
+              "avg": ".191",
+              "obp": ".266",
+              "ops": ".580",
+              "hr": 5,
+              "so": 49,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 8,
+              "hr": 1,
+              "so": 4,
+              "bb": 2,
+              "avg": ".258",
+              "obp": ".303",
+              "ops": ".755",
+              "streak_status": "warm",
+              "ops_delta": 0.136
+            },
+            "bvp": {
+              "ab": 4,
+              "hits": 0,
+              "hr": 0,
+              "so": 2,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".167",
+              "has_data": true
+            }
+          },
+          {
+            "id": 592518,
+            "name": "Manny Machado",
+            "position": "3B",
+            "pa": 284,
+            "avg": ".175",
+            "obp": ".254",
+            "slg": ".359",
+            "ops": ".613",
+            "hr": 12,
+            "so": 63,
+            "bb": 28,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 189,
+              "avg": ".153",
+              "obp": ".242",
+              "ops": ".565",
+              "hr": 9,
+              "so": 49,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 30,
+              "hits": 6,
+              "hr": 1,
+              "so": 4,
+              "bb": 1,
+              "avg": ".200",
+              "obp": ".226",
+              "ops": ".659",
+              "streak_status": "neutral",
+              "ops_delta": 0.046
+            },
+            "bvp": {
+              "ab": 34,
+              "hits": 9,
+              "hr": 2,
+              "so": 8,
+              "bb": 2,
+              "avg": ".265",
+              "ops": ".806",
+              "has_data": true
+            }
+          },
+          {
+            "id": 823550,
+            "name": "Sung-Mun Song",
+            "position": "SS",
+            "pa": 48,
+            "avg": ".190",
+            "obp": ".292",
+            "slg": ".214",
+            "ops": ".506",
+            "hr": 0,
+            "so": 11,
+            "bb": 6,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 37,
+              "avg": ".216",
+              "obp": ".326",
+              "ops": ".569",
+              "hr": 0,
+              "so": 10,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 21,
+              "hits": 4,
+              "hr": 0,
+              "so": 6,
+              "bb": 2,
+              "avg": ".190",
+              "obp": ".261",
+              "ops": ".451",
+              "streak_status": "cool",
+              "ops_delta": -0.055
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 1,
+              "avg": ".000",
+              "ops": ".500",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": true,
+      "away_real_lineup": false,
+      "home_bvp": {
+        "total_ab": 6,
+        "total_hits": 2,
+        "total_hr": 1,
+        "total_so": 0,
+        "weighted_avg": 0.333,
+        "weighted_ops": 1.417,
+        "batters_with_history": 3,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 64,
+        "total_hits": 16,
+        "total_hr": 3,
+        "total_so": 15,
+        "weighted_avg": 0.25,
+        "weighted_ops": 0.748,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "L",
+        "total_ab": 294,
+        "weighted_ops": 0.767,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 625,
+        "weighted_ops": 0.595,
+        "advantage_count": 2,
+        "disadvantage_count": 2,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.967,
+        "avg_ops_delta": 0.132,
+        "hot_count": 2,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.696,
+        "avg_ops_delta": 0.087,
+        "hot_count": 2,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 100,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 67.8,
+        "wind_mph": 4.8,
+        "precip_chance": 0,
+        "wind_dir": 257,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 3.3,
+          "label": "blowing in"
+        }
+      },
+      "away_pitcher_score": 46.5,
+      "home_pitcher_score": 53.0,
+      "home_lineup_threat": 69.0,
+      "away_lineup_threat": 33.0,
+      "nrfi": {
+        "score": 19.1,
+        "tier": "FADE",
+        "pitcher_component": 47.8,
+        "lineup_component": 38.2,
+        "fi_adj": -0.8,
+        "bvp_adj": -1.0,
+        "platoon_adj": 0.0,
+        "streak_adj": -4.0,
+        "park_adj": 0.0,
+        "weather_adj": 0.0,
+        "team_tendency_adj": -0.7,
+        "rest_adj": 0.5,
+        "bullpen_adj": -6.0
+      },
+      "away_fi_adj": 0.9,
+      "home_fi_adj": -1.7,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": -1.0,
+      "home_platoon_adj": -2.0,
+      "away_platoon_adj": 2.0,
+      "home_streak_adj": -3.0,
+      "away_streak_adj": -1.0,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": true,
+        "reason": "reliever (0 GS, 28 G this season)",
+        "games_started": 0,
+        "games_played": 28,
+        "relief_appearances": 28
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 13,
+        "games_played": 13,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": true,
+      "f5": {
+        "ml": {
+          "away_rating": 27.72,
+          "home_rating": 57.49,
+          "edge": -29.8,
+          "pick": "STL",
+          "pick_full": "St. Louis Cardinals",
+          "confidence": "LEAN",
+          "has_bullpen_game": true,
+          "away_pitch_eff_adj": 0.0,
+          "home_pitch_eff_adj": 0.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": -29.8,
+          "abs_edge": 29.8,
+          "pick": "STL",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 5.2,
+          "home_runs_proj": 2.8,
+          "away_runs_proj": 1.9,
+          "env_adj": -0.0,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.2
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.7
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.2
+            },
+            "5.5": {
+              "lean": "UNDER",
+              "confidence": "SLIGHT",
+              "diff": -0.3
+            }
+          },
+          "units": 1.5
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 822887,
+      "matchup": "MIN @ TEX",
+      "game_time": "2026-06-16T00:05:00Z",
+      "venue": "Globe Life Field",
+      "is_indoor": true,
+      "away_team": "Minnesota Twins",
+      "home_team": "Texas Rangers",
+      "away_abbr": "MIN",
+      "home_abbr": "TEX",
+      "away_pitcher": "TBD",
+      "home_pitcher": "MacKenzie Gore",
+      "away_pitcher_hand": "?",
+      "home_pitcher_hand": "L",
+      "away_pitcher_stats": {
+        "era": null,
+        "whip": null,
+        "k9": null,
+        "bb9": null,
+        "hr9": null,
+        "ip": null,
+        "hits": null,
+        "walks": null,
+        "strikeouts": null,
+        "games_started": null,
+        "games_played": null,
+        "runs": null,
+        "earned_runs": null
+      },
+      "home_pitcher_stats": {
+        "era": 4.18,
+        "whip": 1.35,
+        "k9": 9.63,
+        "bb9": 4.18,
+        "hr9": 0.76,
+        "ip": 71.0,
+        "hits": 63.0,
+        "walks": 33.0,
+        "strikeouts": 76.0,
+        "games_started": 14.0,
+        "games_played": 14.0,
+        "runs": 33.0,
+        "earned_runs": 33.0
+      },
+      "away_fi": {
+        "has_data": false
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 3.21,
+        "fi_runs": 5,
+        "fi_hits": 10,
+        "fi_hits_per_fi": 0.714,
+        "fi_starts": 14,
+        "fi_clean": 10,
+        "fi_clean_pct": 0.714
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 12,
+        "away_games": 18,
+        "home_scored": 7,
+        "away_scored": 4,
+        "home_score_rate": 0.583,
+        "away_score_rate": 0.222,
+        "overall_score_rate": 0.367
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 17,
+        "away_games": 13,
+        "home_scored": 4,
+        "away_scored": 6,
+        "home_score_rate": 0.235,
+        "away_score_rate": 0.462,
+        "overall_score_rate": 0.333
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.445,
+        "away_team_away_rate_shrunk": 0.382,
+        "blended_rate": 0.413,
+        "adj": -3.0
+      },
+      "away_rest": {
+        "has_data": false
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 87,
+        "last_start_date": "2026-06-10"
+      },
+      "away_pitch_eff": {
+        "has_data": false
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 19.31,
+        "median_pitches_per_inning": 17.7,
+        "high_inefficiency_starts": 4,
+        "high_inefficiency_rate": 0.5
+      },
+      "home_top_order": {
+        "avg_obp": 0.3335,
+        "avg_slg": 0.43525,
+        "avg_ops": 0.76875,
+        "batters": [
+          {
+            "id": 607043,
+            "name": "Brandon Nimmo",
+            "pa": 297,
+            "avg": ".257",
+            "obp": ".330",
+            "slg": ".408",
+            "ops": ".738",
+            "hr": 7,
+            "so": 61,
+            "bb": 24,
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 9,
+              "hr": 0,
+              "so": 4,
+              "bb": 1,
+              "avg": ".333",
+              "obp": ".357",
+              "ops": ".876",
+              "streak_status": "warm",
+              "ops_delta": 0.138
+            }
+          },
+          {
+            "id": 673962,
+            "name": "Josh Jung",
+            "pa": 281,
+            "avg": ".307",
+            "obp": ".367",
+            "slg": ".465",
+            "ops": ".832",
+            "hr": 8,
+            "so": 45,
+            "bb": 21,
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 28,
+              "hits": 8,
+              "hr": 1,
+              "so": 7,
+              "bb": 4,
+              "avg": ".286",
+              "obp": ".394",
+              "ops": ".787",
+              "streak_status": "neutral",
+              "ops_delta": -0.045
+            }
+          },
+          {
+            "id": 669394,
+            "name": "Jake Burger",
+            "pa": 279,
+            "avg": ".247",
+            "obp": ".305",
+            "slg": ".439",
+            "ops": ".744",
+            "hr": 12,
+            "so": 73,
+            "bb": 21,
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 23,
+              "hits": 10,
+              "hr": 2,
+              "so": 5,
+              "bb": 4,
+              "avg": ".435",
+              "obp": ".500",
+              "ops": "1.283",
+              "streak_status": "hot",
+              "ops_delta": 0.539
+            }
+          },
+          {
+            "id": 677649,
+            "name": "Ezequiel Duran",
+            "pa": 230,
+            "avg": ".281",
+            "obp": ".332",
+            "slg": ".429",
+            "ops": ".761",
+            "hr": 4,
+            "so": 59,
+            "bb": 16,
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 9,
+              "hr": 0,
+              "so": 13,
+              "bb": 0,
+              "avg": ".290",
+              "obp": ".312",
+              "ops": ".667",
+              "streak_status": "cool",
+              "ops_delta": -0.094
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.3245,
+        "avg_slg": 0.4465,
+        "avg_ops": 0.7710000000000001,
+        "batters": [
+          {
+            "id": 668885,
+            "name": "Austin Martin",
+            "position": "RF",
+            "pa": 232,
+            "avg": ".239",
+            "obp": ".349",
+            "slg": ".320",
+            "ops": ".669",
+            "hr": 2,
+            "so": 42,
+            "bb": 29,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 72,
+              "avg": ".264",
+              "obp": ".426",
+              "ops": ".801",
+              "hr": 1,
+              "so": 13,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 15,
+              "hits": 1,
+              "hr": 0,
+              "so": 7,
+              "bb": 3,
+              "avg": ".067",
+              "obp": ".300",
+              "ops": ".367",
+              "streak_status": "cold",
+              "ops_delta": -0.302
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 621439,
+            "name": "Byron Buxton",
+            "position": "CF",
+            "pa": 274,
+            "avg": ".276",
+            "obp": ".336",
+            "slg": ".600",
+            "ops": ".936",
+            "hr": 22,
+            "so": 72,
+            "bb": 20,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 69,
+              "avg": ".290",
+              "obp": ".347",
+              "ops": ".811",
+              "hr": 3,
+              "so": 19,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 11,
+              "hr": 4,
+              "so": 8,
+              "bb": 2,
+              "avg": ".440",
+              "obp": ".481",
+              "ops": "1.521",
+              "streak_status": "hot",
+              "ops_delta": 0.585
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 665019,
+            "name": "Kody Clemens",
+            "position": "1B",
+            "pa": 229,
+            "avg": ".251",
+            "obp": ".317",
+            "slg": ".483",
+            "ops": ".800",
+            "hr": 10,
+            "so": 50,
+            "bb": 15,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 46,
+              "avg": ".261",
+              "obp": ".306",
+              "ops": ".741",
+              "hr": 2,
+              "so": 9,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 8,
+              "hr": 2,
+              "so": 4,
+              "bb": 1,
+              "avg": ".320",
+              "obp": ".346",
+              "ops": ".946",
+              "streak_status": "warm",
+              "ops_delta": 0.146
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 668904,
+            "name": "Royce Lewis",
+            "position": "3B",
+            "pa": 152,
+            "avg": ".211",
+            "obp": ".296",
+            "slg": ".383",
+            "ops": ".679",
+            "hr": 6,
+            "so": 41,
+            "bb": 15,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 37,
+              "avg": ".216",
+              "obp": ".310",
+              "ops": ".742",
+              "hr": 2,
+              "so": 9,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 11,
+              "hr": 3,
+              "so": 3,
+              "bb": 2,
+              "avg": ".423",
+              "obp": ".448",
+              "ops": "1.294",
+              "streak_status": "hot",
+              "ops_delta": 0.615
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": true,
+      "home_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 4,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 1,
+        "weighted_avg": 0.0,
+        "weighted_ops": 0.0,
+        "batters_with_history": 2,
+        "has_meaningful_data": false
+      },
+      "home_platoon": {
+        "has_data": false
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "L",
+        "total_ab": 224,
+        "weighted_ops": 0.782,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.903,
+        "avg_ops_delta": 0.135,
+        "hot_count": 2,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 1.032,
+        "avg_ops_delta": 0.261,
+        "hot_count": 3,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 106,
+        "label": "Hitter-friendly",
+        "tier": "hitter"
+      },
+      "weather": {
+        "indoor": true,
+        "temp_f": 72,
+        "wind_mph": 0,
+        "precip_chance": 0,
+        "wind_dir": null,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 0,
+          "label": "indoor"
+        }
+      },
+      "away_pitcher_score": 50.0,
+      "home_pitcher_score": 40.0,
+      "home_lineup_threat": 56.0,
+      "away_lineup_threat": 56.0,
+      "nrfi": {
+        "score": 16.1,
+        "tier": "FADE",
+        "pitcher_component": 42.0,
+        "lineup_component": 44.0,
+        "fi_adj": 2.8,
+        "bvp_adj": 0.0,
+        "platoon_adj": -4.0,
+        "streak_adj": -9.0,
+        "park_adj": -3.6,
+        "weather_adj": 3,
+        "team_tendency_adj": -3.0,
+        "rest_adj": 0.0,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": 0.0,
+      "home_fi_adj": 2.8,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": 0.0,
+      "home_platoon_adj": 0.0,
+      "away_platoon_adj": -4.0,
+      "home_streak_adj": -3.0,
+      "away_streak_adj": -6,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.0,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 0,
+        "games_played": 0,
+        "relief_appearances": 0
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 14,
+        "games_played": 14,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": 44.72,
+          "home_rating": 25.86,
+          "edge": 18.9,
+          "pick": "MIN",
+          "pick_full": "Minnesota Twins",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": 0.0,
+          "home_pitch_eff_adj": -4.5,
+          "units": 4.5
+        },
+        "spread": {
+          "edge": 18.9,
+          "abs_edge": 18.9,
+          "pick": "MIN",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 5.6,
+          "home_runs_proj": 2.4,
+          "away_runs_proj": 2.9,
+          "env_adj": 0.05,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.6
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.1
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.6
+            },
+            "5.5": {
+              "lean": "PUSH",
+              "confidence": "TOSS-UP",
+              "diff": 0.1
+            }
+          },
+          "units": 2.5
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 822724,
+      "matchup": "KC @ WSH",
+      "game_time": "2026-06-15T22:45:00Z",
+      "venue": "Nationals Park",
+      "is_indoor": false,
+      "away_team": "Kansas City Royals",
+      "home_team": "Washington Nationals",
+      "away_abbr": "KC",
+      "home_abbr": "WSH",
+      "away_pitcher": "Mitch Spence",
+      "home_pitcher": "Andrew Alvarez",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "L",
+      "away_pitcher_stats": {
+        "era": 13.5,
+        "whip": 2.25,
+        "k9": 6.75,
+        "bb9": 11.25,
+        "hr9": 2.25,
+        "ip": 4.0,
+        "hits": 4.0,
+        "walks": 5.0,
+        "strikeouts": 3.0,
+        "games_started": 0.0,
+        "games_played": 1.0,
+        "runs": 6.0,
+        "earned_runs": 6.0
+      },
+      "home_pitcher_stats": {
+        "era": 3.7,
+        "whip": 1.44,
+        "k9": 9.62,
+        "bb9": 4.07,
+        "hr9": 0.74,
+        "ip": 24.1,
+        "hits": 24.0,
+        "walks": 11.0,
+        "strikeouts": 26.0,
+        "games_started": 2.0,
+        "games_played": 7.0,
+        "runs": 10.0,
+        "earned_runs": 10.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 7.88,
+        "fi_runs": 7,
+        "fi_hits": 11,
+        "fi_hits_per_fi": 1.375,
+        "fi_starts": 8,
+        "fi_clean": 5,
+        "fi_clean_pct": 0.625
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 1.0,
+        "fi_runs": 1,
+        "fi_hits": 3,
+        "fi_hits_per_fi": 0.444,
+        "fi_starts": 7,
+        "fi_clean": 6,
+        "fi_clean_pct": 0.889
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 16,
+        "away_games": 14,
+        "home_scored": 4,
+        "away_scored": 4,
+        "home_score_rate": 0.25,
+        "away_score_rate": 0.286,
+        "overall_score_rate": 0.267
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 15,
+        "away_games": 15,
+        "home_scored": 5,
+        "away_scored": 7,
+        "home_score_rate": 0.333,
+        "away_score_rate": 0.467,
+        "overall_score_rate": 0.4
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.259,
+        "away_team_away_rate_shrunk": 0.412,
+        "blended_rate": 0.335,
+        "adj": -2.0
+      },
+      "away_rest": {
+        "has_data": false
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 6,
+        "last_pitches": 90,
+        "last_start_date": "2026-06-09"
+      },
+      "away_pitch_eff": {
+        "has_data": false
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 2,
+        "starts_lookback": 2,
+        "avg_pitches_per_inning": 20.04,
+        "median_pitches_per_inning": 20.04,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 1.0
+      },
+      "home_top_order": {
+        "avg_obp": 0.35425,
+        "avg_slg": 0.50175,
+        "avg_ops": 0.8560000000000001,
+        "batters": [
+          {
+            "id": 695578,
+            "name": "James Wood",
+            "position": "DH",
+            "pa": 336,
+            "avg": ".281",
+            "obp": ".414",
+            "slg": ".558",
+            "ops": ".972",
+            "hr": 20,
+            "so": 98,
+            "bb": 58,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 182,
+              "avg": ".291",
+              "obp": ".434",
+              "ops": "1.027",
+              "hr": 15,
+              "so": 65,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 11,
+              "hr": 3,
+              "so": 6,
+              "bb": 5,
+              "avg": ".407",
+              "obp": ".500",
+              "ops": "1.278",
+              "streak_status": "hot",
+              "ops_delta": 0.306
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 671277,
+            "name": "Luis Garc\u00eda Jr.",
+            "position": "1B",
+            "pa": 229,
+            "avg": ".259",
+            "obp": ".284",
+            "slg": ".464",
+            "ops": ".748",
+            "hr": 9,
+            "so": 36,
+            "bb": 8,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 195,
+              "avg": ".256",
+              "obp": ".284",
+              "ops": ".740",
+              "hr": 7,
+              "so": 29,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 6,
+              "hr": 2,
+              "so": 6,
+              "bb": 0,
+              "avg": ".240",
+              "obp": ".240",
+              "ops": ".800",
+              "streak_status": "warm",
+              "ops_delta": 0.052
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 678554,
+            "name": "Curtis Mead",
+            "position": "3B",
+            "pa": 199,
+            "avg": ".234",
+            "obp": ".342",
+            "slg": ".468",
+            "ops": ".810",
+            "hr": 10,
+            "so": 34,
+            "bb": 25,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 97,
+              "avg": ".227",
+              "obp": ".348",
+              "ops": ".812",
+              "hr": 6,
+              "so": 20,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 25,
+              "hits": 4,
+              "hr": 2,
+              "so": 4,
+              "bb": 2,
+              "avg": ".160",
+              "obp": ".250",
+              "ops": ".690",
+              "streak_status": "cool",
+              "ops_delta": -0.12
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 682928,
+            "name": "CJ Abrams",
+            "position": "SS",
+            "pa": 300,
+            "avg": ".290",
+            "obp": ".377",
+            "slg": ".517",
+            "ops": ".894",
+            "hr": 14,
+            "so": 61,
+            "bb": 29,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 182,
+              "avg": ".297",
+              "obp": ".395",
+              "ops": ".950",
+              "hr": 12,
+              "so": 40,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 8,
+              "hr": 1,
+              "so": 7,
+              "bb": 0,
+              "avg": ".276",
+              "obp": ".276",
+              "ops": ".655",
+              "streak_status": "cold",
+              "ops_delta": -0.239
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.34550000000000003,
+        "avg_slg": 0.399,
+        "avg_ops": 0.7444999999999999,
+        "batters": [
+          {
+            "id": 657041,
+            "name": "Lane Thomas",
+            "position": "CF",
+            "pa": 164,
+            "avg": ".224",
+            "obp": ".354",
+            "slg": ".321",
+            "ops": ".675",
+            "hr": 3,
+            "so": 36,
+            "bb": 26,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 65,
+              "avg": ".246",
+              "obp": ".375",
+              "ops": ".713",
+              "hr": 1,
+              "so": 16,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 21,
+              "hits": 5,
+              "hr": 1,
+              "so": 7,
+              "bb": 3,
+              "avg": ".238",
+              "obp": ".360",
+              "ops": ".741",
+              "streak_status": "warm",
+              "ops_delta": 0.066
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 677951,
+            "name": "Bobby Witt Jr.",
+            "position": "SS",
+            "pa": 321,
+            "avg": ".287",
+            "obp": ".358",
+            "slg": ".455",
+            "ops": ".813",
+            "hr": 9,
+            "so": 56,
+            "bb": 32,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 62,
+              "avg": ".323",
+              "obp": ".391",
+              "ops": ".923",
+              "hr": 1,
+              "so": 5,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 9,
+              "hr": 0,
+              "so": 4,
+              "bb": 2,
+              "avg": ".310",
+              "obp": ".355",
+              "ops": ".734",
+              "streak_status": "cool",
+              "ops_delta": -0.079
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 695506,
+            "name": "Jac Caglianone",
+            "position": "RF",
+            "pa": 244,
+            "avg": ".269",
+            "obp": ".344",
+            "slg": ".438",
+            "ops": ".782",
+            "hr": 8,
+            "so": 73,
+            "bb": 22,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 63,
+              "avg": ".286",
+              "obp": ".318",
+              "ops": ".794",
+              "hr": 3,
+              "so": 20,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 24,
+              "hits": 10,
+              "hr": 2,
+              "so": 9,
+              "bb": 3,
+              "avg": ".417",
+              "obp": ".481",
+              "ops": "1.190",
+              "streak_status": "hot",
+              "ops_delta": 0.408
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          },
+          {
+            "id": 672580,
+            "name": "Maikel Garcia",
+            "position": "3B",
+            "pa": 279,
+            "avg": ".268",
+            "obp": ".326",
+            "slg": ".382",
+            "ops": ".708",
+            "hr": 3,
+            "so": 43,
+            "bb": 23,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 48,
+              "avg": ".354",
+              "obp": ".436",
+              "ops": ".978",
+              "hr": 2,
+              "so": 7,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 8,
+              "hr": 0,
+              "so": 8,
+              "bb": 2,
+              "avg": ".276",
+              "obp": ".323",
+              "ops": ".702",
+              "streak_status": "neutral",
+              "ops_delta": -0.006
+            },
+            "bvp": {
+              "ab": 0,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": null,
+              "ops": null,
+              "has_data": false
+            }
+          }
+        ]
+      },
+      "home_real_lineup": true,
+      "away_real_lineup": true,
+      "home_bvp": {
+        "total_ab": 1,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": 0.0,
+        "weighted_ops": 0.0,
+        "batters_with_history": 1,
+        "has_meaningful_data": false
+      },
+      "away_bvp": {
+        "total_ab": 0,
+        "total_hits": 0,
+        "total_hr": 0,
+        "total_so": 0,
+        "weighted_avg": null,
+        "weighted_ops": null,
+        "batters_with_history": 0,
+        "has_meaningful_data": false
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 656,
+        "weighted_ops": 0.889,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "L",
+        "total_ab": 238,
+        "weighted_ops": 0.843,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.856,
+        "avg_ops_delta": -0.0,
+        "hot_count": 2,
+        "cold_count": 2,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.842,
+        "avg_ops_delta": 0.097,
+        "hot_count": 2,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 99,
+        "label": "Neutral",
+        "tier": "neutral"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 73.4,
+        "wind_mph": 6.1,
+        "precip_chance": 0,
+        "wind_dir": 303,
+        "wind_effect": {
+          "component_out": 5.2,
+          "component_in": 0,
+          "label": "blowing out"
+        }
+      },
+      "away_pitcher_score": 24.0,
+      "home_pitcher_score": 47.8,
+      "home_lineup_threat": 77.0,
+      "away_lineup_threat": 61.0,
+      "nrfi": {
+        "score": 4.5,
+        "tier": "FADE",
+        "pitcher_component": 28.8,
+        "lineup_component": 26.2,
+        "fi_adj": 2.9,
+        "bvp_adj": 0.0,
+        "platoon_adj": -10.0,
+        "streak_adj": -1.0,
+        "park_adj": 0.6,
+        "weather_adj": 0.0,
+        "team_tendency_adj": -2.0,
+        "rest_adj": 0.5,
+        "bullpen_adj": -6.0
+      },
+      "away_fi_adj": -3.2,
+      "home_fi_adj": 6.1,
+      "home_bvp_adj": 0.0,
+      "away_bvp_adj": 0.0,
+      "home_platoon_adj": -6,
+      "away_platoon_adj": -4.0,
+      "home_streak_adj": 0.0,
+      "away_streak_adj": -1.0,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.5,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 0,
+        "games_played": 1,
+        "relief_appearances": 1
+      },
+      "home_bullpen": {
+        "is_bullpen": true,
+        "reason": "primary reliever (2 GS, 5 relief apps)",
+        "games_started": 2,
+        "games_played": 7,
+        "relief_appearances": 5
+      },
+      "has_bullpen_game": true,
+      "f5": {
+        "ml": {
+          "away_rating": 16.919999999999998,
+          "home_rating": 30.589999999999996,
+          "edge": -13.7,
+          "pick": "WSH",
+          "pick_full": "Washington Nationals",
+          "confidence": "LEAN",
+          "has_bullpen_game": true,
+          "away_pitch_eff_adj": 0.0,
+          "home_pitch_eff_adj": -1.7,
+          "units": 3.5
+        },
+        "spread": {
+          "edge": -13.7,
+          "abs_edge": 13.7,
+          "pick": "WSH",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 6.9,
+          "home_runs_proj": 3.8,
+          "away_runs_proj": 2.5,
+          "env_adj": -0.05,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "SLIGHT",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 2.9
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 2.4
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.9
+            },
+            "5.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.4
+            }
+          },
+          "units": 5.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    },
+    {
+      "game_pk": 824666,
+      "matchup": "COL @ CHC",
+      "game_time": "2026-06-16T00:05:00Z",
+      "venue": "Wrigley Field",
+      "is_indoor": false,
+      "away_team": "Colorado Rockies",
+      "home_team": "Chicago Cubs",
+      "away_abbr": "COL",
+      "home_abbr": "CHC",
+      "away_pitcher": "Michael Lorenzen",
+      "home_pitcher": "Shota Imanaga",
+      "away_pitcher_hand": "R",
+      "home_pitcher_hand": "L",
+      "away_pitcher_stats": {
+        "era": 7.54,
+        "whip": 1.9,
+        "k9": 7.54,
+        "bb9": 3.29,
+        "hr9": 1.51,
+        "ip": 65.2,
+        "hits": 101.0,
+        "walks": 24.0,
+        "strikeouts": 55.0,
+        "games_started": 14.0,
+        "games_played": 15.0,
+        "runs": 61.0,
+        "earned_runs": 55.0
+      },
+      "home_pitcher_stats": {
+        "era": 4.44,
+        "whip": 1.06,
+        "k9": 9.0,
+        "bb9": 2.33,
+        "hr9": 1.89,
+        "ip": 81.0,
+        "hits": 65.0,
+        "walks": 21.0,
+        "strikeouts": 81.0,
+        "games_started": 14.0,
+        "games_played": 14.0,
+        "runs": 41.0,
+        "earned_runs": 40.0
+      },
+      "away_fi": {
+        "has_data": true,
+        "fi_era": 5.79,
+        "fi_runs": 9,
+        "fi_hits": 16,
+        "fi_hits_per_fi": 1.143,
+        "fi_starts": 14,
+        "fi_clean": 11,
+        "fi_clean_pct": 0.786
+      },
+      "home_fi": {
+        "has_data": true,
+        "fi_era": 6.43,
+        "fi_runs": 10,
+        "fi_hits": 11,
+        "fi_hits_per_fi": 0.786,
+        "fi_starts": 14,
+        "fi_clean": 10,
+        "fi_clean_pct": 0.714
+      },
+      "home_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 12,
+        "away_games": 18,
+        "home_scored": 1,
+        "away_scored": 5,
+        "home_score_rate": 0.083,
+        "away_score_rate": 0.278,
+        "overall_score_rate": 0.2
+      },
+      "away_team_tendency": {
+        "has_data": true,
+        "games": 30,
+        "home_games": 15,
+        "away_games": 15,
+        "home_scored": 8,
+        "away_scored": 2,
+        "home_score_rate": 0.533,
+        "away_score_rate": 0.133,
+        "overall_score_rate": 0.333
+      },
+      "team_tendency_meta": {
+        "has_data": true,
+        "league_baseline": 0.27,
+        "home_team_home_rate_shrunk": 0.161,
+        "away_team_away_rate_shrunk": 0.223,
+        "blended_rate": 0.192,
+        "adj": 2.3
+      },
+      "away_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 84,
+        "last_start_date": "2026-06-10"
+      },
+      "home_rest": {
+        "has_data": true,
+        "days_rest": 5,
+        "last_pitches": 90,
+        "last_start_date": "2026-06-10"
+      },
+      "away_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 19.02,
+        "median_pitches_per_inning": 18.1,
+        "high_inefficiency_starts": 4,
+        "high_inefficiency_rate": 0.5
+      },
+      "home_pitch_eff": {
+        "has_data": true,
+        "starts_sample": 8,
+        "starts_lookback": 8,
+        "avg_pitches_per_inning": 15.33,
+        "median_pitches_per_inning": 14.86,
+        "high_inefficiency_starts": 2,
+        "high_inefficiency_rate": 0.25
+      },
+      "home_top_order": {
+        "avg_obp": 0.34775,
+        "avg_slg": 0.42724999999999996,
+        "avg_ops": 0.775,
+        "batters": [
+          {
+            "id": 691718,
+            "name": "Pete Crow-Armstrong",
+            "position": "CF",
+            "pa": 304,
+            "avg": ".267",
+            "obp": ".343",
+            "slg": ".463",
+            "ops": ".806",
+            "hr": 12,
+            "so": 77,
+            "bb": 24,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 184,
+              "avg": ".261",
+              "obp": ".332",
+              "ops": ".816",
+              "hr": 9,
+              "so": 48,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 31,
+              "hits": 10,
+              "hr": 1,
+              "so": 9,
+              "bb": 1,
+              "avg": ".323",
+              "obp": ".344",
+              "ops": ".924",
+              "streak_status": "warm",
+              "ops_delta": 0.118
+            },
+            "bvp": {
+              "ab": 3,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".333",
+              "ops": "1.333",
+              "has_data": true
+            }
+          },
+          {
+            "id": 608324,
+            "name": "Alex Bregman",
+            "position": "3B",
+            "pa": 323,
+            "avg": ".250",
+            "obp": ".334",
+            "slg": ".356",
+            "ops": ".690",
+            "hr": 6,
+            "so": 53,
+            "bb": 32,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 215,
+              "avg": ".251",
+              "obp": ".324",
+              "ops": ".701",
+              "hr": 5,
+              "so": 38,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 7,
+              "hr": 1,
+              "so": 3,
+              "bb": 3,
+              "avg": ".269",
+              "obp": ".355",
+              "ops": ".778",
+              "streak_status": "warm",
+              "ops_delta": 0.088
+            },
+            "bvp": {
+              "ab": 7,
+              "hits": 1,
+              "hr": 0,
+              "so": 1,
+              "bb": 3,
+              "avg": ".143",
+              "ops": ".560",
+              "has_data": true
+            }
+          },
+          {
+            "id": 683737,
+            "name": "Michael Busch",
+            "position": "1B",
+            "pa": 313,
+            "avg": ".253",
+            "obp": ".377",
+            "slg": ".412",
+            "ops": ".789",
+            "hr": 8,
+            "so": 71,
+            "bb": 47,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 182,
+              "avg": ".258",
+              "obp": ".379",
+              "ops": ".808",
+              "hr": 6,
+              "so": 48,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 8,
+              "hr": 2,
+              "so": 6,
+              "bb": 4,
+              "avg": ".308",
+              "obp": ".419",
+              "ops": ".996",
+              "streak_status": "hot",
+              "ops_delta": 0.207
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 664023,
+            "name": "Ian Happ",
+            "position": "LF",
+            "pa": 300,
+            "avg": ".224",
+            "obp": ".337",
+            "slg": ".478",
+            "ops": ".815",
+            "hr": 16,
+            "so": 96,
+            "bb": 41,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "R",
+              "ab": 177,
+              "avg": ".254",
+              "obp": ".381",
+              "ops": ".918",
+              "hr": 12,
+              "so": 67,
+              "bat_side": "S"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 26,
+              "hits": 4,
+              "hr": 2,
+              "so": 10,
+              "bb": 3,
+              "avg": ".154",
+              "obp": ".233",
+              "ops": ".695",
+              "streak_status": "cool",
+              "ops_delta": -0.12
+            },
+            "bvp": {
+              "ab": 12,
+              "hits": 3,
+              "hr": 2,
+              "so": 4,
+              "bb": 3,
+              "avg": ".250",
+              "ops": "1.233",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "away_top_order": {
+        "avg_obp": 0.34525,
+        "avg_slg": 0.44525000000000003,
+        "avg_ops": 0.7905,
+        "batters": [
+          {
+            "id": 650489,
+            "name": "Willi Castro",
+            "position": "2B",
+            "pa": 234,
+            "avg": ".278",
+            "obp": ".350",
+            "slg": ".402",
+            "ops": ".752",
+            "hr": 5,
+            "so": 58,
+            "bb": 21,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 68,
+              "avg": ".338",
+              "obp": ".384",
+              "ops": ".825",
+              "hr": 1,
+              "so": 16,
+              "bat_side": "S"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 30,
+              "hits": 12,
+              "hr": 2,
+              "so": 2,
+              "bb": 3,
+              "avg": ".400",
+              "obp": ".455",
+              "ops": "1.088",
+              "streak_status": "hot",
+              "ops_delta": 0.336
+            },
+            "bvp": {
+              "ab": 9,
+              "hits": 0,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 671289,
+            "name": "Tyler Freeman",
+            "position": "RF",
+            "pa": 170,
+            "avg": ".270",
+            "obp": ".349",
+            "slg": ".378",
+            "ops": ".727",
+            "hr": 3,
+            "so": 20,
+            "bb": 8,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 42,
+              "avg": ".214",
+              "obp": ".267",
+              "ops": ".648",
+              "hr": 2,
+              "so": 9,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 24,
+              "hits": 8,
+              "hr": 1,
+              "so": 3,
+              "bb": 3,
+              "avg": ".333",
+              "obp": ".429",
+              "ops": "1.054",
+              "streak_status": "hot",
+              "ops_delta": 0.327
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 0,
+              "hr": 0,
+              "so": 1,
+              "bb": 0,
+              "avg": ".000",
+              "ops": ".000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 681198,
+            "name": "TJ Rumfield",
+            "position": "1B",
+            "pa": 277,
+            "avg": ".280",
+            "obp": ".361",
+            "slg": ".465",
+            "ops": ".826",
+            "hr": 9,
+            "so": 40,
+            "bb": 27,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 63,
+              "avg": ".270",
+              "obp": ".343",
+              "ops": ".708",
+              "hr": 1,
+              "so": 8,
+              "bat_side": "L"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 27,
+              "hits": 9,
+              "hr": 2,
+              "so": 3,
+              "bb": 4,
+              "avg": ".333",
+              "obp": ".438",
+              "ops": "1.215",
+              "streak_status": "hot",
+              "ops_delta": 0.389
+            },
+            "bvp": {
+              "ab": 2,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 0,
+              "avg": ".500",
+              "ops": "1.000",
+              "has_data": true
+            }
+          },
+          {
+            "id": 696100,
+            "name": "Hunter Goodman",
+            "position": "DH",
+            "pa": 280,
+            "avg": ".250",
+            "obp": ".321",
+            "slg": ".536",
+            "ops": ".857",
+            "hr": 20,
+            "so": 95,
+            "bb": 23,
+            "platoon": {
+              "has_data": true,
+              "vs_hand": "L",
+              "ab": 77,
+              "avg": ".260",
+              "obp": ".313",
+              "ops": ".832",
+              "hr": 5,
+              "so": 35,
+              "bat_side": "R"
+            },
+            "recent": {
+              "has_data": true,
+              "games": 7,
+              "ab": 29,
+              "hits": 9,
+              "hr": 4,
+              "so": 11,
+              "bb": 3,
+              "avg": ".310",
+              "obp": ".375",
+              "ops": "1.134",
+              "streak_status": "hot",
+              "ops_delta": 0.277
+            },
+            "bvp": {
+              "ab": 1,
+              "hits": 1,
+              "hr": 0,
+              "so": 0,
+              "bb": 1,
+              "avg": "1.000",
+              "ops": "2.000",
+              "has_data": true
+            }
+          }
+        ]
+      },
+      "home_real_lineup": false,
+      "away_real_lineup": true,
+      "home_bvp": {
+        "total_ab": 24,
+        "total_hits": 5,
+        "total_hr": 2,
+        "total_so": 6,
+        "weighted_avg": 0.208,
+        "weighted_ops": 0.946,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "away_bvp": {
+        "total_ab": 14,
+        "total_hits": 2,
+        "total_hr": 0,
+        "total_so": 1,
+        "weighted_avg": 0.143,
+        "weighted_ops": 0.286,
+        "batters_with_history": 4,
+        "has_meaningful_data": true
+      },
+      "home_platoon": {
+        "has_data": true,
+        "vs_hand": "R",
+        "total_ab": 758,
+        "weighted_ops": 0.805,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "away_platoon": {
+        "has_data": true,
+        "vs_hand": "L",
+        "total_ab": 250,
+        "weighted_ops": 0.768,
+        "advantage_count": 3,
+        "disadvantage_count": 1,
+        "batters_with_data": 4
+      },
+      "home_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 0.848,
+        "avg_ops_delta": 0.073,
+        "hot_count": 3,
+        "cold_count": 1,
+        "total_with_data": 4
+      },
+      "away_streaks": {
+        "has_data": true,
+        "avg_recent_ops": 1.123,
+        "avg_ops_delta": 0.332,
+        "hot_count": 4,
+        "cold_count": 0,
+        "total_with_data": 4
+      },
+      "park": {
+        "factor": 103,
+        "label": "Hitter-friendly",
+        "tier": "hitter"
+      },
+      "weather": {
+        "indoor": false,
+        "temp_f": 60.2,
+        "wind_mph": 6.2,
+        "precip_chance": 1,
+        "wind_dir": 210,
+        "wind_effect": {
+          "component_out": 0,
+          "component_in": 6.2,
+          "label": "blowing in"
+        }
+      },
+      "away_pitcher_score": 9.0,
+      "home_pitcher_score": 57.0,
+      "home_lineup_threat": 61.0,
+      "away_lineup_threat": 69.0,
+      "nrfi": {
+        "score": 2.6,
+        "tier": "FADE",
+        "pitcher_component": 18.6,
+        "lineup_component": 32.6,
+        "fi_adj": 3.7,
+        "bvp_adj": -5.1,
+        "platoon_adj": -8.0,
+        "streak_adj": -8.0,
+        "park_adj": -1.8,
+        "weather_adj": 3.0,
+        "team_tendency_adj": 2.3,
+        "rest_adj": 0.0,
+        "bullpen_adj": 0.0
+      },
+      "away_fi_adj": 2.8,
+      "home_fi_adj": 0.9,
+      "home_bvp_adj": -8.8,
+      "away_bvp_adj": 3.7,
+      "home_platoon_adj": -4.0,
+      "away_platoon_adj": -4.0,
+      "home_streak_adj": -2.0,
+      "away_streak_adj": -6,
+      "away_rest_adj": 0.0,
+      "home_rest_adj": 0.0,
+      "away_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 14,
+        "games_played": 15,
+        "relief_appearances": 1
+      },
+      "home_bullpen": {
+        "is_bullpen": false,
+        "reason": null,
+        "games_started": 14,
+        "games_played": 14,
+        "relief_appearances": 0
+      },
+      "has_bullpen_game": false,
+      "f5": {
+        "ml": {
+          "away_rating": -2.4000000000000004,
+          "home_rating": 43.83,
+          "edge": -46.2,
+          "pick": "CHC",
+          "pick_full": "Chicago Cubs",
+          "confidence": "STRONG",
+          "has_bullpen_game": false,
+          "away_pitch_eff_adj": -4.5,
+          "home_pitch_eff_adj": 0.0,
+          "units": 5.0
+        },
+        "spread": {
+          "edge": -46.2,
+          "abs_edge": 46.2,
+          "pick": "CHC",
+          "covers_half": false,
+          "covers_1_5": false,
+          "recommended_line": 0,
+          "recommended_label": "Disabled",
+          "confidence": "DISABLED"
+        },
+        "total": {
+          "projected_total": 6.4,
+          "home_runs_proj": 4.1,
+          "away_runs_proj": 2.5,
+          "env_adj": -0.1,
+          "primary_line": 4.5,
+          "lean": "OVER",
+          "confidence": "STRONG",
+          "line_calls": {
+            "4.0": {
+              "lean": "OVER",
+              "confidence": "STRONG",
+              "diff": 2.4
+            },
+            "4.5": {
+              "lean": "OVER",
+              "confidence": "STRONG",
+              "diff": 1.9
+            },
+            "5.0": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 1.4
+            },
+            "5.5": {
+              "lean": "OVER",
+              "confidence": "SLIGHT",
+              "diff": 0.9
+            }
+          },
+          "units": 4.0
+        }
+      },
+      "odds": {
+        "has_odds": false
+      }
+    }
+  ]
+}
